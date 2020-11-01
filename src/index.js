@@ -211,7 +211,7 @@ function Shows({ shows, setShows, colors, ...props }) {
                 ))}
                 <input
                     type='text'
-                    class='add-new'
+                    class='show add-new'
                     placeholder='Add +'
                     value={add}
                     onChange={e => setAdd(() => e.target.value)}
@@ -224,7 +224,7 @@ function Shows({ shows, setShows, colors, ...props }) {
 }
 
 function WheelPage() {
-    const [shows, setShows] = useState(() => ['Jojo', 'No Game No Lige', 'Kaiji', 'Your Lie In April', 'Want 2 Eat ur Pancreas', 'Kill la Kill', 'Fate', 'No Gun No Lige'].map(
+    const [shows, setShows] = useState(() => ['Fat Zero', 'Kaiji', 'Haikyuu', 'Panty & Stocking'].map(
         name => ({
             name,
             uuid: uuidv4(),
