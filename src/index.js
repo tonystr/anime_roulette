@@ -192,17 +192,21 @@ function Shows({ shows, setShows, colors, ...props }) {
             <div class='shows-list'>
                 <h2>Shows</h2>
                 {shows.map((show, i) => (
-                    <div key={show.uuid}>
+                    <div class='show' key={show.uuid}>
                         <input
                             type='text'
                             defaultValue={show.name}
                             onChange={e => setShows(prev => [
                                 ...prev.slice(0, i),
                                 { ...show, name: e.target.value },
-                                ...prev.slice(i + 1)]
-                            )}
-                            style={{ borderColor: pickColor(i, colors, shows) }}
+                                ...prev.slice(i + 1)
+                            ])}
+                            style={{ borderLeftColor: pickColor(i, colors, shows) }}
                         />
+                        <button class='delete' onClick={e => setShows(prev => [
+                            ...prev.slice(0, i),
+                            ...prev.slice(i + 1)
+                        ])}>×</button>
                     </div>
                 ))}
                 <input
