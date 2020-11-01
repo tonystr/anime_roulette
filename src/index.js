@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { ReactComponent as ArrowDown } from './arrow_down.svg';
+import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 
 function pickColor(i, colors, shows) {
     return colors[i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2];
+}
+
+function choose(...args) {
+    return args[Math.floor(Math.random() * args.length)];
 }
 
 const extendContext = (ctx, size) => ({
@@ -56,7 +61,7 @@ const extendContext = (ctx, size) => ({
             this.drawTextRotated(
                 half + Math.cos(angle) * half / 1.9,
                 half + Math.sin(angle) * half / 1.9,
-                shows[i],
+                shows[i].name,
                 angle
             );
         }
@@ -74,30 +79,27 @@ class Rotate {
     }
 }
 
-function Wheel({ shows }) {
+function Wheel({ shows, colors, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [rotate, setRotate] = useState(null);
-    const [arrowColor, setArrowColor] = useState('#63787d');
-
-    const colors = [
-        '#caa05a',
-        '#ae6a47',
-        '#8b4049',
-        '#543344',
-        '#515262',
-        '#63787d',
-        '#8ea091',
-    ];
+    const [arrowColor, setArrowColor] = useState('#afb8c6');
 
     // Draw wheel
     useEffect(() => {
         if (!canvasRef || !canvasRef.current || (rotate && rotate.active)) return;
 
+        // Draw wheel
         const ctx = extendContext(canvasRef.current.getContext('2d'), size);
         ctx.drawWheel(shows, colors, rotate ? rotate.offset + rotate.rng * Math.PI * 2 : 0);
 
-    }, [canvasRef, size, rotate]);
+        // Set Arrow color with default state
+        if (!rotate) {
+            const targetIndex = Math.floor(.75 * shows.length);
+            setArrowColor(() => pickColor(targetIndex, colors, shows));
+        }
+
+    }, [canvasRef, size, rotate, shows, colors]);
 
     // Resize
     useEffect(() => {
@@ -115,7 +117,7 @@ function Wheel({ shows }) {
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [canvasRef, shows, colors]);
+    }, [canvasRef, size]);
 
     // Rotation
     useEffect(() => {
@@ -149,11 +151,11 @@ function Wheel({ shows }) {
             const interval = setInterval(handleRotate, 10);
             return () => clearInterval(interval);
         }
-    }, [rotate, canvasRef, shows, colors]);
+    }, [rotate, canvasRef, shows, colors, size]);
 
     return (
-        <>
-            <div className="wheel-box">
+        <div {...props} id='wheel-width'>
+            <div className='wheel-box'>
                 <div className='arrow'>
                     <ArrowDown style={{ fill: arrowColor }} />
                 </div>
@@ -165,24 +167,65 @@ function Wheel({ shows }) {
                     height={size}
                 />
             </div>
-            <div className="result">{rotate ? rotate.winner || 'Spinning...' : ''}</div>
-        </>
+            <div className='result'>{rotate ? rotate.winner.name || 'Spinning...' : ''}</div>
+        </div>
+    );
+}
+
+function Shows({ shows, setShows, colors, ...props }) {
+
+    return (
+        <div {...props}>
+            {shows.map((show, i) => (
+                <div key={show.uuid}>
+                    <input
+                        type='text'
+                        defaultValue={show.name}
+                        onChange={e => setShows(prev => [
+                            ...prev.slice(0, i),
+                            { ...show, name: e.target.value }, 
+                            ...prev.slice(i + 1)]
+                        )}
+                        style={{ color: pickColor(i, colors, shows) }}
+                    />
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function WheelPage() {
+    const [shows, setShows] = useState(() => ['Jojo', 'No Game No Lige', 'Kaiji', 'Your Lie In April', 'Want 2 Eat ur Pancreas', 'Kill la Kill', 'Fate', 'No Gun No Lige'].map(
+        name => ({
+            name,
+            uuid: uuidv4(),
+            owner: choose('Tony', 'Espen', 'Jørgen', 'Sigurd')
+        })
+    ));
+
+    const colors = [
+        '#caa05a',
+        '#ae6a47',
+        '#8b4049',
+        '#543344',
+        '#515262',
+        '#63787d',
+        '#8ea091',
+        '#8B9863'
+    ];
+
+    return (
+        <div id='home'>
+            <Shows className='left shows'   shows={shows} setShows={setShows} colors={colors} />
+            <Wheel className='center wheel' shows={shows} colors={colors} />
+            <div className='right' />
+        </div>
     );
 }
 
 ReactDOM.render(
     <React.StrictMode>
-        <div id='home'>
-            <div className='left shows'>
-
-            </div>
-            <div id="wheel-width" className='center wheel'>
-                <Wheel shows={['Jojo', 'No Game No Lige', 'Kaiji', 'Your Lie In April', 'Want 2 Eat ur Pancreas', 'Fate', 'No Game No Lige']} />
-            </div>
-            <div className='right'>
-
-            </div>
-        </div>
+        <WheelPage />
     </React.StrictMode>,
     document.getElementById('root')
 );
