@@ -173,23 +173,48 @@ function Wheel({ shows, colors, ...props }) {
 }
 
 function Shows({ shows, setShows, colors, ...props }) {
+    const [add, setAdd] = useState('');
+
+    const addNew = () => {
+        setShows(prev => [
+            ...prev,
+            {
+                name: add,
+                uuid: uuidv4(),
+                owner: choose('Tony', 'Espen', 'Jørgen', 'Sigurd')
+            }
+        ]);
+        setAdd(() => '');
+    }
 
     return (
         <div {...props}>
-            {shows.map((show, i) => (
-                <div key={show.uuid}>
-                    <input
-                        type='text'
-                        defaultValue={show.name}
-                        onChange={e => setShows(prev => [
-                            ...prev.slice(0, i),
-                            { ...show, name: e.target.value }, 
-                            ...prev.slice(i + 1)]
-                        )}
-                        style={{ color: pickColor(i, colors, shows) }}
-                    />
-                </div>
-            ))}
+            <div class='shows-list'>
+                <h2>Shows</h2>
+                {shows.map((show, i) => (
+                    <div key={show.uuid}>
+                        <input
+                            type='text'
+                            defaultValue={show.name}
+                            onChange={e => setShows(prev => [
+                                ...prev.slice(0, i),
+                                { ...show, name: e.target.value },
+                                ...prev.slice(i + 1)]
+                            )}
+                            style={{ borderColor: pickColor(i, colors, shows) }}
+                        />
+                    </div>
+                ))}
+                <input
+                    type='text'
+                    class='add-new'
+                    placeholder='Add +'
+                    value={add}
+                    onChange={e => setAdd(() => e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && add && addNew()}
+                    onBlur={e => add && addNew()}
+                />
+            </div>
         </div>
     );
 }
