@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { ReactComponent as ArrowDown } from './arrow_down.svg';
+import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
+import { ReactComponent as UserIcon  } from './icons/user.svg';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 
-function pickColor(i, colors, shows) {
-    return colors[i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2];
-}
-
 function choose(...args) {
     return args[Math.floor(Math.random() * args.length)];
+}
+
+function arrayRandom(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function pickColor(i, colors, shows) {
+    return colors[i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2];
 }
 
 const extendContext = (ctx, size) => ({
@@ -34,6 +39,20 @@ const extendContext = (ctx, size) => ({
         ctx.arc(x, y, radius, startAngle, endAngle);
         ctx.closePath();
         ctx.fill();
+    },
+    drawPieSliceImage(x, y, radius, startAngle, endAngle, image) {
+        ctx.save();
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.arc(x, y, radius, startAngle, endAngle);
+        ctx.closePath();
+
+        ctx.clip();
+        ctx.translate(x, y);
+        ctx.rotate((startAngle + endAngle) / 2);
+        ctx.drawImage(image, 0, -image.height / 2);
+        ctx.restore();
     },
     drawTextRotated(x, y, text, angle, color) {
         ctx.save();
@@ -79,7 +98,7 @@ class Rotate {
     }
 }
 
-function Wheel({ shows, colors, ...props }) {
+function Wheel({ shows, users, colors, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [rotate, setRotate] = useState(null);
@@ -172,7 +191,7 @@ function Wheel({ shows, colors, ...props }) {
     );
 }
 
-function Shows({ shows, setShows, colors, ...props }) {
+function AddNewButton({ user, setShows }) {
     const [add, setAdd] = useState('');
 
     const addNew = () => {
@@ -181,54 +200,86 @@ function Shows({ shows, setShows, colors, ...props }) {
             {
                 name: add,
                 uuid: uuidv4(),
-                owner: choose('Tony', 'Espen', 'Jørgen', 'Sigurd')
+                owner: user
             }
         ]);
         setAdd(() => '');
-    }
+    };
+
+    return (
+        <input
+            type='text'
+            className='show add-new'
+            placeholder='Add Show +'
+            value={add}
+            onChange={e => setAdd(() => e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && add && addNew()}
+            onBlur={e => add && addNew()}
+        />
+    );
+}
+
+function Shows({ shows, users, setShows, colors, ...props }) {
+    const [showUsers, setShowUsers] = useState(true);
+
+    const renderShows = show => {
+        const i = shows.findIndex(s => s === show);
+        return (
+            <div className='show' key={show.uuid}>
+                <input
+                    type='text'
+                    defaultValue={show.name}
+                    onChange={e => setShows(prev => [
+                        ...prev.slice(0, i),
+                        { ...show, name: e.target.value },
+                        ...prev.slice(i + 1)
+                    ])}
+                    style={{ borderLeftColor: pickColor(i, colors, shows) }}
+                />
+                <button className='delete' onClick={e => setShows(prev => [
+                    ...prev.slice(0, i),
+                    ...prev.slice(i + 1)
+                ])}>×</button>
+            </div>
+        );
+    };
+
+    const renderUsers = () => users.map((user, i) => {
+        const userShows = shows.filter(show => show.owner.name === user.name).map(renderShows);
+
+        return (
+            <div class='user-shows'>
+                <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
+                {userShows}
+                <AddNewButton key={'add new button ' + user.name} user={user} setShows={setShows} />
+            </div>
+        );
+    });
 
     return (
         <div {...props}>
-            <div class='shows-list'>
-                <h2>Shows</h2>
-                {shows.map((show, i) => (
-                    <div class='show' key={show.uuid}>
-                        <input
-                            type='text'
-                            defaultValue={show.name}
-                            onChange={e => setShows(prev => [
-                                ...prev.slice(0, i),
-                                { ...show, name: e.target.value },
-                                ...prev.slice(i + 1)
-                            ])}
-                            style={{ borderLeftColor: pickColor(i, colors, shows) }}
-                        />
-                        <button class='delete' onClick={e => setShows(prev => [
-                            ...prev.slice(0, i),
-                            ...prev.slice(i + 1)
-                        ])}>×</button>
-                    </div>
-                ))}
-                <input
-                    type='text'
-                    class='show add-new'
-                    placeholder='Add +'
-                    value={add}
-                    onChange={e => setAdd(() => e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && add && addNew()}
-                    onBlur={e => add && addNew()}
-                />
+            <div className='shows-list'>
+                <h2>Shows <span className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></span></h2>
+                {showUsers ?
+                    renderUsers() :
+                    [shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} setShows={setShows} />]}
             </div>
         </div>
     );
 }
 
 function WheelPage() {
-    const [shows, setShows] = useState(() => ['Fat Zero', 'Kaiji', 'Haikyuu', 'Panty & Stocking'].map(
+    const [users, setUsers] = useState([
+        { name: 'Tony' },
+        { name: 'Espen' },
+        { name: 'Jørgen' },
+        { name: 'Sigurd' }
+    ]);
+    const [shows, setShows] = useState(() => ['Kaiji', 'Haikyuu', 'Panty & Stocking', 'Beans', 'Crumbs', 'Wheat', 'Snails'].map(
         name => ({
             name,
             uuid: uuidv4(),
-            owner: choose('Tony', 'Espen', 'Jørgen', 'Sigurd')
+            owner: arrayRandom(users)
         })
     ));
 
@@ -245,8 +296,8 @@ function WheelPage() {
 
     return (
         <div id='home'>
-            <Shows className='left shows'   shows={shows} setShows={setShows} colors={colors} />
-            <Wheel className='center wheel' shows={shows} colors={colors} />
+            <Shows className='left shows'   users={users} shows={shows} setShows={setShows} colors={colors} />
+            <Wheel className='center wheel' users={users} shows={shows} colors={colors} />
             <div className='right' />
         </div>
     );
