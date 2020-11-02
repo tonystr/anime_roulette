@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Gamers",
+    "uuid": "f390267a-5be8-4af0-b8a3-3cfca513b906",
+    "owner": {
+      "name": "Jørgen"
+    },
+    "date": "2020-10-14T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Rent-a-Girlfriend",
+    "uuid": "46a2df4f-6cc2-4cf8-8b07-58cd9fedfca7",
+    "owner": {
+      "name": "Tony"
+    },
+    "date": "2020-10-16T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Jojo part 1",
+    "uuid": "c5d5e77f-1578-426b-99e0-8c9d879a6a8f",
+    "owner": {
+      "name": "Espen"
+    },
+    "date": "2020-10-21T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Noragami",
+    "uuid": "3598a6a8-5866-4675-a63d-ed68d4e06719",
+    "owner": {
+      "name": "Jørgen"
+    },
+    "date": "2020-10-23T11:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Uzaki-Chan",
+    "uuid": "8ba9db22-7595-471a-b9be-18f3d535485a",
+    "owner": {
+      "name": "Sigurd"
+    },
+    "date": "2020-10-25T12:10:03.475Z",
+    "state": "Dropped"
+  },
+  {
+    "name": "No Game No Life",
+    "uuid": "fb4da39f-e12e-4c83-a70e-f00e545f0daa",
+    "owner": {
+      "name": "Espen"
+    },
+    "date": "2020-10-25T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Domestic Girlfriend",
+    "uuid": "0af561c2-cf2c-4a8d-a024-d3a4f4084f55",
+    "owner": {
+      "name": "Sigurd"
+    },
+    "date": "2020-10-27T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Fat/Zero",
+    "uuid": "52095abf-85ca-49e8-8b9c-602b5fc7c000",
+    "owner": {
+      "name": "Espen"
+    },
+    "date": "2020-10-29T12:10:03.475Z",
+    "state": "Completed"
+  }
+]

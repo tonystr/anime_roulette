@@ -4,7 +4,25 @@ import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
+import historySauce from './history.json';
 import reportWebVitals from './reportWebVitals';
+
+const HISTORY = historySauce.map(h => ({ ...h, date: new Date(h.date) }));
+
+const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+];
 
 function choose(...args) {
     return args[Math.floor(Math.random() * args.length)];
@@ -12,6 +30,12 @@ function choose(...args) {
 
 function arrayRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
+}
+
+function arrayReverse(array) {
+    const newArray = array.slice();
+    newArray.reverse();
+    return newArray;
 }
 
 function pickColor(i, colors, shows) {
@@ -230,7 +254,7 @@ function UserShows({ users, shows, renderShows, setShows }) {
 }
 
 function Shows({ shows, users, setShows, colors, ...props }) {
-    const [showUsers, setShowUsers] = useState(true);
+    const [showUsers, setShowUsers] = useState(false);
 
     const renderShows = show => {
         const i = shows.findIndex(s => s === show);
@@ -266,8 +290,24 @@ function Shows({ shows, users, setShows, colors, ...props }) {
     );
 }
 
+function History({ users, shows, history, ...props }) {
+    return (
+        <div>
+            <div {...props}>
+                <h2>History</h2>
+                {arrayReverse(history).map(show => (
+                    <div className='show'>
+                        <span className='title'>{show.name}</span>
+                        <span className='date'> - {show.date.getDate()} {monthNames[show.date.getMonth()]}.</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function WheelPage() {
-    const [users, setUsers] = useState([
+    const [users, setUsers] = useState(() => [
         { name: 'Tony' },
         { name: 'Espen' },
         { name: 'Jørgen' },
@@ -280,6 +320,7 @@ function WheelPage() {
             owner: arrayRandom(users)
         })
     ));
+    const [history, setHistory] = useState(() => HISTORY);
 
     const colors = [
         '#caa05a',
@@ -294,9 +335,12 @@ function WheelPage() {
 
     return (
         <div id='home'>
-            <Shows className='left shows'   users={users} shows={shows} setShows={setShows} colors={colors} />
-            <Wheel className='center wheel' users={users} shows={shows} colors={colors} />
-            <div className='right' />
+            <h1>Anime Roulette</h1>
+            <main>
+                <Shows   className='left   shows'   users={users} shows={shows} setShows={setShows} colors={colors} />
+                <Wheel   className='center wheel'   users={users} shows={shows} colors={colors} />
+                <History className='right  history' users={users} shows={shows} history={history} />
+            </main>
         </div>
     );
 }
