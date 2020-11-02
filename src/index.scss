@@ -93,15 +93,16 @@ h2 {
         }
     }
 
+    &:not(:hover) .add-new {
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+    }
+
     .user-shows {
         display: flex;
         flex-direction: column;
         align-items: baseline;
-
-        .add-new {
-            transition: all .3s;
-            display: block;
-        }
 
         &:not(:hover) .add-new {
             padding-top: 0;
@@ -137,6 +138,8 @@ h2 {
         border-color: transparent;
         padding: .5rem 1rem;
         font-size: 1.15rem;
+        transition: all .2s;
+        display: block;
 
         &:hover {
             border-left-color: #838373;

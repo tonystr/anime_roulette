@@ -219,6 +219,16 @@ function AddNewButton({ user, setShows }) {
     );
 }
 
+function UserShows({ users, shows, renderShows, setShows }) {
+    return users.map((user, i) => (
+        <div class='user-shows'>
+            <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
+            {shows.filter(show => show.owner.name === user.name).map(renderShows)}
+            <AddNewButton key={'add new button ' + user.name} user={user} setShows={setShows} />
+        </div>
+    ));
+}
+
 function Shows({ shows, users, setShows, colors, ...props }) {
     const [showUsers, setShowUsers] = useState(true);
 
@@ -244,24 +254,12 @@ function Shows({ shows, users, setShows, colors, ...props }) {
         );
     };
 
-    const renderUsers = () => users.map((user, i) => {
-        const userShows = shows.filter(show => show.owner.name === user.name).map(renderShows);
-
-        return (
-            <div class='user-shows'>
-                <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
-                {userShows}
-                <AddNewButton key={'add new button ' + user.name} user={user} setShows={setShows} />
-            </div>
-        );
-    });
-
     return (
         <div {...props}>
             <div className='shows-list'>
                 <h2>Shows <span className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></span></h2>
                 {showUsers ?
-                    renderUsers() :
+                    <UserShows shows={shows} users={users} renderShows={renderShows} setShows={setShows} /> :
                     [shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} setShows={setShows} />]}
             </div>
         </div>
