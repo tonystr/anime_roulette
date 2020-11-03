@@ -295,12 +295,14 @@ function History({ users, shows, history, setHistory, ...props }) {
     const [inspectingShow, setInspectingShow] = useState(null);
 
     const updateBanner = (url, show) => {
-        console.log('giving show banner: ' + url, show);
+        if (!url || url === show.url) return;
         setHistory(prev => prev.map(
             v => v.uuid === show.uuid ? { ...v, banner: url } : { ...v }
         ));
         setInspectingShow(prev => ({ ...prev, banner: url }));
     }
+
+    console.log(history);
 
     return (
         <div>
@@ -330,15 +332,28 @@ function History({ users, shows, history, setHistory, ...props }) {
                                 <option>Dropped</option>
                             </select>
                         </h2>
-                        {inspectingShow.banner ?
-                            <img className='banner' alt='banner' src={inspectingShow.banner} /> :
+                        <div className='middle'>
+                            {inspectingShow.banner && <img className='banner' alt='banner' src={inspectingShow.banner} />}
                             <input
-                                className='banner-url'
+                                className={'banner-url hover-input ' + (inspectingShow.banner ? '' : 'visible')}
                                 type='text'
                                 placeholder='Insert banner url...'
                                 onKeyDown={e => e.key === 'Enter' && updateBanner(e.target.value, inspectingShow)}
                                 onBlur={e => updateBanner(e.target.value, inspectingShow)}
-                            />}
+                            />
+                        </div>
+                        {inspectingShow.state === 'Watching' && (
+                            <div className='links'>
+                                {inspectingShow.watchingUrl && <span>Watching at <a href={inspectingShow.watchingUrl} target='_blank'>{(inspectingShow.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}</a></span>}
+                                <input
+                                    className={'watching-url hover-input ' + (inspectingShow.watchingUrl ? '' : 'visible')}
+                                    type='text'
+                                    placeholder={`${inspectingShow.watchingUrl ? 'Replace' : 'Insert'} watching url...`}
+                                    onKeyDown={e => e.key === 'Enter' && updateBanner(e.target.value, inspectingShow)}
+                                    onBlur={e => updateBanner(e.target.value, inspectingShow)}
+                                />
+                            </div>
+                        )}
                         <div className='bottom'>
                             <div className='owner-field'>
                                 Suggested by <span className='user'>{inspectingShow.owner.name}</span>

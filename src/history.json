@@ -6,7 +6,8 @@
       "name": "Jørgen"
     },
     "date": "2020-10-14T12:10:03.475Z",
-    "state": "Completed"
+    "state": "Completed",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2FQU__H8WYYTg%2Fmaxresdefault.jpg&f=1&nofb=1"
   },
   {
     "name": "Rent-a-Girlfriend",
@@ -15,7 +16,8 @@
       "name": "Tony"
     },
     "date": "2020-10-16T12:10:03.475Z",
-    "state": "Completed"
+    "state": "Completed",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.thecinemaholic.com%2Fwp-content%2Fuploads%2F2020%2F07%2Frent-a-girlfriend.jpeg&f=1&nofb=1"
   },
   {
     "name": "Jojo part 1",
@@ -24,7 +26,8 @@
       "name": "Espen"
     },
     "date": "2020-10-21T12:10:03.475Z",
-    "state": "Completed"
+    "state": "Completed",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2F-sgXm0eAGPE%2Fmaxresdefault.jpg&f=1&nofb=1"
   },
   {
     "name": "Noragami",
@@ -33,7 +36,8 @@
       "name": "Jørgen"
     },
     "date": "2020-10-23T11:10:03.475Z",
-    "state": "Completed"
+    "state": "Completed",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fotakudaydreams.files.wordpress.com%2F2014%2F03%2Fnoragami-12-9.png&f=1&nofb=1"
   },
   {
     "name": "Uzaki-Chan",
@@ -42,7 +46,8 @@
       "name": "Sigurd"
     },
     "date": "2020-10-25T12:10:03.475Z",
-    "state": "Dropped"
+    "state": "Dropped",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.abcotvs.com%2Fdip%2Fimages%2F5006222_010219-kgo-trash-overflowing-park-img.jpg%3Fw%3D1280%26r%3D16%253A9&f=1&nofb=1"
   },
   {
     "name": "No Game No Life",
@@ -51,10 +56,12 @@
       "name": "Espen"
     },
     "date": "2020-10-25T12:10:03.475Z",
-    "state": "Completed"
+    "state": "Completed",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Forig14.deviantart.net%2F6bdf%2Ff%2F2015%2F300%2F5%2Ff%2Fno_game_no_life_by_akatsukimamoru-d9ejkco.jpg&f=1&nofb=1"
   },
   {
     "name": "Domestic Girlfriend",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapercave.com%2Fwp%2Fwp4218180.jpg&f=1&nofb=1",
     "uuid": "0af561c2-cf2c-4a8d-a024-d3a4f4084f55",
     "owner": {
       "name": "Sigurd"
@@ -69,11 +76,13 @@
       "name": "Espen"
     },
     "date": "2020-10-30T12:10:03.475Z",
-    "state": "Completed"
+    "state": "Completed",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fanimeblurayuk.files.wordpress.com%2F2013%2F07%2Ffate_zero_screenshot.png&f=1&nofb=1"
   },
   {
     "name": "Seitokai Yakuindomo",
     "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdbuPHzpZSR0%2Fmaxresdefault.jpg&f=1&nofb=1",
+    "watchingUrl": "https://4anime.to/seitokai-yakuindomo-episode-04?id=27907",
     "uuid": "f20a5b5a-85ca-49e8-8b9c-2b5760c00fc0",
     "owner": {
       "name": "Jørgen"
