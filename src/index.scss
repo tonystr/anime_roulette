@@ -1,3 +1,7 @@
+
+$c_text: #e3e3c3;
+$c_text_bright: #ffffff;
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -52,18 +56,81 @@ h2 {
     }
 }
 
+.ReactModal__Overlay {
+    background-color: rgba(#000, .3) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1010010;
+}
+
+.show-inspector {
+    background-color: #262628;
+    border-radius: 4px;
+    box-shadow: 0 1px 8px rgba(#000, .33);
+    color: $c_text;
+    width: 50rem;
+    min-height: 30rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .banner {
+        max-width: 50rem;
+    }
+
+    .banner-url {
+        font-size: 1rem;
+        border: none;
+        background-color: transparent;
+        color: #ffffff;
+        padding: 5rem 0;
+        text-align: center;
+    }
+
+    .bottom,
+    .title {
+        display: flex;
+        justify-content: space-between;
+        margin: 1rem 2rem;
+    }
+
+    .user,
+    .date-string {
+        color: $c_text_bright;
+    }
+
+    .state {
+        border: none;
+        background-color: #3a3a3a;
+        font-family: inherit;
+        color: $c_text;
+        font-size: 1.1rem;
+        padding: .1rem .3rem;
+        margin-left: 2rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+}
+
 #home .history {
     margin-right: 1rem;
     text-align: right;
 
     .show {
-        color: #e3e3c3;
+        color: $c_text;
         font-size: 1.3rem;
         padding: .2rem 0;
+        transition: .14s color;
+        cursor: pointer;
 
         .date {
             color: #6a6a66;
             font-size: 1rem;
+        }
+
+        &:hover {
+            color: #ffffff;
         }
     }
 }
@@ -79,7 +146,7 @@ h2 {
         border-bottom-right-radius: 4px;
         transition: background-color .14s, color .14s, border-color .14s;
         display: inline-block;
-        color: #e3e3c3;
+        color: $c_text;
 
         .delete {
             border: none;

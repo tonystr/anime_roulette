@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import ReactModal from 'react-modal';
 import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
 import { v4 as uuidv4 } from 'uuid';
@@ -253,7 +254,7 @@ function UserShows({ users, shows, renderShows, setShows }) {
     ));
 }
 
-function Shows({ shows, users, setShows, colors, ...props }) {
+function Shows({ users, shows, setShows, colors, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
 
     const renderShows = show => {
@@ -290,18 +291,71 @@ function Shows({ shows, users, setShows, colors, ...props }) {
     );
 }
 
-function History({ users, shows, history, ...props }) {
+function History({ users, shows, history, setHistory, ...props }) {
+    const [inspectingShow, setInspectingShow] = useState(null);
+
+    const updateBanner = (url, show) => {
+        console.log('giving show banner: ' + url, show);
+        setHistory(prev => prev.map(
+            v => v.uuid === show.uuid ? { ...v, banner: url } : { ...v }
+        ));
+        setInspectingShow(prev => ({ ...prev, banner: url }));
+    }
+
     return (
         <div>
             <div {...props}>
                 <h2>History</h2>
                 {arrayReverse(history).map(show => (
-                    <div className='show'>
+                    <div key={show.uuid} className='show' onClick={() => setInspectingShow(show)}>
                         <span className='title'>{show.name}</span>
                         <span className='date'> - {show.date.getDate()} {monthNames[show.date.getMonth()]}.</span>
                     </div>
                 ))}
             </div>
+            <ReactModal
+                className='show-inspector'
+                isOpen={!!inspectingShow}
+                onRequestClose={() => setInspectingShow(null)}
+                ariaHideApp={false}
+            >
+                {inspectingShow && (
+                    <>
+                        <h2 className='title'>{inspectingShow.name}
+                            <select className='state' defaultValue={inspectingShow.state} onChange={e => setHistory(prev => prev.map(
+                                v => v.uuid === inspectingShow.uuid ? { ...v, state: e.target.value } : { ...v }
+                            ))}>
+                                <option>Watching</option>
+                                <option>Completed</option>
+                                <option>Dropped</option>
+                            </select>
+                        </h2>
+                        {inspectingShow.banner ?
+                            <img className='banner' alt='banner' src={inspectingShow.banner} /> :
+                            <input
+                                className='banner-url'
+                                type='text'
+                                placeholder='Insert banner url...'
+                                onKeyDown={e => e.key === 'Enter' && updateBanner(e.target.value, inspectingShow)}
+                                onBlur={e => updateBanner(e.target.value, inspectingShow)}
+                            />}
+                        <div className='bottom'>
+                            <div className='owner-field'>
+                                Suggested by <span className='user'>{inspectingShow.owner.name}</span>
+                            </div>
+                            <div className='date'>
+                                Started watching at&nbsp;
+                                <span className='date-string'>
+                                    {inspectingShow.date.getDate()}&nbsp;
+                                    {monthNames[inspectingShow.date.getMonth()]}.&nbsp;
+                                    {inspectingShow.date.getFullYear()}
+                                </span>
+                                .
+                            </div>
+                        </div>
+                    </>
+                )}
+            </ReactModal>
         </div>
     );
 }
@@ -339,7 +393,7 @@ function WheelPage() {
             <main>
                 <Shows   className='left   shows'   users={users} shows={shows} setShows={setShows} colors={colors} />
                 <Wheel   className='center wheel'   users={users} shows={shows} colors={colors} />
-                <History className='right  history' users={users} shows={shows} history={history} />
+                <History className='right  history' users={users} shows={shows} history={history} setHistory={setHistory} />
             </main>
         </div>
     );

@@ -68,7 +68,17 @@
     "owner": {
       "name": "Espen"
     },
-    "date": "2020-10-29T12:10:03.475Z",
+    "date": "2020-10-30T12:10:03.475Z",
     "state": "Completed"
+  },
+  {
+    "name": "Seitokai Yakuindomo",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdbuPHzpZSR0%2Fmaxresdefault.jpg&f=1&nofb=1",
+    "uuid": "f20a5b5a-85ca-49e8-8b9c-2b5760c00fc0",
+    "owner": {
+      "name": "Jørgen"
+    },
+    "date": "2020-11-03T12:10:03.475Z",
+    "state": "Watching"
   }
 ]
