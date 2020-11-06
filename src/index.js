@@ -5,10 +5,8 @@ import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-import historySauce from './history.json';
 import reportWebVitals from './reportWebVitals';
-
-const HISTORY = historySauce.map(h => ({ ...h, date: new Date(h.date) }));
+// import historySauce from './history.json';
 
 const monthNames = [
     'Jan',
@@ -31,6 +29,10 @@ function choose(...args) {
 
 function arrayRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
+}
+
+function parseHistory(historySauce) {
+    return JSON.parse(historySauce).map(h => ({ ...h, date: new Date(h.date) }));
 }
 
 function arrayReverse(array) {
@@ -246,7 +248,7 @@ function AddNewButton({ user, setShows }) {
 
 function UserShows({ users, shows, renderShows, setShows }) {
     return users.map((user, i) => (
-        <div class='user-shows'>
+        <div className='user-shows' key={user.name}>
             <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
             {shows.filter(show => show.owner.name === user.name).map(renderShows)}
             <AddNewButton key={'add new button ' + user.name} user={user} setShows={setShows} />
@@ -294,13 +296,16 @@ function Shows({ users, shows, setShows, colors, ...props }) {
 function History({ users, shows, history, setHistory, ...props }) {
     const [inspectingShow, setInspectingShow] = useState(null);
 
-    const updateBanner = (url, show) => {
-        if (!url || url === show.url) return;
+// check if !url
+    const updateHistoryProp = (show, prop, value) => {
+        if (show[prop] === value) return;
         setHistory(prev => prev.map(
-            v => v.uuid === show.uuid ? { ...v, banner: url } : { ...v }
+            hShow => hShow.uuid === show.uuid ? { ...hShow, [prop]: value } : { ...hShow }
         ));
-        setInspectingShow(prev => ({ ...prev, banner: url }));
+        setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
+
+    // https://4anime.to/anime/kimetsu-no-yaiba
 
     return (
         <div>
@@ -336,8 +341,8 @@ function History({ users, shows, history, setHistory, ...props }) {
                                 className={'banner-url hover-input ' + (inspectingShow.banner ? '' : 'visible')}
                                 type='text'
                                 placeholder='Insert banner url...'
-                                onKeyDown={e => e.key === 'Enter' && updateBanner(e.target.value, inspectingShow)}
-                                onBlur={e => updateBanner(e.target.value, inspectingShow)}
+                                onKeyDown={e => e.key === 'Enter' && e.target.value && updateHistoryProp(inspectingShow, 'banner', e.target.value)}
+                                onBlur={e => e.target.value && updateHistoryProp(inspectingShow, 'banner', e.target.value)}
                             />
                         </div>
                         {inspectingShow.state === 'Watching' && (
@@ -347,8 +352,8 @@ function History({ users, shows, history, setHistory, ...props }) {
                                     className={'watching-url hover-input ' + (inspectingShow.watchingUrl ? '' : 'visible')}
                                     type='text'
                                     placeholder={`${inspectingShow.watchingUrl ? 'Replace' : 'Insert'} watching url...`}
-                                    onKeyDown={e => e.key === 'Enter' && updateBanner(e.target.value, inspectingShow)}
-                                    onBlur={e => updateBanner(e.target.value, inspectingShow)}
+                                    onKeyDown={e => e.key === 'Enter' && e.target.value && updateHistoryProp(inspectingShow, 'watchingUrl', e.target.value)}
+                                    onBlur={e => e.target.value && updateHistoryProp(inspectingShow, 'watchingUrl', e.target.value)}
                                 />
                             </div>
                         )}
@@ -381,13 +386,15 @@ function WheelPage() {
         { name: 'Sigurd' }
     ]);
     const [shows, setShows] = useState(() => JSON.parse(localStorage.getItem('shows')));
-    const [history, setHistory] = useState(() => HISTORY);
+    const [history, setHistory] = useState(() => parseHistory(localStorage.getItem('history')));
 
     useEffect(() => {
         localStorage.setItem('shows', JSON.stringify(shows));
     }, [shows]);
 
-    console.log(shows);
+    useEffect(() => {
+        localStorage.setItem('history', JSON.stringify(history));
+    }, [history]);
 
     const colors = [
         '#caa05a',
