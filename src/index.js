@@ -296,7 +296,6 @@ function Shows({ users, shows, setShows, colors, ...props }) {
 function History({ users, shows, history, setHistory, ...props }) {
     const [inspectingShow, setInspectingShow] = useState(null);
 
-// check if !url
     const updateHistoryProp = (show, prop, value) => {
         if (show[prop] === value) return;
         setHistory(prev => prev.map(
@@ -304,8 +303,6 @@ function History({ users, shows, history, setHistory, ...props }) {
         ));
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
-
-    // https://4anime.to/anime/kimetsu-no-yaiba
 
     return (
         <div>
