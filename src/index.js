@@ -302,8 +302,6 @@ function History({ users, shows, history, setHistory, ...props }) {
         setInspectingShow(prev => ({ ...prev, banner: url }));
     }
 
-    console.log(history);
-
     return (
         <div>
             <div {...props}>
@@ -382,14 +380,14 @@ function WheelPage() {
         { name: 'Jørgen' },
         { name: 'Sigurd' }
     ]);
-    const [shows, setShows] = useState(() => ['Kaiji', 'Haikyuu', 'Panty & Stocking', 'Beans', 'Crumbs', 'Wheat', 'Snails'].map(
-        name => ({
-            name,
-            uuid: uuidv4(),
-            owner: arrayRandom(users)
-        })
-    ));
+    const [shows, setShows] = useState(() => JSON.parse(localStorage.getItem('shows')));
     const [history, setHistory] = useState(() => HISTORY);
+
+    useEffect(() => {
+        localStorage.setItem('shows', JSON.stringify(shows));
+    }, [shows]);
+
+    console.log(shows);
 
     const colors = [
         '#caa05a',

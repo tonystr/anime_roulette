@@ -1,6 +1,6 @@
 [
   {
-    "name": "Gamers",
+    "name": "Gamers!",
     "uuid": "f390267a-5be8-4af0-b8a3-3cfca513b906",
     "owner": {
       "name": "Jørgen"
@@ -88,6 +88,28 @@
       "name": "Jørgen"
     },
     "date": "2020-11-03T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Kaji",
+    "banner": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fabandonedfactory.files.wordpress.com%2F2011%2F07%2Fkaiji2-17-1.png&f=1&nofb=1",
+    "watchingUrl": "https://4anime.to/anime/gyakkyou-burai-kaiji-ultimate-survivor",
+    "uuid": "f24c5b5a-85ca-49e8-8b9c-2b32a0c03fc0",
+    "owner": {
+      "name": "Tony"
+    },
+    "date": "2020-11-05T12:10:03.475Z",
+    "state": "Completed"
+  },
+  {
+    "name": "Demon Slayer",
+    "banner": "https://static1.cbrimages.com/wordpress/wp-content/uploads/2019/12/Demon-Slayer-2.jpg",
+    "watchingUrl": "https://4anime.to/kimetsu-no-yaiba-episode-01?id=16651",
+    "uuid": "f25b0a5a-85ca-49e8-8b9c-2b57c0600fc0",
+    "owner": {
+      "name": "Sigurd"
+    },
+    "date": "2020-11-06T12:10:03.475Z",
     "state": "Watching"
   }
 ]
