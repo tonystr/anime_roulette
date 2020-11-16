@@ -84,6 +84,23 @@ a:hover {
     flex-direction: column;
     justify-content: space-between;
 
+    .begin-wating {
+        border: none;
+        background-color: #3d645d;
+        color: #fff;
+        font-family: inherit;
+        border-radius: 4px;
+        font-size: 1.3rem;
+        padding: .3rem .6rem;
+        cursor: pointer;
+        transition: .12s all;
+
+        &:hover {
+            background-color: #68bd95;
+            color: #fff;
+        }
+    }
+
     &:focus {
         outline: none;
     }

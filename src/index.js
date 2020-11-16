@@ -173,6 +173,7 @@ function Wheel({ shows, users, colors, ...props }) {
         const handleRotate = () => {
             const date = new Date();
 
+            // Rotation end
             if (date > rotate.endDate) {
                 const winnerIndex = Math.floor((1 - ((rotate.offset / (Math.PI * 2) + rotate.rng + .25) % 1)) * shows.length);
                 setRotate(prev => ({
@@ -222,7 +223,7 @@ function Wheel({ shows, users, colors, ...props }) {
                 onRequestClose={() => setShowWinner(false)}
                 ariaHideApp={false}
             >
-                {showWinner && <ShowInpsector show={rotate.winner} />}
+                {showWinner && <ShowInpsector show={rotate.winner} beginWatching={() => console.log('begin watching')} />}
             </ReactModal>
         </div>
     );
@@ -337,17 +338,22 @@ function History({ users, shows, history, setHistory, ...props }) {
     );
 }
 
-function ShowInpsector({ show, updateShowProp, setHistory }) {
+function ShowInpsector({ show, updateShowProp, setHistory, beginWatching = null }) {
     return (
         <>
             <h2 className='title'>{show.name}
-                <select className='state' defaultValue={show.state} onChange={e => setHistory(prev => prev.map(
-                    v => v.uuid === show.uuid ? { ...v, state: e.target.value } : { ...v }
-                ))}>
-                    <option>Watching</option>
-                    <option>Completed</option>
-                    <option>Dropped</option>
-                </select>
+                {beginWatching ? (
+                    <button className='begin-wating' onClick={beginWatching}>Start watching</button>
+                ) : (
+                    <select className='state' defaultValue={show.state} onChange={e => setHistory(prev => prev.map(
+                        v => v.uuid === show.uuid ? { ...v, state: e.target.value } : { ...v }
+                    ))}>
+                        <option>Watching</option>
+                        <option>Completed</option>
+                        <option>Dropped</option>
+                    </select>
+                )}
+
             </h2>
             <div className='middle'>
                 {show.banner && <img className='banner' alt='banner' src={show.banner} />}
@@ -376,7 +382,7 @@ function ShowInpsector({ show, updateShowProp, setHistory }) {
                     Suggested by <span className='user'>{show.owner.name}</span>
                 </div>
                 <div className='date'>
-                    Started watching at&nbsp;
+                    {!beginWatching &&'Started watching at'}&nbsp;
                     <span className='date-string'>
                         {show.date.getDate()}&nbsp;
                         {monthNames[show.date.getMonth()]}.&nbsp;
