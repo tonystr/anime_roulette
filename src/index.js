@@ -125,7 +125,7 @@ class Rotate {
     }
 }
 
-function Wheel({ shows, users, colors, ...props }) {
+function Wheel({ shows, users, colors, setHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [rotate, setRotate] = useState(null);
@@ -229,7 +229,12 @@ function Wheel({ shows, users, colors, ...props }) {
                 onRequestClose={() => setShowWinner(false)}
                 ariaHideApp={false}
             >
-                {showWinner && <ShowInpsector show={rotate.winner} beginWatching={() => console.log('begin watching')} />}
+                {showWinner && <ShowInpsector
+                    show={rotate.winner}
+                    beginWatching={() => {
+                        setHistory(prev => [...prev, rotate.winner]);
+                        setShowWinner(() => false);
+                    }} />}
             </ReactModal>
         </div>
     );
@@ -404,8 +409,8 @@ function ShowInpsector({ show, updateShowProp, setHistory, beginWatching = null 
 
 function WheelPage() {
     const [users, setUsers] = useState(() => [
-        { name: 'Tony' },
-        { name: 'Espen' },
+        { name: 'Tony'   },
+        { name: 'Espen'  },
         { name: 'Jørgen' },
         { name: 'Sigurd' }
     ]);
@@ -436,7 +441,7 @@ function WheelPage() {
             <h1>Anime Roulette</h1>
             <main>
                 <Shows   className='left   shows'   users={users} shows={shows} setShows={setShows} colors={colors} />
-                <Wheel   className='center wheel'   users={users} shows={shows} colors={colors} />
+                <Wheel   className='center wheel'   users={users} shows={shows} colors={colors}   setHistory={setHistory} />
                 <History className='right  history' users={users} shows={shows} history={history} setHistory={setHistory} />
             </main>
         </div>
