@@ -111,6 +111,8 @@ a:hover {
 
     .middle {
         position: relative;
+        height: auto;
+        flex-grow: 1;
     }
 
     .hover-input {

@@ -176,13 +176,19 @@ function Wheel({ shows, users, colors, ...props }) {
             // Rotation end
             if (date > rotate.endDate) {
                 const winnerIndex = Math.floor((1 - ((rotate.offset / (Math.PI * 2) + rotate.rng + .25) % 1)) * shows.length);
+                const winnerColor = pickColor(winnerIndex, colors, shows);
+
                 setRotate(prev => ({
                     ...prev,
                     active: false,
-                    winner: { ...shows[winnerIndex], date: new Date() }
+                    winner: {
+                        ...shows[winnerIndex],
+                        date: new Date(),
+                        color: winnerColor
+                    }
                 }));
                 setShowWinner(() => true);
-                setArrowColor(() => pickColor(winnerIndex, colors, shows));
+                setArrowColor(() => winnerColor);
                 return;
             }
 
@@ -341,7 +347,8 @@ function History({ users, shows, history, setHistory, ...props }) {
 function ShowInpsector({ show, updateShowProp, setHistory, beginWatching = null }) {
     return (
         <>
-            <h2 className='title'>{show.name}
+            <h2 className='title'>
+                {show.name}
                 {beginWatching ? (
                     <button className='begin-wating' onClick={beginWatching}>Start watching</button>
                 ) : (
@@ -355,7 +362,7 @@ function ShowInpsector({ show, updateShowProp, setHistory, beginWatching = null 
                 )}
 
             </h2>
-            <div className='middle'>
+            <div className='middle' style={{ backgroundColor: show.color }}>
                 {show.banner && <img className='banner' alt='banner' src={show.banner} />}
                 <input
                     className={'banner-url hover-input ' + (show.banner ? '' : 'visible')}
