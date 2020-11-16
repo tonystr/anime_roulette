@@ -167,6 +167,30 @@ a:hover {
         color: $c_text_bright;
     }
 
+    .date-string {
+        position: relative;
+        transition: .14s color;
+
+        &:hover {
+            color: #c0ffe2;
+        }
+
+        &:focus-within {
+            background-color: #444;
+        }
+
+        input {
+            position: absolute;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            cursor: pointer;
+            opacity: 0;
+        }
+    }
+
     .state {
         border: none;
         background-color: #3a3a3a;

@@ -394,8 +394,9 @@ function ShowInpsector({ show, updateShowProp, setHistory, beginWatching = null 
                     Suggested by <span className='user'>{show.owner.name}</span>
                 </div>
                 <div className='date'>
-                    {!beginWatching &&'Started watching at'}&nbsp;
+                    {!beginWatching && 'Started watching at'}&nbsp;
                     <span className='date-string'>
+                        <input type='date' defaultValue={show.date.toLocaleDateString('en-CA')} onChange={e => updateShowProp(show, 'date', new Date(e.target.value))} />
                         {show.date.getDate()}&nbsp;
                         {monthNames[show.date.getMonth()]}.&nbsp;
                         {show.date.getFullYear()}
@@ -455,7 +456,5 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// reportWebVitals(console.log) || https://bit.ly/CRA-vitals
 reportWebVitals();
