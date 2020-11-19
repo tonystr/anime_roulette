@@ -238,6 +238,21 @@ a:hover {
         transition: background-color .14s, color .14s, border-color .14s;
         color: $c_text;
 
+        .edit {
+            position: absolute;
+            padding-left: 1rem;
+            padding-top: 5px;
+            opacity: 0;
+            transition: all .14s;
+            cursor: pointer;
+            color: #6a6a66;
+            font-size: 1rem;
+
+            &:hover {
+                color: #ffffff;
+            }
+        }
+
         .delete {
             border: none;
             background: none;
@@ -261,6 +276,11 @@ a:hover {
             input {
                 border-right-color: #262628;
             }
+        }
+
+        &:hover .edit {
+            opacity: 1;
+
         }
 
         &:hover .delete {

@@ -223,19 +223,15 @@ function Wheel({ shows, users, colors, setHistory, ...props }) {
                 />
             </div>
             <div className='result'>{rotate ? rotate.winner.name || 'Spinning...' : ''}</div>
-            <ReactModal
-                className='show-inspector'
+            <ShowInpsectorModal
                 isOpen={showWinner}
-                onRequestClose={() => setShowWinner(false)}
-                ariaHideApp={false}
-            >
-                {showWinner && <ShowInpsector
-                    show={rotate.winner}
-                    beginWatching={() => {
-                        setHistory(prev => [...prev, rotate.winner]);
-                        setShowWinner(() => false);
-                    }} />}
-            </ReactModal>
+                onRequestClose={() => setShowWinner(() => false)}
+                show={rotate && rotate.winner}
+                beginWatching={rotate ? () => {
+                    setHistory(prev => [...prev, rotate.winner]);
+                    setShowWinner(() => false);
+                } : null}
+            />
         </div>
     );
 }
@@ -280,6 +276,15 @@ function UserShows({ users, shows, renderShows, setShows }) {
 
 function Shows({ users, shows, setShows, colors, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
+    const [inspectingShow, setInspectingShow] = useState(null);
+
+    const updateShowProp = (show, prop, value) => {
+        if (show[prop] === value) return;
+        setShows(prev => prev.map(
+            hShow => hShow.uuid === show.uuid ? { ...hShow, [prop]: value } : { ...hShow }
+        ));
+        setInspectingShow(prev => ({ ...prev, [prop]: value }));
+    }
 
     const renderShows = show => {
         const i = shows.findIndex(s => s === show);
@@ -299,6 +304,15 @@ function Shows({ users, shows, setShows, colors, ...props }) {
                     ...prev.slice(0, i),
                     ...prev.slice(i + 1)
                 ])}>×</button>
+                <span className='edit' onClick={() => setInspectingShow(() => show)}>edit</span>
+                <ShowInpsectorModal
+                    isOpen={!!inspectingShow}
+                    onRequestClose={() => setInspectingShow(null)}
+                    show={inspectingShow}
+                    updateShowProp={updateShowProp}
+                    setHistory={setShows}
+                    beginWatching={true}
+                />
             </div>
         );
     };
@@ -337,74 +351,81 @@ function History({ users, shows, history, setHistory, ...props }) {
                     </div>
                 ))}
             </div>
-            <ReactModal
-                className='show-inspector'
+            <ShowInpsectorModal
                 isOpen={!!inspectingShow}
                 onRequestClose={() => setInspectingShow(null)}
-                ariaHideApp={false}
-            >
-                {inspectingShow && <ShowInpsector show={inspectingShow} updateShowProp={updateHistoryProp} setHistory={setHistory} />}
-            </ReactModal>
+                show={inspectingShow}
+                updateShowProp={updateHistoryProp}
+                setHistory={setHistory}
+            />
         </div>
     );
 }
 
-function ShowInpsector({ show, updateShowProp, setHistory, beginWatching = null }) {
+function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = null, ...props }) {
     return (
-        <>
-            <h2 className='title'>
-                {show.name}
-                {beginWatching ? (
-                    <button className='begin-wating' onClick={beginWatching}>Start watching</button>
-                ) : (
-                    <select className='state' defaultValue={show.state} onChange={e => setHistory(prev => prev.map(
-                        v => v.uuid === show.uuid ? { ...v, state: e.target.value } : { ...v }
-                    ))}>
-                        <option>Watching</option>
-                        <option>Completed</option>
-                        <option>Dropped</option>
-                    </select>
-                )}
+        <ReactModal
+            className='show-inspector'
+            ariaHideApp={false}
+            {...props}
+        >
+            {show && (<>
+                <h2 className='title'>
+                    {show.name}
+                    {beginWatching ? (
+                        <button className='begin-wating' onClick={beginWatching}>Start watching</button>
+                    ) : (
+                        <select className='state' defaultValue={show.state} onChange={e => setHistory(prev => prev.map(
+                            v => v.uuid === show.uuid ? { ...v, state: e.target.value } : { ...v }
+                        ))}>
+                            <option>Watching</option>
+                            <option>Completed</option>
+                            <option>Dropped</option>
+                        </select>
+                    )}
 
-            </h2>
-            <div className='middle' style={{ backgroundColor: show.color }}>
-                {show.banner && <img className='banner' alt='banner' src={show.banner} />}
-                <input
-                    className={'banner-url hover-input ' + (show.banner ? '' : 'visible')}
-                    type='text'
-                    placeholder='Insert banner url...'
-                    onKeyDown={e => e.key === 'Enter' && e.target.value && updateShowProp(show, 'banner', e.target.value)}
-                    onBlur={e => e.target.value && updateShowProp(show, 'banner', e.target.value)}
-                />
-            </div>
-            {show.state === 'Watching' && (
-                <div className='links'>
-                    {show.watchingUrl && <span>Watching at <a href={show.watchingUrl} target='_blank'>{(show.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}</a></span>}
+                </h2>
+                <div className='middle' style={{ backgroundColor: show.color }}>
+                    {show.banner && <img className='banner' alt='banner' src={show.banner} />}
                     <input
-                        className={'watching-url hover-input ' + (show.watchingUrl ? '' : 'visible')}
+                        className={'banner-url hover-input ' + (show.banner ? '' : 'visible')}
                         type='text'
-                        placeholder={`${show.watchingUrl ? 'Replace' : 'Insert'} watching url...`}
-                        onKeyDown={e => e.key === 'Enter' && e.target.value && updateShowProp(show, 'watchingUrl', e.target.value)}
-                        onBlur={e => e.target.value && updateShowProp(show, 'watchingUrl', e.target.value)}
+                        placeholder='Insert banner url...'
+                        onKeyDown={e => e.key === 'Enter' && e.target.value && updateShowProp(show, 'banner', e.target.value)}
+                        onBlur={e => e.target.value && updateShowProp(show, 'banner', e.target.value)}
                     />
                 </div>
-            )}
-            <div className='bottom'>
-                <div className='owner-field'>
-                    Suggested by <span className='user'>{show.owner.name}</span>
+                {show.state === 'Watching' && (
+                    <div className='links'>
+                        {show.watchingUrl && <span>Watching at <a href={show.watchingUrl} target='_blank'>{(show.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}</a></span>}
+                        <input
+                            className={'watching-url hover-input ' + (show.watchingUrl ? '' : 'visible')}
+                            type='text'
+                            placeholder={`${show.watchingUrl ? 'Replace' : 'Insert'} watching url...`}
+                            onKeyDown={e => e.key === 'Enter' && e.target.value && updateShowProp(show, 'watchingUrl', e.target.value)}
+                            onBlur={e => e.target.value && updateShowProp(show, 'watchingUrl', e.target.value)}
+                        />
+                    </div>
+                )}
+                <div className='bottom'>
+                    <div className='owner-field'>
+                        Suggested by <span className='user'>{show.owner.name}</span>
+                    </div>
+                    {show.date && (
+                        <div className='date'>
+                            {!beginWatching && 'Started watching at'}&nbsp;
+                            <span className='date-string'>
+                                <input type='date' defaultValue={show.date.toLocaleDateString('en-CA')} onChange={e => updateShowProp(show, 'date', new Date(e.target.value))} />
+                                {show.date.getDate()}&nbsp;
+                                {monthNames[show.date.getMonth()]}.&nbsp;
+                                {show.date.getFullYear()}
+                            </span>
+                            .
+                        </div>
+                    )}
                 </div>
-                <div className='date'>
-                    {!beginWatching && 'Started watching at'}&nbsp;
-                    <span className='date-string'>
-                        <input type='date' defaultValue={show.date.toLocaleDateString('en-CA')} onChange={e => updateShowProp(show, 'date', new Date(e.target.value))} />
-                        {show.date.getDate()}&nbsp;
-                        {monthNames[show.date.getMonth()]}.&nbsp;
-                        {show.date.getFullYear()}
-                    </span>
-                    .
-                </div>
-            </div>
-        </>
+            </>)}
+        </ReactModal>
     );
 }
 
