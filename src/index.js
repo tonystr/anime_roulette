@@ -31,8 +31,23 @@ function arrayRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
 
+function tryParseJSON(source) {
+    let json = null;
+    try {
+        json = JSON.parse(source);
+    } catch(err) {
+        return null;
+    }
+    return json;
+}
+
 function parseHistory(historySauce) {
-    return JSON.parse(historySauce).map(h => ({ ...h, date: new Date(h.date) }));
+    const json = tryParseJSON(historySauce);
+    return json ? json.map(h => ({ ...h, date: new Date(h.date) })) : [];
+}
+
+function parseShows(showsSauce) {
+    return tryParseJSON(showsSauce) || [];
 }
 
 function arrayReverse(array) {
@@ -429,23 +444,28 @@ function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = 
     );
 }
 
-function WheelPage() {
+function WheelPage({ wheelName, setWheelName }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'   },
         { name: 'Espen'  },
         { name: 'Jørgen' },
         { name: 'Sigurd' }
     ]);
-    const [shows, setShows] = useState(() => JSON.parse(localStorage.getItem('shows')));
-    const [history, setHistory] = useState(() => parseHistory(localStorage.getItem('history')));
+    const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
+    const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
 
     useEffect(() => {
-        localStorage.setItem('shows', JSON.stringify(shows));
+        localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
     }, [shows]);
 
     useEffect(() => {
-        localStorage.setItem('history', JSON.stringify(history));
+        localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
     }, [history]);
+
+    useEffect(() => {
+        setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
+        setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
+    }, [wheelName]);
 
     const colors = [
         '#caa05a',
@@ -460,19 +480,44 @@ function WheelPage() {
 
     return (
         <div id='home'>
-            <h1>Anime Roulette</h1>
+            <header>
+                <div>
+                    <div className='wheel-name'>
+                        {wheelName}
+                        <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                            <option>Anime Abuse</option>
+                            <option>Testing Wheel</option>
+                            <option>Third one for show</option>
+                        </select>
+                    </div>
+                </div>
+                <h1>Anime Roulette</h1>
+                <div />
+            </header>
             <main>
-                <Shows   className='left   shows'   users={users} shows={shows} setShows={setShows} colors={colors} />
-                <Wheel   className='center wheel'   users={users} shows={shows} colors={colors}   setHistory={setHistory} />
-                <History className='right  history' users={users} shows={shows} history={history} setHistory={setHistory} />
+                <Shows   className='left   shows'   users={users} shows={shows} setShows={setShows} colors={colors}         />
+                <Wheel   className='center wheel'   users={users} shows={shows} colors={colors}     setHistory={setHistory} />
+                <History className='right  history' users={users} shows={shows} history={history}   setHistory={setHistory} />
             </main>
         </div>
     );
 }
 
+function PageRenderer() {
+    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name'));
+
+    useEffect(() => {
+        localStorage.setItem('wheel-name', wheelName);
+    }, [wheelName]);
+
+    return (
+        <WheelPage wheelName={wheelName} setWheelName={setWheelName} />
+    );
+}
+
 ReactDOM.render(
     <React.StrictMode>
-        <WheelPage />
+        <PageRenderer />
     </React.StrictMode>,
     document.getElementById('root')
 );

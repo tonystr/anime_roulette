@@ -17,6 +17,38 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+header {
+    display: flex;
+
+    * {
+        width: 33.3334%;
+    }
+
+    .wheel-name {
+        margin: 1rem 2rem;
+        position: relative;
+        color: #6a6a66;
+        transition: .14s color;
+
+        &:hover {
+            color: #fff;
+        }
+
+        select {
+            background: none;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
+    }
+}
+
 h2 {
     font-weight: 400;
     font-size: 1.6rem;
