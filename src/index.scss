@@ -105,7 +105,35 @@ a:hover {
     z-index: 1010010;
 }
 
-.show-inspector {
+.edit-users-modal {
+    h2 {
+        padding: 1rem 1rem;
+        margin: 0 1rem;
+    }
+
+    .users-list {
+        padding: 1rem 1rem;
+        margin: 0 1rem;
+
+        div {
+            margin-bottom: .8rem;
+        }
+
+        input {
+            border: none;
+            background: none;
+            font-size: 1.3rem;
+            font-family: inherit;
+            color: inherit;
+
+            &:hover {
+                background-color: #333333;
+            }
+        }
+    }
+}
+
+.modal-screen {
     background-color: #262628;
     border-radius: 4px;
     box-shadow: 0 1px 8px rgba(#000, .33);
@@ -114,6 +142,9 @@ a:hover {
     min-height: 30rem;
     display: flex;
     flex-direction: column;
+}
+
+.show-inspector {
     justify-content: space-between;
 
     .begin-wating {
@@ -263,6 +294,30 @@ a:hover {
     display: flex;
     flex-direction: column;
     align-items: baseline;
+
+    .top-bar {
+        display: flex;
+        align-items: baseline;
+
+        .edit {
+            padding-left: .8rem;
+            padding-top: 5px;
+            padding-bottom: 1px;
+            opacity: 0;
+            transition: all .14s;
+            cursor: pointer;
+            color: #6a6a66;
+            font-size: 1rem;
+
+            &:hover {
+                color: #ffffff;
+            }
+        }
+
+        &:hover .edit {
+            opacity: 1;
+        }
+    }
 
     .show {
         border-top-right-radius:    4px;
@@ -433,6 +488,6 @@ a:hover {
 
     svg {
         height: 1.4rem;
-        margin-bottom: -1px;
+        margin-bottom: -2px;
     }
 }

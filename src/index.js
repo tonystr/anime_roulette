@@ -290,9 +290,10 @@ function UserShows({ users, shows, renderShows, setShows, setHistory }) {
     ));
 }
 
-function Shows({ users, shows, setShows, setHistory, colors, ...props }) {
+function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
+    const [editUsers, setEditUsers] = useState(false);
 
     const updateShowProp = (show, prop, value) => {
         if (show[prop] === value) return;
@@ -340,11 +341,30 @@ function Shows({ users, shows, setShows, setHistory, colors, ...props }) {
     return (
         <div {...props}>
             <div className='shows-list'>
-                <h2>Shows <span className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></span></h2>
+                <div className='top-bar'>
+                    <h2>Shows</h2>
+                    <span className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></span>
+                    <span className='edit' onClick={() => setEditUsers(() => true)}>edit users</span>
+                </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} setShows={setShows} setHistory={setHistory} /> :
                     [shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} setShows={setShows} />]}
             </div>
+            <ReactModal
+                className='edit-users-modal modal-screen'
+                ariaHideApp={false}
+                isOpen={editUsers}
+                onRequestClose={() => setEditUsers(() => false)}
+            >
+                <h2>Manage Users</h2>
+                <div className='users-list'>
+                    {users.map(user => (
+                        <div><input type='text' defaultValue={user.name} onChange={e => setUsers(prev => prev.map(
+                            u => u.uuid === user.uuid ?  { ...user, name: e.target.value } : { ...u }
+                        ))} /></div>
+                    ))}
+                </div>
+            </ReactModal>
         </div>
     );
 }
@@ -385,7 +405,7 @@ function History({ users, shows, history, setHistory, ...props }) {
 function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = null, ...props }) {
     return (
         <ReactModal
-            className='show-inspector'
+            className='show-inspector modal-screen'
             ariaHideApp={false}
             {...props}
         >
@@ -451,10 +471,10 @@ function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = 
 
 function WheelPage({ wheelName, setWheelName }) {
     const [users, setUsers] = useState(() => [
-        { name: 'Tony'   },
-        { name: 'Espen'  },
-        { name: 'Jørgen' },
-        { name: 'Sigurd' }
+        { name: 'Tony'  , uuid: uuidv4() },
+        { name: 'Espen' , uuid: uuidv4() },
+        { name: 'Jørgen', uuid: uuidv4() },
+        { name: 'Sigurd', uuid: uuidv4() }
     ]);
     const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
     const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
@@ -500,7 +520,7 @@ function WheelPage({ wheelName, setWheelName }) {
                 <div />
             </header>
             <main>
-                <Shows   className='left   shows'   users={users} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
+                <Shows   className='left   shows'   users={users} setUsers={setUsers} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
                 <Wheel   className='center wheel'   users={users} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
                 <History className='right  history' users={users} shows={shows} history={history}                   setHistory={setHistory} />
             </main>
