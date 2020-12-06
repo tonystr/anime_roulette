@@ -380,10 +380,15 @@ a:hover {
         }
     }
 
-    &:not(:hover) .add-new {
-        padding-top: 0;
-        padding-bottom: 0;
-        opacity: 0;
+
+    &:hover > .add-new {
+        padding: .5rem 1rem;
+        opacity: 1;
+    }
+
+    .add-new:focus {
+        padding: .5rem 1rem;
+        opacity: 1;
     }
 
     .user-shows {
@@ -391,10 +396,9 @@ a:hover {
         flex-direction: column;
         align-items: baseline;
 
-        &:not(:hover) .add-new {
-            padding-top: 0;
-            padding-bottom: 0;
-            opacity: 0;
+        &:hover .add-new {
+            padding: .5rem 1rem;
+            opacity: 1;
         }
     }
 
@@ -419,9 +423,10 @@ a:hover {
 
     .add-new {
         border-color: transparent;
-        padding: .5rem 1rem;
+        padding: 0 1rem;
         font-size: 1.15rem;
         transition: all .2s;
+        opacity: 0;
         display: block;
 
         &:hover {
