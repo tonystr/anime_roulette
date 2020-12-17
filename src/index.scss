@@ -17,6 +17,24 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.clickable-faded {
+    color: #6a6a66;
+    cursor: pointer;
+    transition: .14s color;
+    border: none;
+    background: none;
+    font: inherit;
+    width: auto;
+
+    &:hover {
+        color: #fff;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
 header {
     display: flex;
 
@@ -24,15 +42,14 @@ header {
         width: 33.3334%;
     }
 
+    .export-data {
+        float: right;
+        margin: 1rem 2rem;
+    }
+
     .wheel-name {
         margin: 1rem 2rem;
         position: relative;
-        color: #6a6a66;
-        transition: .14s color;
-
-        &:hover {
-            color: #fff;
-        }
 
         select {
             background: none;
@@ -304,14 +321,7 @@ a:hover {
             padding-top: 5px;
             padding-bottom: 1px;
             opacity: 0;
-            transition: all .14s;
-            cursor: pointer;
-            color: #6a6a66;
             font-size: 1rem;
-
-            &:hover {
-                color: #ffffff;
-            }
         }
 
         &:hover .edit {
@@ -331,13 +341,7 @@ a:hover {
             padding-top: 5px;
             opacity: 0;
             transition: all .14s;
-            cursor: pointer;
-            color: #6a6a66;
             font-size: 1rem;
-
-            &:hover {
-                color: #ffffff;
-            }
         }
 
         .delete {
@@ -483,6 +487,10 @@ a:hover {
 }
 
 .show-users-button {
+    background: none;
+    border: none;
+    width: auto;
+    padding: 0;
     margin-left: 2rem;
     cursor: pointer;
     fill: #8ea091;

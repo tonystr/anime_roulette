@@ -321,9 +321,9 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
                     ...prev.slice(0, i),
                     ...prev.slice(i + 1)
                 ])}>×</button>
-                <span className='edit' onClick={() => setInspectingShow(() => show)}>edit</span>
+                <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
                 <ShowInpsectorModal
-                    isOpen={!!inspectingShow}
+                    isOpen={inspectingShow && inspectingShow.uuid === show.uuid}
                     onRequestClose={() => setInspectingShow(null)}
                     show={inspectingShow}
                     updateShowProp={updateShowProp}
@@ -343,8 +343,8 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
             <div className='shows-list'>
                 <div className='top-bar'>
                     <h2>Shows</h2>
-                    <span className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></span>
-                    <span className='edit' onClick={() => setEditUsers(() => true)}>edit users</span>
+                    <button className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></button>
+                    <button className='clickable-faded edit' onClick={() => setEditUsers(() => true)}>edit users</button>
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} setShows={setShows} setHistory={setHistory} /> :
@@ -507,7 +507,7 @@ function WheelPage({ wheelName, setWheelName }) {
         <div id='home'>
             <header>
                 <div>
-                    <div className='wheel-name'>
+                    <div className='wheel-name clickable-faded'>
                         {wheelName}
                         <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
                             <option>Anime Abuse</option>
@@ -517,7 +517,9 @@ function WheelPage({ wheelName, setWheelName }) {
                     </div>
                 </div>
                 <h1>Anime Roulette</h1>
-                <div />
+                <div>
+                    <button className='export-data clickable-faded'>Export Data</button>
+                </div>
             </header>
             <main>
                 <Shows   className='left   shows'   users={users} setUsers={setUsers} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
