@@ -503,6 +503,18 @@ function WheelPage({ wheelName, setWheelName }) {
         '#8B9863'
     ];
 
+    const exportData = () => {
+        const data = JSON.stringify({ users, shows, history });
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+        anchor.setAttribute('download', `${wheelName} Anime Roulette Data.json`);
+        anchor.innerText = `Click here to download data export of ${wheelName}`;
+        anchor.style.display = 'none';
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    };
+
     return (
         <div id='home'>
             <header>
@@ -518,13 +530,13 @@ function WheelPage({ wheelName, setWheelName }) {
                 </div>
                 <h1>Anime Roulette</h1>
                 <div>
-                    <button className='export-data clickable-faded'>Export Data</button>
+                    <button className='export-data clickable-faded' onClick={exportData}>Export Data</button>
                 </div>
             </header>
             <main>
                 <Shows   className='left   shows'   users={users} setUsers={setUsers} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
-                <Wheel   className='center wheel'   users={users} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
-                <History className='right  history' users={users} shows={shows} history={history}                   setHistory={setHistory} />
+                <Wheel   className='center wheel'   users={users}                     shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
+                <History className='right  history' users={users}                     shows={shows} history={history}                   setHistory={setHistory} />
             </main>
         </div>
     );
