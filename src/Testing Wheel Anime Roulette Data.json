@@ -1,1 +1,88 @@
-{"users":[{"name":"Tony","uuid":"10fbafb0-f584-4f5e-afcf-71ea02424987"},{"name":"Espen","uuid":"c077ca3a-df92-4cb4-bf7f-6f919b70e10e"},{"name":"Jørgen","uuid":"6904b47c-0fa2-4c69-a02b-788da170fe9b"},{"name":"Sigurd","uuid":"46ac882b-b97b-4845-b0bc-9aef667e6320"}],"shows":[{"name":"test","uuid":"72917e8f-22dd-4afa-a898-eae9a7788007","owner":{"name":"Tony"}},{"name":"best","uuid":"e7ebbd77-d8fd-45d4-825c-dda525e9bcbb","owner":{"name":"Tony"}},{"name":"rest","uuid":"37b683e4-9f99-4cd9-b242-04a8b815ba82","owner":{"name":"Tony"}},{"name":"lest","uuid":"52a37abc-eae3-4c2b-a5e6-53cc3c492479","owner":{"name":"Tony"}},{"name":"sest","uuid":"2c1bd496-167e-4c19-b656-2059dca70162","owner":{"name":"Tony"}},{"name":"grest","uuid":"e64a7da2-08e7-4518-bd79-76fd2f9e4e0f","owner":{"name":"Tony"}},{"name":"chest","uuid":"fe345bf2-6a67-4b6d-bebe-357d4237267f","owner":{"name":"Tony"}},{"name":"nest","uuid":"8b449e57-f0ce-4234-953e-5bc71e8aa15e","owner":{"name":"Tony"}}],"history":[{"name":"test","uuid":"72917e8f-22dd-4afa-a898-eae9a7788007","owner":{"name":"Tony"},"date":"2020-11-20T17:47:51.362Z","color":"#caa05a"},{"name":"jest","uuid":"5462202e-61e9-429a-bc9b-9146a106e5a7","owner":{"name":"Tony"},"date":"2020-11-20T17:50:26.086Z","color":"#ae6a47"},{"name":"quest","uuid":"f9f4103b-32c9-4edc-bd9c-2ff879a14f8b","owner":{"name":"Tony"},"date":"2020-11-20T17:52:35.826Z"}]}
+{
+    "users": [{
+        "name": "Tony",
+        "uuid": "10fbafb0-f584-4f5e-afcf-71ea02424987"
+    }, {
+        "name": "Espen",
+        "uuid": "c077ca3a-df92-4cb4-bf7f-6f919b70e10e"
+    }, {
+        "name": "Jørgen",
+        "uuid": "6904b47c-0fa2-4c69-a02b-788da170fe9b"
+    }, {
+        "name": "Sigurd",
+        "uuid": "46ac882b-b97b-4845-b0bc-9aef667e6320"
+    }],
+    "shows": [{
+        "name": "test",
+        "uuid": "72917e8f-22dd-4afa-a898-eae9a7788007",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "best",
+        "uuid": "e7ebbd77-d8fd-45d4-825c-dda525e9bcbb",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "rest",
+        "uuid": "37b683e4-9f99-4cd9-b242-04a8b815ba82",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "lest",
+        "uuid": "52a37abc-eae3-4c2b-a5e6-53cc3c492479",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "sest",
+        "uuid": "2c1bd496-167e-4c19-b656-2059dca70162",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "grest",
+        "uuid": "e64a7da2-08e7-4518-bd79-76fd2f9e4e0f",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "chest",
+        "uuid": "fe345bf2-6a67-4b6d-bebe-357d4237267f",
+        "owner": {
+            "name": "Tony"
+        }
+    }, {
+        "name": "nest",
+        "uuid": "8b449e57-f0ce-4234-953e-5bc71e8aa15e",
+        "owner": {
+            "name": "Tony"
+        }
+    }],
+    "history": [{
+        "name": "test",
+        "uuid": "72917e8f-22dd-4afa-a898-eae9a7788007",
+        "owner": {
+            "name": "Tony"
+        },
+        "date": "2020-11-20T17:47:51.362Z",
+        "color": "#caa05a"
+    }, {
+        "name": "jest",
+        "uuid": "5462202e-61e9-429a-bc9b-9146a106e5a7",
+        "owner": {
+            "name": "Tony"
+        },
+        "date": "2020-11-20T17:50:26.086Z",
+        "color": "#ae6a47"
+    }, {
+        "name": "quest",
+        "uuid": "f9f4103b-32c9-4edc-bd9c-2ff879a14f8b",
+        "owner": {
+            "name": "Tony"
+        },
+        "date": "2020-11-20T17:52:35.826Z"
+    }]
+}
