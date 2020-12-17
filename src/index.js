@@ -301,7 +301,7 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
             <div className='show' key={show.uuid}>
                 <input
                     type='text'
-                    defaultValue={show.name}
+                    value={show.name}
                     onChange={e => setShows(prev => [
                         ...prev.slice(0, i),
                         { ...show, name: e.target.value },
@@ -351,9 +351,17 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
                 <h2>Manage Users</h2>
                 <div className='users-list'>
                     {users.map(user => (
-                        <div><input type='text' defaultValue={user.name} onChange={e => setUsers(prev => prev.map(
-                            u => u.uuid === user.uuid ?  { ...user, name: e.target.value } : { ...u }
-                        ))} /></div>
+                        <div key={user.uuid}>
+                            <input
+                                type='text'
+                                defaultValue={user.name}
+                                onChange={e => setUsers(prev => prev.map(
+                                    u => u.uuid === user.uuid ?
+                                    { ...user, name: e.target.value } :
+                                    { ...u }
+                                ))}
+                            />
+                        </div>
                     ))}
                 </div>
             </ReactModal>
@@ -472,6 +480,11 @@ function WheelPage({ wheelName, setWheelName }) {
     const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
 
     useEffect(() => {
+        setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
+        setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
+    }, [wheelName]);
+
+    useEffect(() => {
         localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
     }, [shows, wheelName]);
 
@@ -479,10 +492,6 @@ function WheelPage({ wheelName, setWheelName }) {
         localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
     }, [history, wheelName]);
 
-    useEffect(() => {
-        setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
-        setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
-    }, [wheelName]);
 
     const colors = [
         '#caa05a',
@@ -507,6 +516,29 @@ function WheelPage({ wheelName, setWheelName }) {
         document.body.removeChild(anchor);
     };
 
+    const importData = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.innerText = `Click here to upload data to ${wheelName}`;
+        input.style.display = 'none';
+        document.body.appendChild(input);
+        input.click();
+        input.addEventListener('change', e => {
+            try {
+                const file = e.target.files[0];
+                file.text().then(text => {
+                    const { users, shows, history } = JSON.parse(text);
+                    setUsers(users);
+                    setShows(shows);
+                    setHistory(history.map(show => ({ ...show, date: new Date(show.date) })));
+                })
+            } catch (err) {
+                console.log(err);
+            }
+            document.body.removeChild(input);
+        })
+    };
+
     return (
         <div id='home'>
             <header>
@@ -517,12 +549,15 @@ function WheelPage({ wheelName, setWheelName }) {
                             <option>Anime Abuse</option>
                             <option>Testing Wheel</option>
                             <option>Third one for show</option>
+                            <option>WHEEL OF IMPORT</option>
                         </select>
                     </div>
                 </div>
                 <h1>Anime Roulette</h1>
-                <div>
+                <div className="export-import">
                     <button className='export-data clickable-faded' onClick={exportData}>Export Data</button>
+                    /
+                    <button className='import-data clickable-faded' onClick={importData}>Import Data</button>
                 </div>
             </header>
             <main>

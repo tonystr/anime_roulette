@@ -25,6 +25,7 @@ code {
     background: none;
     font: inherit;
     width: auto;
+    outline: none;
 
     &:hover {
         color: #fff;
@@ -42,9 +43,16 @@ header {
         width: 33.3334%;
     }
 
-    .export-data {
-        float: right;
-        margin: 1rem 2rem;
+    .export-import {
+        display: flex;
+        justify-content: flex-end;
+        margin: 1rem 0;
+        align-items: baseline;
+        color: #44484d;
+
+        .import-data {
+            margin-right: 2rem;
+        }
     }
 
     .wheel-name {
@@ -321,6 +329,7 @@ a:hover {
             padding-top: 5px;
             padding-bottom: 1px;
             opacity: 0;
+            transition: all .14s;
             font-size: 1rem;
         }
 
