@@ -23,14 +23,6 @@ const monthNames = [
     'Dec',
 ];
 
-function choose(...args) {
-    return args[Math.floor(Math.random() * args.length)];
-}
-
-function arrayRandom(array) {
-    return array[Math.floor(Math.random() * array.length)];
-}
-
 function tryParseJSON(source) {
     let json = null;
     try {
@@ -323,7 +315,7 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
                 ])}>×</button>
                 <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
                 <ShowInpsectorModal
-                    isOpen={inspectingShow && inspectingShow.uuid === show.uuid}
+                    isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
                     onRequestClose={() => setInspectingShow(null)}
                     show={inspectingShow}
                     updateShowProp={updateShowProp}
@@ -437,7 +429,7 @@ function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = 
                 </div>
                 {show.state === 'Watching' && (
                     <div className='links'>
-                        {show.watchingUrl && <span>Watching at <a href={show.watchingUrl} target='_blank'>{(show.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}</a></span>}
+                        {show.watchingUrl && <span>Watching at <a href={show.watchingUrl} rel="noreferrer" target='_blank'>{(show.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}</a></span>}
                         <input
                             className={'watching-url hover-input ' + (show.watchingUrl ? '' : 'visible')}
                             type='text'
@@ -481,11 +473,11 @@ function WheelPage({ wheelName, setWheelName }) {
 
     useEffect(() => {
         localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
-    }, [shows]);
+    }, [shows, wheelName]);
 
     useEffect(() => {
         localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
-    }, [history]);
+    }, [history, wheelName]);
 
     useEffect(() => {
         setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
