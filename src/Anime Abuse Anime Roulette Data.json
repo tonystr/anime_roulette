@@ -129,6 +129,46 @@
         "date": "2020-11-06T12:10:03.475Z",
         "state": "Completed"
     }, {
+        "name": "Mob Psycho 100 (12)",
+        "banner": "",
+        "watchingUrl": "",
+        "uuid": "",
+        "owner": {
+            "name": "Jørgen"
+        },
+        "date": "2020-11-19T12:10:03.475Z",
+        "state": "Completed"
+    }, {
+        "name": "Rascal Does Not Dream of Bunny Girl Senpai (12)",
+        "banner": "",
+        "watchingUrl": "",
+        "uuid": "",
+        "owner": {
+            "name": "Jørgen"
+        },
+        "date": "2020-11-28T12:10:03.475Z",
+        "state": "Completed"
+    }, {
+        "name": "Grand Blue (12)",
+        "banner": "",
+        "watchingUrl": "",
+        "uuid": "",
+        "owner": {
+            "name": "Jørgen"
+        },
+        "date": "2020-12-05T12:10:03.475Z",
+        "state": "Completed"
+    }, {
+        "name": "SAIDO CHESTO (12)",
+        "banner": "",
+        "watchingUrl": "",
+        "uuid": "",
+        "owner": {
+            "name": "Espen"
+        },
+        "date": "2020-12-10T12:10:03.475Z",
+        "state": "Completed"
+    }, {
         "name": "Jojo part 2",
         "banner": "",
         "watchingUrl": "",
@@ -140,6 +180,7 @@
         "state": "Completed"
     }, {
         "name": "Ching Chong (3)",
+        "actual_title": "Wu Shan Wu Xing",
         "banner": "",
         "watchingUrl": "",
         "uuid": "",
