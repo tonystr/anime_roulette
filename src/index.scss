@@ -293,8 +293,29 @@ a:hover {
 }
 
 #home .history {
-    margin-right: 1rem;
     text-align: right;
+    position: relative;
+
+    > * {
+        padding-right: 1rem;
+    }
+
+    .list {
+        max-height: 75vh;
+        overflow-y: scroll;
+        scrollbar-color: #302f2f transparent;
+        scrollbar-width: thin;
+
+        &::after {
+            position: absolute;
+            content: '';
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1rem;
+            background: linear-gradient(to bottom, transparent, #262628);
+        }
+    }
 
     .show {
         color: $c_text;
@@ -303,9 +324,25 @@ a:hover {
         transition: .14s color;
         cursor: pointer;
 
+        display: flex;
+        justify-content: flex-end;
+
+        .title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 1;
+            max-width: 70%;
+        }
+
         .date {
             color: #6a6a66;
             font-size: 1rem;
+            display: inline-block;
+            width: 4.3rem;
+            text-align: left;
+            padding-left: 5px;
+            flex-shrink: 0;
         }
 
         &:hover {
@@ -477,6 +514,7 @@ a:hover {
 #home .wheel-box {
     margin-top: 4rem;
     position: relative;
+    max-height: 70vh;
 
     svg#arrow-down {
         width: 40px;

@@ -390,12 +390,14 @@ function History({ users, shows, history, setHistory, ...props }) {
         <div>
             <div {...props}>
                 <h2>History</h2>
-                {arrayReverse(history).map(show => (
-                    <div key={show.uuid} className='show' onClick={() => setInspectingShow(show)}>
-                        <span className='title'>{show.name}</span>
-                        <span className='date'> - {show.date.getDate()} {monthNames[show.date.getMonth()]}.</span>
-                    </div>
-                ))}
+                <div className='list'>
+                    {arrayReverse(history).map(show => (
+                        <div key={show.uuid} className='show' onClick={() => setInspectingShow(show)}>
+                            <span className='title'>{show.name}</span>
+                            <span className='date'> - {show.date.getDate()} {monthNames[show.date.getMonth()]}.</span>
+                        </div>
+                    ))}
+                </div>
             </div>
             <ShowInpsectorModal
                 isOpen={!!inspectingShow}
