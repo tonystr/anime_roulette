@@ -306,6 +306,10 @@ a:hover {
         scrollbar-color: #302f2f transparent;
         scrollbar-width: thin;
 
+        .show:last-child {
+            padding-bottom: 1rem;
+        }
+
         &::after {
             position: absolute;
             content: '';
