@@ -6,7 +6,10 @@ import { ReactComponent as UserIcon  } from './icons/user.svg';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
-// import historySauce from './history.json';
+
+for (let i = 0; i < 16; i++) {
+    console.log(uuidv4());
+}
 
 const monthNames = [
     'Jan',
@@ -23,10 +26,13 @@ const monthNames = [
     'Dec',
 ];
 
-function tryParseJSON(source) {
+function tryParseJSON(source, test=null) {
     let json = null;
     try {
         json = JSON.parse(source);
+        if (test && !test(json)) {
+            return null;
+        }
     } catch(err) {
         return null;
     }
@@ -34,12 +40,12 @@ function tryParseJSON(source) {
 }
 
 function parseHistory(historySauce) {
-    const json = tryParseJSON(historySauce);
+    const json = tryParseJSON(historySauce, Array.isArray);
     return json ? json.map(h => ({ ...h, date: new Date(h.date) })) : [];
 }
 
 function parseShows(showsSauce) {
-    return tryParseJSON(showsSauce) || [];
+    return tryParseJSON(showsSauce, Array.isArray) || [];
 }
 
 function arrayReverse(array) {
@@ -121,27 +127,18 @@ const extendContext = (ctx, size) => ({
     }
 });
 
-class Rotate {
-    constructor(active = true, offset = 0, showWinner = false) {
-        this.date = new Date();
-        this.offset = offset;
-        this.rng = Math.random();
-        this.endDate = +this.date + 8000 + this.rng * 1000;
-        this.active = active
-        this.winner = '';
-    }
-}
-
 function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [rotate, setRotate] = useState(null);
     const [arrowColor, setArrowColor] = useState('#afb8c6');
     const [showWinner, setShowWinner] = useState(false);
+    const [winner, setWinner] = useState(null);
+    const [rotating, setRotating] = useState(false);
 
     // Draw wheel
     useEffect(() => {
-        if (!canvasRef || !canvasRef.current || (rotate && rotate.active)) return;
+        if (!canvasRef || !canvasRef.current || (rotate && rotating)) return;
 
         // Draw wheel
         const ctx = extendContext(canvasRef.current.getContext('2d'), size);
@@ -185,15 +182,12 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
                 const winnerIndex = Math.floor((1 - ((rotate.offset / (Math.PI * 2) + rotate.rng + .25) % 1)) * shows.length);
                 const winnerColor = pickColor(winnerIndex, colors, shows);
 
-                setRotate(prev => ({
-                    ...prev,
-                    active: false,
-                    winner: {
-                        ...shows[winnerIndex],
-                        date: new Date(),
-                        color: winnerColor
-                    }
+                setWinner(() => ({
+                    ...shows[winnerIndex],
+                    date: new Date(),
+                    color: winnerColor
                 }));
+
                 setShowWinner(() => true);
                 setArrowColor(() => winnerColor);
                 return;
@@ -209,7 +203,7 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
             ctx.drawWheel(shows, colors, rotate.offset + time * (Math.PI * 2 * 13 + rotate.rng * Math.PI * 2));
         };
 
-        if (rotate.active) {
+        if (rotating) {
             const interval = setInterval(handleRotate, 10);
             return () => clearInterval(interval);
         }
@@ -223,20 +217,32 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
                 </div>
                 <canvas
                     id='wheel'
-                    onClick={() => setRotate(prev => prev ? (prev.active ? prev : new Rotate(true, prev.offset + prev.rng * Math.PI * 2)) : new Rotate())}
+                    onClick={() => setRotate(prev => {
+                        if (prev && rotating) return prev;
+
+                        const date = new Date();
+                        const rng = Math.random();
+
+                        return {
+                            date,
+                            offset: prev ? prev.offset + prev.rng * Math.PI * 2 : 0,
+                            rng,
+                            endDate: +date + 8000 + rng * 1000 // 8-9 seconds after start
+                        };
+                    })}
                     ref={canvasRef}
                     width={size}
                     height={size}
                 />
             </div>
-            <div className='result'>{rotate ? rotate.winner.name || 'Spinning...' : ''}</div>
+            <div className='result'>{rotate ? winner.name || 'Spinning...' : ''}</div>
             <ShowInpsectorModal
                 isOpen={showWinner}
                 onRequestClose={() => setShowWinner(() => false)}
-                show={rotate && rotate.winner}
+                show={rotate && winner}
                 beginWatching={rotate ? () => {
-                    setHistory(prev => [...prev, rotate.winner]);
-                    setShows(prev => prev.filter(show => show.uuid !== rotate.winner.uuid));
+                    setHistory(prev => [...prev, winner]);
+                    setShows(prev => prev.filter(show => show.uuid !== winner.uuid));
                     setShowWinner(() => false);
                 } : null}
             />
@@ -524,18 +530,20 @@ function WheelPage({ wheelName, setWheelName }) {
         document.body.appendChild(input);
         input.click();
         input.addEventListener('change', e => {
-            try {
-                const file = e.target.files[0];
-                file.text().then(text => {
-                    const { users, shows, history } = JSON.parse(text);
-                    setUsers(users);
-                    setShows(shows);
-                    setHistory(history.map(show => ({ ...show, date: new Date(show.date) })));
-                })
-            } catch (err) {
-                console.log(err);
-            }
+            const file = e.target.files[0];
             document.body.removeChild(input);
+            if (!file) return;
+            file.text()
+                .then(text => {
+                    //localStorage.setItem(`${wheelName}-shows`, '[]');
+                    //localStorage.setItem(`${wheelName}-history`, '[]');
+
+                    const { users, shows, history } = JSON.parse(text);
+                    setUsers(() => users);
+                    setShows(() => shows);
+                    setHistory(() => history.map(show => ({ ...show, date: new Date(show.date) })));
+                })
+                .catch(console.log);
         })
     };
 
