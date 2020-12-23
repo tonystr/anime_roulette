@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import ReactModal from 'react-modal';
 import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
+import GoogleLogo from './icons/google_logo.png';
 import { v4 as uuidv4 } from 'uuid';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -148,6 +149,16 @@ function Wheel({ shows, removeShow, users, colors, addHistory, ...props }) {
     const [showWinner, setShowWinner] = useState(false);
     const [winner, setWinner] = useState(null);
     const [rotating, setRotating] = useState(false);
+
+    // Listen for rotating change
+    //useEffect(() => { 
+    //   const unsubscribe = someFirestoreAPICall().onSnapshot(snap => {
+    //     const data = snap.docs.map(doc => doc.data())
+    //     setRotating(data)
+    //   });
+//
+    //   return unsubscribe
+   //}, []);
 
     // Draw wheel
     useEffect(() => {
@@ -496,29 +507,18 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
 
     const [shows] = useCollectionData(showsQuery);
     const historyCD = useCollectionData(historyQuery);
-    console.log(historyCD[0]);
     const history = (historyCD[0] || []).map(h => ({ ...h, date: h.date.toDate ?
         h.date.toDate() :
         new Date(h.date)
     }));
-    console.log(history);
 
     const setShows   = () => {};
     const setHistory = () => {};
-
 
     useEffect(() => {
         setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
         setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
     }, [wheelName]);
-
-    // useEffect(() => {
-    //     localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
-    // }, [shows, wheelName]);
-
-    // useEffect(() => {
-    //     localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
-    // }, [history, wheelName]);
 
 
     const colors = [
@@ -601,43 +601,25 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
         <button className='import-data clickable-faded' onClick={importData}>Import Data</button>
     */
     return (
-        <div id='home'>
-            <header>
-                <div>
-                    <div className='wheel-name clickable-faded'>
-                        {wheelName}
-                        <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                            <option>Anime Abuse</option>
-                            <option>Testing Wheel</option>
-                            <option>Animal Abuse</option>
-                            <option>Third one for show</option>
-                            <option>WHEEL OF IMPORT</option>
-                            <option>Test Wheel</option>
-                        </select>
-                    </div>
-                </div>
-                <h1>Anime Roulette</h1>
-                <div className="export-import">
-                    <SignOut />
-                </div>
-            </header>
-            <main>
-                <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} />
-                <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} />
-                <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
-            </main>
-        </div>
+        <main id='home' role='main'>
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} />
+            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} />
+            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
+        </main>
     );
 }
 
 function SignIn() {
     return (
-        <button onClick={() => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithRedirect(provider);
-        }}>
-            Sign in with Google
-        </button>
+        <div className='sign-in-panel'>
+            <button className='sign-in' onClick={() => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithRedirect(provider);
+            }}>
+                <img alt='Google Logo' className='google-logo' src={GoogleLogo} width={50} height={50} />
+                Sign in with Google
+            </button>
+        </div>
     );
 }
 
@@ -651,7 +633,7 @@ function SignOut({ className='', ...props }) {
 }
 
 function PageRenderer() {
-    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Select wheel');
+    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
     const [user] = useAuthState(auth);
 
     const wheelsRef = firestore.collection('wheels');
@@ -664,15 +646,39 @@ function PageRenderer() {
         localStorage.setItem('wheel-name', wheelName);
     }, [wheelName]);
 
-    return user ?
-        <WheelPage
-            wheelName={wheelName}
-            setWheelName={setWheelName}
-            wheelQuery={query}
-            showsQuery={showsQuery}
-            historyQuery={historyQuery}
-        /> :
-        <SignIn />;
+    return (
+        <div>
+            <header>
+                <div>
+                    {user && (
+                        <div className='wheel-name clickable-faded'>
+                            {wheelName}
+                            <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                                <option>Anime Abuse</option>
+                                <option>Testing Wheel</option>
+                                <option>Animal Abuse</option>
+                                <option>Third one for show</option>
+                                <option>WHEEL OF IMPORT</option>
+                                <option>Test Wheel</option>
+                            </select>
+                        </div>
+                    )}
+                </div>
+                <h1>Anime Roulette</h1>
+                <div className="export-import">
+                    <SignOut />
+                </div>
+            </header>
+            {user ?
+                <WheelPage
+                    wheelName={wheelName}
+                    wheelQuery={query}
+                    showsQuery={showsQuery}
+                    historyQuery={historyQuery}
+                /> :
+                <SignIn />}
+        </div>
+    );
 }
 
 ReactDOM.render(
