@@ -22,7 +22,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-window.firestore = firestore;
+//window.firestore = firestore;
 
 const monthNames = [
     'Jan',
@@ -496,8 +496,12 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
 
     const [shows] = useCollectionData(showsQuery);
     const historyCD = useCollectionData(historyQuery);
-
-    const history = (historyCD[0] || []).map(h => ({ ...h, date: new Date(h.date) }));
+    console.log(historyCD[0]);
+    const history = (historyCD[0] || []).map(h => ({ ...h, date: h.date.toDate ?
+        h.date.toDate() :
+        new Date(h.date)
+    }));
+    console.log(history);
 
     const setShows   = () => {};
     const setHistory = () => {};
@@ -565,23 +569,37 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
         })
     };
 
-    const removeShow = uuid => {
-        setShows(prev => prev.filter(show => show.uuid !== uuid));
-    };
-    const addShow = show => setShows(prev => [...prev, show]);
-    const updateShowProp = (uuid, prop, value) => setShows(prev => prev.map(
-        hShow => hShow.uuid === uuid ?
-            { ...hShow, [prop]: value } :
-            { ...hShow }
-    ));
+    const removeShow = uuid => firestore.collection(`shows-${wheelName}`)
+        .doc(uuid).delete()
+        .then(() => console.log('Document successfully deleted!'))
+        .catch(err => console.error('Error removing document: ', err));
 
-    const addHistory = show => setHistory(prev => [...prev, show]);
-    const updateHistoryProp = (uuid, prop, value) => setHistory(prev => prev.map(
-        hShow => hShow.uuid === uuid ?
-            { ...hShow, [prop]: value } :
-            { ...hShow }
-    ));
+    const addShow = show => firestore.collection(`shows-${wheelName}`)
+        .doc(show.uuid).set(show)
+        .then(() => console.log('Document successfully added!'))
+        .catch(err => console.error('Error adding document: ', err));
 
+    const updateShowProp = (uuid, prop, value) => firestore.collection(`shows-${wheelName}`)
+        .doc(uuid).update({ [prop]: value })
+        .then(() => console.log('Document successfully updated!'))
+        .catch(err => console.error('Error updating document: ', err));
+
+
+    const addHistory = show => firestore.collection(`history-${wheelName}`)
+        .doc(show.uuid).set(show)
+        .then(() => console.log('Document successfully added!'))
+        .catch(err => console.error('Error adding document: ', err));
+
+    const updateHistoryProp = (uuid, prop, value) => firestore.collection(`history-${wheelName}`)
+        .doc(uuid).update({ [prop]: value })
+        .then(() => console.log('Document successfully updated!'))
+        .catch(err => console.error('Error updating document: ', err));
+
+    /*
+        <button className='export-data clickable-faded' onClick={exportData}>Export Data</button>
+        /
+        <button className='import-data clickable-faded' onClick={importData}>Import Data</button>
+    */
     return (
         <div id='home'>
             <header>
@@ -600,9 +618,7 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
                 </div>
                 <h1>Anime Roulette</h1>
                 <div className="export-import">
-                    <button className='export-data clickable-faded' onClick={exportData}>Export Data</button>
-                    /
-                    <button className='import-data clickable-faded' onClick={importData}>Import Data</button>
+                    <SignOut />
                 </div>
             </header>
             <main>
@@ -619,13 +635,18 @@ function SignIn() {
         <button onClick={() => {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithRedirect(provider);
-        }}>Sign in with Google</button>
+        }}>
+            Sign in with Google
+        </button>
     );
 }
 
-function SignOut() {
+function SignOut({ className='', ...props }) {
     return auth.currentUser && (
-        <button onClick={auth.signOut}>Sign out</button>
+        <button {...props}
+            className={'clickable-faded ' + className}
+            onClick={() => auth.signOut()}
+        >Sign out</button>
     );
 }
 
