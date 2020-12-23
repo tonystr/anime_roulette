@@ -151,7 +151,7 @@ function Wheel({ shows, removeShow, users, colors, addHistory, ...props }) {
 
     // Draw wheel
     useEffect(() => {
-        if (!canvasRef || !canvasRef.current || (rotate && rotating)) return;
+        if (!canvasRef || !canvasRef.current || (rotate && rotating) || !shows) return;
 
         // Draw wheel
         const ctx = extendContext(canvasRef.current.getContext('2d'), size);
@@ -185,7 +185,7 @@ function Wheel({ shows, removeShow, users, colors, addHistory, ...props }) {
 
     // Rotation
     useEffect(() => {
-        if (!canvasRef || !rotate) return;
+        if (!canvasRef || !rotate || !shows) return;
 
         const handleRotate = () => {
             const date = new Date();
@@ -250,7 +250,7 @@ function Wheel({ shows, removeShow, users, colors, addHistory, ...props }) {
                     height={size}
                 />
             </div>
-            <div className='result'>{rotate ? winner && winner.name || 'Spinning...' : ''}</div>
+            <div className='result'>{rotate && (winner ? winner.name : 'Spinning...')}</div>
             <ShowInpsectorModal
                 isOpen={showWinner}
                 onRequestClose={() => {
@@ -300,7 +300,7 @@ function UserShows({ users, shows, renderShows, addShow }) {
     return users.map((user, i) => (
         <div className='user-shows' key={user.name}>
             <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
-            {shows.filter(show => show.owner.name === user.name).map(renderShows)}
+            {shows && shows.filter(show => show.owner.name === user.name).map(renderShows)}
             <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} />
         </div>
     ));
@@ -354,7 +354,7 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
-                    [shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} addShow={addShow} />]}
+                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} addShow={addShow} />]}
             </div>
             <ReactModal
                 className='edit-users-modal modal-screen'
@@ -494,10 +494,9 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
     // const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
     // const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
 
-    const showsCD = useCollectionData(showsQuery);
+    const [shows] = useCollectionData(showsQuery);
     const historyCD = useCollectionData(historyQuery);
 
-    const shows = showsCD[0] || [];
     const history = (historyCD[0] || []).map(h => ({ ...h, date: new Date(h.date) }));
 
     const setShows   = () => {};
@@ -509,13 +508,13 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
         setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
     }, [wheelName]);
 
-    useEffect(() => {
-        localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
-    }, [shows, wheelName]);
+    // useEffect(() => {
+    //     localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
+    // }, [shows, wheelName]);
 
-    useEffect(() => {
-        localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
-    }, [history, wheelName]);
+    // useEffect(() => {
+    //     localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
+    // }, [history, wheelName]);
 
 
     const colors = [
@@ -645,7 +644,13 @@ function PageRenderer() {
     }, [wheelName]);
 
     return user ?
-        <WheelPage wheelName={wheelName} setWheelName={setWheelName} wheelQuery={query} showsQuery={showsQuery} historyQuery={historyQuery} /> :
+        <WheelPage
+            wheelName={wheelName}
+            setWheelName={setWheelName}
+            wheelQuery={query}
+            showsQuery={showsQuery}
+            historyQuery={historyQuery}
+        /> :
         <SignIn />;
 }
 
