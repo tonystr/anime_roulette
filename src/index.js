@@ -9,7 +9,7 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 
@@ -141,24 +141,28 @@ const extendContext = (ctx, size) => ({
     }
 });
 
-function Wheel({ shows, removeShow, users, colors, addHistory, ...props }) {
+function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [rotate, setRotate] = useState(null);
     const [arrowColor, setArrowColor] = useState('#afb8c6');
     const [showWinner, setShowWinner] = useState(false);
     const [winner, setWinner] = useState(null);
-    const [rotating, setRotating] = useState(false);
+    const [rotating, setRotatingLocal] = useState(false);
 
-    // Listen for rotating change
-    //useEffect(() => { 
-    //   const unsubscribe = someFirestoreAPICall().onSnapshot(snap => {
-    //     const data = snap.docs.map(doc => doc.data())
-    //     setRotating(data)
-    //   });
-//
-    //   return unsubscribe
-   //}, []);
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
+    const rotatingServer = wheel ? wheel.spinning : false;
+
+    useEffect(() => {
+        setRotatingLocal(() => rotatingServer);
+    }, [rotatingServer]);
+
+    const setRotating = rotating => {
+        firestore.doc(`wheels/${wheelName}`).update({
+            spinning: typeof rotating === 'function' ? rotating() : rotating
+        });
+        setRotatingLocal(rotating);
+    };
 
     // Draw wheel
     useEffect(() => {
@@ -212,6 +216,7 @@ function Wheel({ shows, removeShow, users, colors, addHistory, ...props }) {
                     color: winnerColor
                 }));
 
+                setRotating(() => false);
                 setShowWinner(() => true);
                 setArrowColor(() => winnerColor);
                 return;
@@ -495,7 +500,7 @@ function ShowInpsectorModal({ show, updateShowProp, beginWatching = null, ...pro
     );
 }
 
-function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQuery }) {
+function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'  , uuid: uuidv4() },
         { name: 'Espen' , uuid: uuidv4() },
@@ -519,7 +524,6 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
         setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
         setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
     }, [wheelName]);
-
 
     const colors = [
         '#caa05a',
@@ -595,15 +599,10 @@ function WheelPage({ wheelName, setWheelName, wheelQuery, showsQuery, historyQue
         .then(() => console.log('Document successfully updated!'))
         .catch(err => console.error('Error updating document: ', err));
 
-    /*
-        <button className='export-data clickable-faded' onClick={exportData}>Export Data</button>
-        /
-        <button className='import-data clickable-faded' onClick={importData}>Import Data</button>
-    */
     return (
         <main id='home' role='main'>
             <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} />
-            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} />
+            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} wheelName={wheelName} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
         </main>
     );
@@ -637,7 +636,6 @@ function PageRenderer() {
     const [user] = useAuthState(auth);
 
     const wheelsRef = firestore.collection('wheels');
-    const query = wheelsRef.where('title', '==', 'Test Wheel');
 
     const showsQuery = firestore.collection(`shows-${wheelName}`);
     const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
@@ -672,7 +670,6 @@ function PageRenderer() {
             {user ?
                 <WheelPage
                     wheelName={wheelName}
-                    wheelQuery={query}
                     showsQuery={showsQuery}
                     historyQuery={historyQuery}
                 /> :
