@@ -141,27 +141,52 @@ const extendContext = (ctx, size) => ({
     }
 });
 
+function compareRotates(r1, r2) {
+    if (r1 === r2) return true;
+    if (!r1 || !r2) return false;
+    return (
+        r1.endDate === r2.endDate &&
+        r1.offset  === r2.offset &&
+        r1.rng     === r2.rng
+    );
+}
+
 function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
-    const [rotate, setRotate] = useState(null);
     const [arrowColor, setArrowColor] = useState('#afb8c6');
     const [showWinner, setShowWinner] = useState(false);
     const [winner, setWinner] = useState(null);
+
     const [rotating, setRotatingLocal] = useState(false);
+    const [rotate, setRotateLocal] = useState(null);
 
     const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
-    const rotatingServer = wheel ? wheel.spinning : false;
+    const rotatingServer = wheel ? wheel.spinning : rotating;
+    const rotateServer = wheel ? wheel.rotate || null : rotate;
 
     useEffect(() => {
         setRotatingLocal(() => rotatingServer);
     }, [rotatingServer]);
 
-    const setRotating = rotating => {
+    useEffect(() => {
+        if (compareRotates(rotateServer, rotate)) return;
+        const newRotate = { ...rotateServer, date: rotateServer.date.toDate() };
+        setRotateLocal(() => newRotate);
+    }, [rotateServer && rotateServer.rng, rotateServer && rotateServer.endDate, rotateServer && rotateServer.offset]);
+
+    const setRotate = newRotate => {
         firestore.doc(`wheels/${wheelName}`).update({
-            spinning: typeof rotating === 'function' ? rotating() : rotating
+            rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
         });
-        setRotatingLocal(rotating);
+        setRotateLocal(newRotate);
+    };
+
+    const setRotating = newRotating => {
+        firestore.doc(`wheels/${wheelName}`).update({
+            spinning: typeof newRotating === 'function' ? newRotating(rotating) : newRotating
+        });
+        setRotatingLocal(newRotating);
     };
 
     // Draw wheel
@@ -175,6 +200,9 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
         // Set Arrow color with default state
         if (!rotate) {
             const targetIndex = Math.floor(.75 * shows.length);
+            setArrowColor(() => pickColor(targetIndex, colors, shows));
+        } else {
+            const targetIndex = Math.floor((1 - ((rotate.offset / (Math.PI * 2) + .25) % 1)) * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
 
@@ -229,6 +257,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
             setArrowColor(() => pickColor(targetIndex, colors, shows));
 
             const ctx = extendContext(canvasRef.current.getContext('2d'), size);
+
             ctx.drawWheel(shows, colors, rotate.offset + time * (Math.PI * 2 * 13 + rotate.rng * Math.PI * 2));
         };
 
@@ -266,20 +295,19 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
                     height={size}
                 />
             </div>
-            <div className='result'>{rotate && (winner ? winner.name : 'Spinning...')}</div>
             <ShowInpsectorModal
                 isOpen={showWinner}
                 onRequestClose={() => {
                     setShowWinner(() => false);
-                    setRotate(() => null);
-                    setWinner(() => null);
+                    //setRotate(() => null);
+                    //setWinner(() => null);
                 }}
                 show={rotate && winner}
                 beginWatching={rotate ? () => {
                     addHistory(winner);
                     removeShow(winner.uuid);
                     setShowWinner(() => false);
-                    setRotate(() => null);
+                    //setRotate(() => null);
                     setWinner(() => null);
                 } : null}
             />
