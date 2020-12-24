@@ -565,6 +565,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     ];
 
     const exportData = () => {
+        return window.alert('probly don\'t work no more, pal');
         const data = JSON.stringify({ users, shows, history });
         const anchor = document.createElement('a');
         anchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
@@ -577,6 +578,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     };
 
     const importData = () => {
+        return window.alert('probly don\'t work no more, pal');
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.innerText = `Click here to upload data to ${wheelName}`;
@@ -662,8 +664,6 @@ function SignOut({ className='', ...props }) {
 function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
     const [user] = useAuthState(auth);
-
-    const wheelsRef = firestore.collection('wheels');
 
     const showsQuery = firestore.collection(`shows-${wheelName}`);
     const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
