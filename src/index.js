@@ -158,16 +158,11 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
     const [showWinner, setShowWinner] = useState(false);
     const [winner, setWinner] = useState(null);
 
-    const [rotating, setRotatingLocal] = useState(false);
+    //const [rotate.spinning, setRotatingLocal] = useState(false);
     const [rotate, setRotateLocal] = useState(null);
 
     const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
-    const rotatingServer = wheel ? wheel.spinning : rotating;
     const rotateServer = wheel ? wheel.rotate || null : rotate;
-
-    useEffect(() => {
-        setRotatingLocal(() => rotatingServer);
-    }, [rotatingServer]);
 
     useEffect(() => {
         if (compareRotates(rotateServer, rotate) || !rotateServer) return;
@@ -181,26 +176,23 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
         rotateServer?.offset
     ]);
 
-    const setRotate = newRotate => {
-        firestore.doc(`wheels/${wheelName}`).update({
-            rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
-        });
-        setRotateLocal(newRotate);
-    }
-
-    const setRotating = useCallback(
-        newRotating => {
+    const setRotate = useCallback(
+        newRotate => {
             firestore.doc(`wheels/${wheelName}`).update({
-                spinning: typeof newRotating === 'function' ? newRotating(rotating) : newRotating
+                rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
             });
-            setRotatingLocal(newRotating);
+            setRotateLocal(newRotate);
         },
-        [rotating, wheelName]
+        [rotate, wheelName]
     );
+
+    //const setRotating = useCallback(
+    //    [rotate.spinning, wheelName]
+    //);
 
     // Draw wheel
     useEffect(() => {
-        if (!canvasRef || !canvasRef.current || (rotate && rotating) || !shows) return;
+        if (!canvasRef || !canvasRef.current || (rotate && rotate.spinning) || !shows) return;
 
         // Draw wheel
         const ctx = extendContext(canvasRef.current.getContext('2d'), size);
@@ -216,7 +208,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
 
-    }, [canvasRef, size, rotate, rotating, shows, colors]);
+    }, [canvasRef, size, rotate, rotate?.spinning, shows, colors]);
 
     // Resize
     useEffect(() => {
@@ -254,7 +246,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
                     color: winnerColor
                 }));
 
-                setRotating(() => false);
+                setRotate(() => ({ ...rotate, spinning: false }));
                 setShowWinner(() => true);
                 setArrowColor(() => winnerColor);
                 return;
@@ -271,11 +263,11 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
             ctx.drawWheel(shows, colors, rotate.offset + time * (Math.PI * 2 * 13 + rotate.rng * Math.PI * 2));
         };
 
-        if (rotating) {
+        if (rotate?.spinning) {
             const interval = setInterval(handleRotate, 10);
             return () => clearInterval(interval);
         }
-    }, [rotate, rotating, setRotating, canvasRef, shows, colors, size]);
+    }, [rotate, rotate?.spinning, setRotate, canvasRef, shows, colors, size]);
 
     return (
         <div {...props} id='wheel-width'>
@@ -287,18 +279,17 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
                     id='wheel'
                     className={!shows || shows.length === 0 ? 'empty' : 'populated'}
                     onClick={() => setRotate(prev => {
-                        if (prev && rotating) return prev;
+                        if (prev && rotate.spinning) return prev;
 
                         const date = new Date();
                         const rng = Math.random();
-
-                        setRotating(() => true);
 
                         return {
                             date,
                             offset: prev ? prev.offset + prev.rng * Math.PI * 2 : 0,
                             rng,
-                            endDate: +date + 8000 + rng * 1000 // 8-9 seconds after start
+                            endDate: +date + 8000 + rng * 1000, // 8-9 seconds after start
+                            spinning: true
                         };
                     })}
                     ref={canvasRef}
