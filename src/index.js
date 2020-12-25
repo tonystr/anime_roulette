@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import ReactModal from 'react-modal';
 import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
@@ -173,21 +173,30 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
         if (compareRotates(rotateServer, rotate) || !rotateServer) return;
         const newRotate = { ...rotateServer, date: rotateServer.date.toDate() };
         setRotateLocal(() => newRotate);
-    }, [rotateServer && rotateServer.rng, rotateServer && rotateServer.endDate, rotateServer && rotateServer.offset]);
+    }, [
+        rotate,
+        rotateServer,
+        rotateServer?.rng,
+        rotateServer?.endDate,
+        rotateServer?.offset
+    ]);
 
     const setRotate = newRotate => {
         firestore.doc(`wheels/${wheelName}`).update({
             rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
         });
         setRotateLocal(newRotate);
-    };
+    }
 
-    const setRotating = newRotating => {
-        firestore.doc(`wheels/${wheelName}`).update({
-            spinning: typeof newRotating === 'function' ? newRotating(rotating) : newRotating
-        });
-        setRotatingLocal(newRotating);
-    };
+    const setRotating = useCallback(
+        newRotating => {
+            firestore.doc(`wheels/${wheelName}`).update({
+                spinning: typeof newRotating === 'function' ? newRotating(rotating) : newRotating
+            });
+            setRotatingLocal(newRotating);
+        },
+        [rotating, wheelName]
+    );
 
     // Draw wheel
     useEffect(() => {
@@ -266,7 +275,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
             const interval = setInterval(handleRotate, 10);
             return () => clearInterval(interval);
         }
-    }, [rotate, rotating, canvasRef, shows, colors, size]);
+    }, [rotate, rotating, setRotating, canvasRef, shows, colors, size]);
 
     return (
         <div {...props} id='wheel-width'>
@@ -566,6 +575,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
         '#8B9863'
     ];
 
+    /*
     const exportData = () => {
         return window.alert('probly don\'t work no more, pal');
         const data = JSON.stringify({ users, shows, history });
@@ -578,9 +588,10 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
         anchor.click();
         document.body.removeChild(anchor);
     };
+    */
 
+    /*
     const importData = () => {
-        return window.alert('probly don\'t work no more, pal');
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.innerText = `Click here to upload data to ${wheelName}`;
@@ -604,6 +615,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
                 .catch(console.log);
         })
     };
+    */
 
     const removeShow = uuid => firestore.collection(`shows-${wheelName}`)
         .doc(uuid).delete()
