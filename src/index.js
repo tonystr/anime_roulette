@@ -154,7 +154,7 @@ function compareRotates(r1, r2) {
 function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
-    const [arrowColor, setArrowColor] = useState('#afb8c6');
+    const [arrowColor, setArrowColor] = useState('#262628');
     const [showWinner, setShowWinner] = useState(false);
     const [winner, setWinner] = useState(null);
 
@@ -170,7 +170,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
     }, [rotatingServer]);
 
     useEffect(() => {
-        if (compareRotates(rotateServer, rotate)) return;
+        if (compareRotates(rotateServer, rotate) || !rotateServer) return;
         const newRotate = { ...rotateServer, date: rotateServer.date.toDate() };
         setRotateLocal(() => newRotate);
     }, [rotateServer && rotateServer.rng, rotateServer && rotateServer.endDate, rotateServer && rotateServer.offset]);
@@ -202,7 +202,8 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
             const targetIndex = Math.floor(.75 * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         } else {
-            const targetIndex = Math.floor((1 - ((rotate.offset / (Math.PI * 2) + .25) % 1)) * shows.length);
+            const off = rotate.offset / (Math.PI * 2) + rotate.rng + .25;
+            const targetIndex = Math.floor((1 - (off % 1)) * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
 
@@ -275,6 +276,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
                 </div>
                 <canvas
                     id='wheel'
+                    className={!shows || shows.length === 0 ? 'empty' : 'populated'}
                     onClick={() => setRotate(prev => {
                         if (prev && rotating) return prev;
 
@@ -665,6 +667,8 @@ function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
     const [user] = useAuthState(auth);
 
+    const wheelTitle = 'Roulette' || 'Anime Roulette';
+
     const showsQuery = firestore.collection(`shows-${wheelName}`);
     const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
 
@@ -690,7 +694,7 @@ function PageRenderer() {
                         </div>
                     )}
                 </div>
-                <h1>Anime Roulette</h1>
+                <h1>{wheelTitle}</h1>
                 <div className="export-import">
                     <SignOut />
                 </div>

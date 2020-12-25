@@ -538,7 +538,11 @@ header h1 {
 
 #wheel {
     filter: drop-shadow(0 1px 8px rgba(#000, .4));
-    transition: filter .2s;
+    transition: filter .2s, opacity .6s;
+
+    &.empty {
+        opacity: 0;
+    }
 
     &:hover {
         cursor: pointer;
