@@ -1,15 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import ReactModal from 'react-modal';
 import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
+import GoogleLogo from './icons/google_logo.png';
 import { v4 as uuidv4 } from 'uuid';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 
-for (let i = 0; i < 16; i++) {
-    console.log(uuidv4());
-}
+firebase.initializeApp({
+    apiKey: 'AIzaSyCKEr3NLxFL9SXJuONJONhQAZct6Yqt2AY',
+    authDomain: 'anime-roulette.firebaseapp.com',
+    projectId: 'anime-roulette',
+    storageBucket: 'anime-roulette.appspot.com',
+    messagingSenderId: '5143254771',
+    appId: '1:5143254771:web:bc9f978bb85bff4cdb8986'
+});
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+//window.firestore = firestore;
 
 const monthNames = [
     'Jan',
@@ -127,18 +141,58 @@ const extendContext = (ctx, size) => ({
     }
 });
 
-function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
+function compareRotates(r1, r2) {
+    if (r1 === r2) return true;
+    if (!r1 || !r2) return false;
+    return (
+        r1.endDate === r2.endDate &&
+        r1.offset  === r2.offset &&
+        r1.rng     === r2.rng
+    );
+}
+
+function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
-    const [rotate, setRotate] = useState(null);
-    const [arrowColor, setArrowColor] = useState('#afb8c6');
+    const [arrowColor, setArrowColor] = useState('#262628');
     const [showWinner, setShowWinner] = useState(false);
     const [winner, setWinner] = useState(null);
-    const [rotating, setRotating] = useState(false);
+
+    //const [rotate.spinning, setRotatingLocal] = useState(false);
+    const [rotate, setRotateLocal] = useState(null);
+
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
+    const rotateServer = wheel ? wheel.rotate || null : rotate;
+
+    useEffect(() => {
+        if (compareRotates(rotateServer, rotate) || !rotateServer) return;
+        const newRotate = { ...rotateServer, date: rotateServer.date.toDate() };
+        setRotateLocal(() => newRotate);
+    }, [
+        rotate,
+        rotateServer,
+        rotateServer?.rng,
+        rotateServer?.endDate,
+        rotateServer?.offset
+    ]);
+
+    const setRotate = useCallback(
+        newRotate => {
+            firestore.doc(`wheels/${wheelName}`).update({
+                rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
+            });
+            setRotateLocal(newRotate);
+        },
+        [rotate, wheelName]
+    );
+
+    //const setRotating = useCallback(
+    //    [rotate.spinning, wheelName]
+    //);
 
     // Draw wheel
     useEffect(() => {
-        if (!canvasRef || !canvasRef.current || (rotate && rotating)) return;
+        if (!canvasRef || !canvasRef.current || (rotate && rotate.spinning) || !shows) return;
 
         // Draw wheel
         const ctx = extendContext(canvasRef.current.getContext('2d'), size);
@@ -148,9 +202,13 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
         if (!rotate) {
             const targetIndex = Math.floor(.75 * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
+        } else {
+            const off = rotate.offset / (Math.PI * 2) + rotate.rng + .25;
+            const targetIndex = Math.floor((1 - (off % 1)) * shows.length);
+            setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
 
-    }, [canvasRef, size, rotate, shows, colors]);
+    }, [canvasRef, size, rotate, rotate?.spinning, shows, colors]);
 
     // Resize
     useEffect(() => {
@@ -172,7 +230,7 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
 
     // Rotation
     useEffect(() => {
-        if (!canvasRef || !rotate) return;
+        if (!canvasRef || !rotate || !shows) return;
 
         const handleRotate = () => {
             const date = new Date();
@@ -188,6 +246,7 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
                     color: winnerColor
                 }));
 
+                setRotate(() => ({ ...rotate, spinning: false }));
                 setShowWinner(() => true);
                 setArrowColor(() => winnerColor);
                 return;
@@ -200,14 +259,21 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
             setArrowColor(() => pickColor(targetIndex, colors, shows));
 
             const ctx = extendContext(canvasRef.current.getContext('2d'), size);
+
             ctx.drawWheel(shows, colors, rotate.offset + time * (Math.PI * 2 * 13 + rotate.rng * Math.PI * 2));
         };
 
-        if (rotating) {
+        if (rotate?.spinning) {
             const interval = setInterval(handleRotate, 10);
             return () => clearInterval(interval);
         }
-    }, [rotate, canvasRef, shows, colors, size]);
+    }, [rotate, rotate?.spinning, setRotate, canvasRef, shows, colors, size]);
+
+    const updateInspectingShowProp = (show, prop, value) => {
+        if (show[prop] === value) return;
+        updateShowProp(show.uuid, prop, value);
+        setWinner(prev => ({ ...prev, [prop]: value }));
+    }
 
     return (
         <div {...props} id='wheel-width'>
@@ -217,8 +283,9 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
                 </div>
                 <canvas
                     id='wheel'
+                    className={!shows || shows.length === 0 ? 'empty' : 'populated'}
                     onClick={() => setRotate(prev => {
-                        if (prev && rotating) return prev;
+                        if (prev && rotate.spinning) return prev;
 
                         const date = new Date();
                         const rng = Math.random();
@@ -227,7 +294,8 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
                             date,
                             offset: prev ? prev.offset + prev.rng * Math.PI * 2 : 0,
                             rng,
-                            endDate: +date + 8000 + rng * 1000 // 8-9 seconds after start
+                            endDate: +date + 8000 + rng * 1000, // 8-9 seconds after start
+                            spinning: true
                         };
                     })}
                     ref={canvasRef}
@@ -235,33 +303,36 @@ function Wheel({ shows, setShows, users, colors, setHistory, ...props }) {
                     height={size}
                 />
             </div>
-            <div className='result'>{rotate ? winner.name || 'Spinning...' : ''}</div>
             <ShowInpsectorModal
                 isOpen={showWinner}
-                onRequestClose={() => setShowWinner(() => false)}
+                onRequestClose={() => {
+                    setShowWinner(() => false);
+                    //setRotate(() => null);
+                    //setWinner(() => null);
+                }}
+                updateShowProp={updateInspectingShowProp}
                 show={rotate && winner}
                 beginWatching={rotate ? () => {
-                    setHistory(prev => [...prev, winner]);
-                    setShows(prev => prev.filter(show => show.uuid !== winner.uuid));
+                    addHistory(winner);
+                    removeShow(winner.uuid);
                     setShowWinner(() => false);
+                    //setRotate(() => null);
+                    setWinner(() => null);
                 } : null}
             />
         </div>
     );
 }
 
-function AddNewButton({ user, setShows }) {
+function AddNewButton({ user, addShow }) {
     const [add, setAdd] = useState('');
 
     const addNew = () => {
-        setShows(prev => [
-            ...prev,
-            {
-                name: add,
-                uuid: uuidv4(),
-                owner: user
-            }
-        ]);
+        addShow({
+            name: add,
+            uuid: uuidv4(),
+            owner: user
+        });
         setAdd(() => '');
     };
 
@@ -278,26 +349,24 @@ function AddNewButton({ user, setShows }) {
     );
 }
 
-function UserShows({ users, shows, renderShows, setShows, setHistory }) {
+function UserShows({ users, shows, renderShows, addShow }) {
     return users.map((user, i) => (
         <div className='user-shows' key={user.name}>
             <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
-            {shows.filter(show => show.owner.name === user.name).map(renderShows)}
-            <AddNewButton key={'add new button ' + user.name} user={user} setShows={setShows} />
+            {shows && shows.filter(show => show.owner.name === user.name).map(renderShows)}
+            <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} />
         </div>
     ));
 }
 
-function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props }) {
+function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
     const [editUsers, setEditUsers] = useState(false);
 
-    const updateShowProp = (show, prop, value) => {
+    const updateInspectingShowProp = (show, prop, value) => {
         if (show[prop] === value) return;
-        setShows(prev => prev.map(
-            hShow => hShow.uuid === show.uuid ? { ...hShow, [prop]: value } : { ...hShow }
-        ));
+        updateShowProp(show.uuid, prop, value);
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
 
@@ -308,27 +377,19 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
                 <input
                     type='text'
                     value={show.name}
-                    onChange={e => setShows(prev => [
-                        ...prev.slice(0, i),
-                        { ...show, name: e.target.value },
-                        ...prev.slice(i + 1)
-                    ])}
+                    onChange={e => updateShowProp(show.uuid, 'name', e.target.value)}
                     style={{ borderLeftColor: pickColor(i, colors, shows) }}
                 />
-                <button className='delete' onClick={e => setShows(prev => [
-                    ...prev.slice(0, i),
-                    ...prev.slice(i + 1)
-                ])}>×</button>
+                <button className='delete' onClick={e => removeShow(show.uuid)}>×</button>
                 <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
                 <ShowInpsectorModal
                     isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
                     onRequestClose={() => setInspectingShow(null)}
                     show={inspectingShow}
-                    updateShowProp={updateShowProp}
-                    setHistory={setShows}
+                    updateShowProp={updateInspectingShowProp}
                     beginWatching={inspectingShow ? () => {
-                        setHistory(prev => [...prev, { ...inspectingShow, date: new Date() }]);
-                        setShows(prev => prev.filter(show => show.uuid !== inspectingShow.uuid));
+                        addHistory({ ...inspectingShow, date: new Date() });
+                        removeShow(inspectingShow.uuid);
                         setInspectingShow(null);
                     } : null}
                 />
@@ -345,8 +406,8 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
                     <button className='clickable-faded edit' onClick={() => setEditUsers(() => true)}>edit users</button>
                 </div>
                 {showUsers ?
-                    <UserShows shows={shows} users={users} renderShows={renderShows} setShows={setShows} setHistory={setHistory} /> :
-                    [shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} setShows={setShows} />]}
+                    <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
+                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} addShow={addShow} />]}
             </div>
             <ReactModal
                 className='edit-users-modal modal-screen'
@@ -375,14 +436,12 @@ function Shows({ users, setUsers, shows, setShows, setHistory, colors, ...props 
     );
 }
 
-function History({ users, shows, history, setHistory, ...props }) {
+function History({ users, shows, history, updateHistoryProp, ...props }) {
     const [inspectingShow, setInspectingShow] = useState(null);
 
-    const updateHistoryProp = (show, prop, value) => {
+    const updateInspectingShowProp = (show, prop, value) => {
         if (show[prop] === value) return;
-        setHistory(prev => prev.map(
-            hShow => hShow.uuid === show.uuid ? { ...hShow, [prop]: value } : { ...hShow }
-        ));
+        updateHistoryProp(show.uuid, prop, value);
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
 
@@ -403,14 +462,13 @@ function History({ users, shows, history, setHistory, ...props }) {
                 isOpen={!!inspectingShow}
                 onRequestClose={() => setInspectingShow(null)}
                 show={inspectingShow}
-                updateShowProp={updateHistoryProp}
-                setHistory={setHistory}
+                updateShowProp={updateInspectingShowProp}
             />
         </div>
     );
 }
 
-function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = null, ...props }) {
+function ShowInpsectorModal({ show, updateShowProp, beginWatching = null, ...props }) {
     return (
         <ReactModal
             className='show-inspector modal-screen'
@@ -423,9 +481,11 @@ function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = 
                     {beginWatching ? (
                         <button className='begin-wating' onClick={beginWatching}>Start watching</button>
                     ) : (
-                        <select className='state' defaultValue={show.state} onChange={e => setHistory(prev => prev.map(
-                            v => v.uuid === show.uuid ? { ...v, state: e.target.value } : { ...v }
-                        ))}>
+                        <select
+                            className='state'
+                            defaultValue={show.state}
+                            onChange={e => updateShowProp(show, 'state', e.target.value)}
+                        >
                             <option>Watching</option>
                             <option>Completed</option>
                             <option>Dropped</option>
@@ -477,29 +537,30 @@ function ShowInpsectorModal({ show, updateShowProp, setHistory, beginWatching = 
     );
 }
 
-function WheelPage({ wheelName, setWheelName }) {
+function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'  , uuid: uuidv4() },
         { name: 'Espen' , uuid: uuidv4() },
         { name: 'Jørgen', uuid: uuidv4() },
         { name: 'Sigurd', uuid: uuidv4() }
     ]);
-    const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
-    const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
+    // const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
+    // const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
+
+    const [shows] = useCollectionData(showsQuery);
+    const historyCD = useCollectionData(historyQuery);
+    const history = (historyCD[0] || []).map(h => ({ ...h, date: h.date.toDate ?
+        h.date.toDate() :
+        new Date(h.date)
+    }));
+
+    const setShows   = () => {};
+    const setHistory = () => {};
 
     useEffect(() => {
         setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
         setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
     }, [wheelName]);
-
-    useEffect(() => {
-        localStorage.setItem(`${wheelName}-shows`, JSON.stringify(shows));
-    }, [shows, wheelName]);
-
-    useEffect(() => {
-        localStorage.setItem(`${wheelName}-history`, JSON.stringify(history));
-    }, [history, wheelName]);
-
 
     const colors = [
         '#caa05a',
@@ -512,7 +573,9 @@ function WheelPage({ wheelName, setWheelName }) {
         '#8B9863'
     ];
 
+    /*
     const exportData = () => {
+        return window.alert('probly don\'t work no more, pal');
         const data = JSON.stringify({ users, shows, history });
         const anchor = document.createElement('a');
         anchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
@@ -523,7 +586,9 @@ function WheelPage({ wheelName, setWheelName }) {
         anchor.click();
         document.body.removeChild(anchor);
     };
+    */
 
+    /*
     const importData = () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -548,46 +613,110 @@ function WheelPage({ wheelName, setWheelName }) {
                 .catch(console.log);
         })
     };
+    */
+
+    const removeShow = uuid => firestore.collection(`shows-${wheelName}`)
+        .doc(uuid).delete()
+        .then(() => console.log('Document successfully deleted!'))
+        .catch(err => console.error('Error removing document: ', err));
+
+    const addShow = show => firestore.collection(`shows-${wheelName}`)
+        .doc(show.uuid).set(show)
+        .then(() => console.log('Document successfully added!'))
+        .catch(err => console.error('Error adding document: ', err));
+
+    const updateShowProp = (uuid, prop, value) => firestore.collection(`shows-${wheelName}`)
+        .doc(uuid).update({ [prop]: value })
+        .then(() => console.log('Document successfully updated!'))
+        .catch(err => console.error('Error updating document: ', err));
+
+
+    const addHistory = show => firestore.collection(`history-${wheelName}`)
+        .doc(show.uuid).set(show)
+        .then(() => console.log('Document successfully added!'))
+        .catch(err => console.error('Error adding document: ', err));
+
+    const updateHistoryProp = (uuid, prop, value) => firestore.collection(`history-${wheelName}`)
+        .doc(uuid).update({ [prop]: value })
+        .then(() => console.log('Document successfully updated!'))
+        .catch(err => console.error('Error updating document: ', err));
 
     return (
-        <div id='home'>
-            <header>
-                <div>
-                    <div className='wheel-name clickable-faded'>
-                        {wheelName}
-                        <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                            <option>Anime Abuse</option>
-                            <option>Testing Wheel</option>
-                            <option>Third one for show</option>
-                            <option>WHEEL OF IMPORT</option>
-                        </select>
-                    </div>
-                </div>
-                <h1>Anime Roulette</h1>
-                <div className="export-import">
-                    <button className='export-data clickable-faded' onClick={exportData}>Export Data</button>
-                    /
-                    <button className='import-data clickable-faded' onClick={importData}>Import Data</button>
-                </div>
-            </header>
-            <main>
-                <Shows   className='left   shows'   users={users} setUsers={setUsers} shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
-                <Wheel   className='center wheel'   users={users}                     shows={shows} setShows={setShows} colors={colors} setHistory={setHistory} />
-                <History className='right  history' users={users}                     shows={shows} history={history}                   setHistory={setHistory} />
-            </main>
+        <main id='home' role='main'>
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} />
+            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
+            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
+        </main>
+    );
+}
+
+function SignIn() {
+    return (
+        <div className='sign-in-panel'>
+            <button className='sign-in' onClick={() => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithRedirect(provider);
+            }}>
+                <img alt='Google Logo' className='google-logo' src={GoogleLogo} width={50} height={50} />
+                Sign in with Google
+            </button>
         </div>
     );
 }
 
+function SignOut({ className='', ...props }) {
+    return auth.currentUser && (
+        <button {...props}
+            className={'clickable-faded ' + className}
+            onClick={() => auth.signOut()}
+        >Sign out</button>
+    );
+}
+
 function PageRenderer() {
-    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name'));
+    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
+    const [user] = useAuthState(auth);
+
+    const wheelTitle = 'Anime Roulette' || 'Roulette';
+
+    const showsQuery = firestore.collection(`shows-${wheelName}`);
+    const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
 
     useEffect(() => {
         localStorage.setItem('wheel-name', wheelName);
     }, [wheelName]);
 
     return (
-        <WheelPage wheelName={wheelName} setWheelName={setWheelName} />
+        <div>
+            <header>
+                <div>
+                    {user && (
+                        <div className='wheel-name clickable-faded'>
+                            {wheelName}
+                            <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                                <option>Anime Abuse</option>
+                                <option>Testing Wheel</option>
+                                <option>Animal Abuse</option>
+                                <option>Third one for show</option>
+                                <option>WHEEL OF IMPORT</option>
+                                <option>Test Wheel</option>
+                            </select>
+                        </div>
+                    )}
+                </div>
+                <h1>{wheelTitle}</h1>
+                <div className="export-import">
+                    <SignOut />
+                </div>
+            </header>
+            {user ?
+                <WheelPage
+                    wheelName={wheelName}
+                    showsQuery={showsQuery}
+                    historyQuery={historyQuery}
+                /> :
+                <SignIn />}
+        </div>
     );
 }
 
