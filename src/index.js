@@ -151,7 +151,7 @@ function compareRotates(r1, r2) {
     );
 }
 
-function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...props }) {
+function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [arrowColor, setArrowColor] = useState('#262628');
@@ -269,6 +269,12 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
         }
     }, [rotate, rotate?.spinning, setRotate, canvasRef, shows, colors, size]);
 
+    const updateInspectingShowProp = (show, prop, value) => {
+        if (show[prop] === value) return;
+        updateShowProp(show.uuid, prop, value);
+        setWinner(prev => ({ ...prev, [prop]: value }));
+    }
+
     return (
         <div {...props} id='wheel-width'>
             <div className='wheel-box'>
@@ -304,6 +310,7 @@ function Wheel({ shows, removeShow, wheelName, users, colors, addHistory, ...pro
                     //setRotate(() => null);
                     //setWinner(() => null);
                 }}
+                updateShowProp={updateInspectingShowProp}
                 show={rotate && winner}
                 beginWatching={rotate ? () => {
                     addHistory(winner);
@@ -637,7 +644,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     return (
         <main id='home' role='main'>
             <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} />
-            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} wheelName={wheelName} />
+            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
         </main>
     );
@@ -670,7 +677,7 @@ function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
     const [user] = useAuthState(auth);
 
-    const wheelTitle = 'Roulette' || 'Anime Roulette';
+    const wheelTitle = 'Anime Roulette' || 'Roulette';
 
     const showsQuery = firestore.collection(`shows-${wheelName}`);
     const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
