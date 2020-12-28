@@ -539,7 +539,7 @@ function ShowInpsectorModal({ show, updateShowProp, beginWatching = null, ...pro
 
 function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     const [users, setUsers] = useState(() => [
-        { name: 'Tony'  , uuid: uuidv4() },
+        { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
         { name: 'Espen' , uuid: uuidv4() },
         { name: 'Jørgen', uuid: uuidv4() },
         { name: 'Sigurd', uuid: uuidv4() }
