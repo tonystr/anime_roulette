@@ -687,7 +687,7 @@ function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
     const [user] = useAuthState(auth);
 
-    const wheelTitle = 'Roulette Wheel' || 'Anime Roulette';
+    const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
     const showsQuery = firestore.collection(`shows-${wheelName}`);
     const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
@@ -705,11 +705,8 @@ function PageRenderer() {
                             {wheelName}
                             <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
                                 <option>Test Wheel</option>
-                                <option>Anime Abuse</option>
-                                <option>Testing Wheel</option>
                                 <option>Animal Abuse</option>
                                 <option>Third one for show</option>
-                                <option>WHEEL OF IMPORT</option>
                             </select>
                         </div>
                     )}

@@ -142,7 +142,6 @@ header h1 {
         max-width: 700px;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
 
@@ -553,6 +552,7 @@ header h1 {
 #home .wheel-box {
     position: relative;
     max-height: 69vh;
+    margin-top: 3rem;
 
     svg#arrow-down {
         width: 40px;
