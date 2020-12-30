@@ -445,6 +445,14 @@ function History({ users, shows, history, updateHistoryProp, ...props }) {
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
 
+    const parseShowTitle = name => {
+        const match = name.match(/(\s*\(\d+\)\s*$)/);
+        if (match) {
+            return name.slice(0, match.index);
+        }
+        return name;
+    }
+
     return (
         <div>
             <div {...props}>
@@ -452,8 +460,10 @@ function History({ users, shows, history, updateHistoryProp, ...props }) {
                 <div className='list'>
                     {arrayReverse(history).map(show => (
                         <div key={show.uuid} className='show' onClick={() => setInspectingShow(show)}>
-                            <span className='title'>{show.name}</span>
-                            <span className='date'> - {show.date.getDate()} {monthNames[show.date.getMonth()]}.</span>
+                            <span className='title'>{parseShowTitle(show.name)}</span>
+                            <span className='date'>
+                                - {show.date.getDate()} {monthNames[show.date.getMonth()]}.
+                            </span>
                         </div>
                     ))}
                 </div>
