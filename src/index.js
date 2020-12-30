@@ -4,6 +4,7 @@ import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
 import ReactModal from 'react-modal';
 import ShowInpsectorModal, { monthNames } from './components/ShowInspectorModal';
+import FacebookLogo from './icons/facebook_logo.png';
 import GoogleLogo from './icons/google_logo.png';
 import { v4 as uuidv4 } from 'uuid';
 import firebase from 'firebase/app';
@@ -580,12 +581,22 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
 function SignIn() {
     return (
         <div className='sign-in-panel'>
-            <button className='sign-in' onClick={() => {
+            <h2>Sign in with</h2>
+
+            <button className='sign-in google' onClick={() => {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 auth.signInWithRedirect(provider);
             }}>
                 <img alt='Google Logo' className='google-logo' src={GoogleLogo} width={50} height={50} />
-                Sign in with Google
+                Google
+            </button>
+
+            <button className='sign-in facebook' onClick={() => {
+                const provider = new firebase.auth.FacebookAuthProvider();
+                auth.signInWithRedirect(provider);
+            }}>
+                <img alt='Facebook Logo' className='facebook-logo' src={FacebookLogo} width={50} height={50} />
+                Facebook
             </button>
         </div>
     );

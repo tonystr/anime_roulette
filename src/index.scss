@@ -37,33 +37,50 @@ code {
 }
 
 .sign-in-panel {
-    min-height: 70vh;
+    min-height: 69vh;
     display: flex;
     justify-content: center;
     align-items: center;
-}
+    flex-direction: column;
 
-.sign-in {
-    display: flex;
-    align-items: center;
-    font-size: 1.3rem;
-    border: none;
-    color: #e3e3e3;
-    cursor: pointer;
-    padding: 9px 13px;
-    border-radius: 8px;
-    background-color: #36373c;
-    border: 3px solid transparent;
-    transition: background-color .1s, border-color .1s, color .1s;
+    .sign-in {
+        display: flex;
+        align-items: center;
+        font-size: 1.4rem;
+        border: none;
+        color: #e3e3e3;
+        cursor: pointer;
+        padding: 7px;
+        border-radius: 8px;
+        background-color: #36373c;
+        transition: background-color .1s, border-color .1s, color .1s;
+        margin-top: .5rem;
+        margin-bottom: .7rem;
+        width: 300px;
 
-    &:hover {
-        background-color: #484b57;
-        border-color: #9babb5;
-        color: #fff;
-    }
+        &.google {
+            background-color: #f6f6f6;
+            color: #335;
 
-    img {
-        margin-right: 12px;
+            &:hover {
+                background-color: #fff;
+            }
+        }
+
+        &.facebook {
+            background-color: #3c5b9a;
+            color: #eee;
+
+            &:hover {
+                background-color: #5276cb;
+                border-color: #5276cb;
+                color: #fff;
+            }
+        }
+
+        img {
+            margin-right: 12px;
+        }
     }
 }
 
