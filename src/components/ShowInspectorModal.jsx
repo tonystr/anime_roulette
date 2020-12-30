@@ -27,7 +27,11 @@ export default function ShowInpsectorModal({ show, updateShowProp, beginWatching
         >
             {show && (<>
                 <h2 className='title'>
-                    {show.name}
+                    <input
+                        className='show-name'
+                        defaultValue={show.name}
+                        onChange={e => updateShowProp(show, 'name', e.target.value)}
+                    />
                     {beginWatching ? (
                         <button className='begin-wating' onClick={beginWatching}>Start watching</button>
                     ) : (

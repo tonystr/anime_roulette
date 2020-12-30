@@ -309,6 +309,26 @@ header h1 {
         }
     }
 
+    .show-name {
+        border: none;
+        background: none;
+        color: inherit;
+        font: inherit;
+        outline: none;
+        transition: background-color .14s, color .14s, border-color .14s;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: #333;
+            color: #e3e3c3;
+        }
+
+        &:focus {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+    }
+
     .state {
         border: none;
         background-color: #3a3a3a;
