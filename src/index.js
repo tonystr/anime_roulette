@@ -313,7 +313,7 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
                 updateShowProp={updateInspectingShowProp}
                 show={rotate && winner}
                 beginWatching={rotate ? () => {
-                    addHistory(winner);
+                    addHistory({ ...winner, state: 'Watching' });
                     removeShow(winner.uuid);
                     setShowWinner(() => false);
                     //setRotate(() => null);
