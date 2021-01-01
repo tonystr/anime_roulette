@@ -318,7 +318,7 @@ function AddNewButton({ user, addShow }) {
         addShow({
             name: add,
             uuid: uuidv4(),
-            owner: user
+            owner: user.uuid
         });
         setAdd(() => '');
     };
@@ -340,13 +340,16 @@ function UserShows({ users, shows, renderShows, addShow }) {
     return users.map((user, i) => (
         <div className='user-shows' key={user.name}>
             <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
-            {shows && shows.filter(show => show.owner.name === user.name).map(renderShows)}
+            {shows && shows.filter(show => (
+                show.owner.name === user.name ||
+                show.owner === user.uuid
+            )).map(renderShows)}
             <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} />
         </div>
     ));
 }
 
-function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, ...props }) {
+function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
     const [editUsers, setEditUsers] = useState(false);
@@ -390,7 +393,17 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
                 <div className='top-bar'>
                     <h2>Shows</h2>
                     <button className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></button>
-                    <button className='clickable-faded edit' onClick={() => setEditUsers(() => true)}>edit users</button>
+                    <button className='clickable-faded edit' onClick={() => {
+                        setEditUsers(() => true);
+
+                        //const collection = firestore.collection('users');
+                        //collection
+                        //    .where('wheels', 'array-contains', wheelName)
+                        //    .get()
+                        //    .then(querySnapshot => querySnapshot.forEach(user => (
+                        //        console.log(user.data())
+                        //    )));
+                    }}>edit users</button>
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
@@ -468,9 +481,9 @@ function History({ users, shows, history, updateHistoryProp, ...props }) {
 function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
-        { name: 'Espen' , uuid: uuidv4() },
-        { name: 'Jørgen', uuid: uuidv4() },
-        { name: 'Sigurd', uuid: uuidv4() }
+        { name: 'Espen' , uuid: 'ArklXKxySSfXCn1JQHcYBiBJrbp1' },
+        { name: 'Jørgen', uuid: 'DiOHXZRe7iP7FHxkG7xEigQoLFF3' },
+        { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
     ]);
     // const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
     // const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
@@ -571,7 +584,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
 
     return (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} />
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} wheelName={wheelName} />
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
         </main>
