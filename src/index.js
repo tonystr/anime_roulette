@@ -478,6 +478,13 @@ function History({ users, shows, history, updateHistoryProp, ...props }) {
     );
 }
 
+function translateCDDates([ array=[] ]) {
+    return array.map(h => ({ ...h, date: h.date.toDate ?
+        h.date.toDate() :
+        new Date(h.date)
+    }));
+}
+
 function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
@@ -486,12 +493,8 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
         { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
     ]);
 
-    const [shows] = useCollectionData(showsQuery);
-    const historyCD = useCollectionData(historyQuery);
-    const history = (historyCD[0] || []).map(h => ({ ...h, date: h.date.toDate ?
-        h.date.toDate() :
-        new Date(h.date)
-    }));
+    const shows   = translateCDDates(useCollectionData(showsQuery));
+    const history = translateCDDates(useCollectionData(historyQuery));
 
     const colors = [
         '#caa05a',
@@ -576,6 +579,8 @@ function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
     const [user] = useAuthState(auth);
 
+    const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
+
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
     const showsQuery = firestore.collection(`shows-${wheelName}`).orderBy('date');
@@ -593,9 +598,7 @@ function PageRenderer() {
                         <div className='wheel-name clickable-faded'>
                             {wheelName}
                             <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                <option>Test Wheel</option>
-                                <option>Animal Abuse</option>
-                                <option>Third one for show</option>
+                                {wheels.map(wheel => <option>{wheel}</option>)}
                             </select>
                         </div>
                     )}
