@@ -47,7 +47,7 @@ export default function ShowInpsectorModal({ show, updateShowProp, beginWatching
                     )}
 
                 </h2>
-                <div className='middle' style={{ backgroundColor: show.color }}>
+                <div className='middle' style={!show.banner ? { backgroundColor: show.color } : null}>
                     {show.banner && <img className='banner' alt='banner' src={show.banner} />}
                     <input
                         className={'banner-url hover-input ' + (show.banner ? '' : 'visible')}

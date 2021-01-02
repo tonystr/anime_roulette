@@ -318,7 +318,8 @@ function AddNewButton({ user, addShow }) {
         addShow({
             name: add,
             uuid: uuidv4(),
-            owner: user.uuid
+            owner: user.uuid,
+            date: new Date()
         });
         setAdd(() => '');
     };
@@ -340,10 +341,9 @@ function UserShows({ users, shows, renderShows, addShow }) {
     return users.map((user, i) => (
         <div className='user-shows' key={user.name}>
             <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
-            {shows && shows.filter(show => (
-                show.owner.name === user.name ||
-                show.owner === user.uuid
-            )).map(renderShows)}
+            {shows && shows
+                .filter(show => show.owner === user.uuid)
+                .map(renderShows)}
             <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} />
         </div>
     ));
@@ -630,7 +630,7 @@ function PageRenderer() {
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
-    const showsQuery = firestore.collection(`shows-${wheelName}`);
+    const showsQuery = firestore.collection(`shows-${wheelName}`).orderBy('date');
     const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
 
     useEffect(() => {
