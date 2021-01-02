@@ -17,6 +17,10 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+:focus-visible {
+    outline: none;
+}
+
 .clickable-faded {
     color: #6a6a66;
     cursor: pointer;
@@ -299,12 +303,10 @@ header h1 {
 
     .user,
     .date-string {
-        color: $c_text_bright;
-    }
-
-    .date-string {
         position: relative;
+        color: $c_text_bright;
         transition: .14s color;
+        cursor: pointer;
 
         &:hover {
             color: #c0ffe2;
@@ -314,7 +316,8 @@ header h1 {
             background-color: #444;
         }
 
-        input {
+        input,
+        select {
             position: absolute;
             z-index: 1;
             left: 0;

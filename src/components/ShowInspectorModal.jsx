@@ -19,6 +19,9 @@ const monthNames = [
 export { monthNames };
 
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
+
+    const findUser = uuid => users.find(u => u.uuid === uuid);
+
     return (
         <ReactModal
             className='show-inspector modal-screen'
@@ -71,7 +74,21 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                 )}
                 <div className='bottom'>
                     <div className='owner-field'>
-                        Suggested by <span className='user'>{show.owner.name || users.find(u => u.uuid === show.owner)?.name}</span>
+                        Suggested by&nbsp;
+                        <span className='user'>
+                            <select
+                                className='user-select'
+                                value={show.owner?.uuid || show.owner}
+                                onChange={e => e.target.value && updateShowProp(
+                                    show,
+                                    'owner',
+                                    e.target.value
+                                )}
+                            >
+                                {users.map(user => <option value={user.uuid}>{user.name}</option>)}
+                            </select>
+                            {show.owner?.name || findUser(show.owner)?.name}
+                        </span>
                     </div>
                     {show.date && (
                         <div className='date'>
