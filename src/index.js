@@ -485,8 +485,6 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
         { name: 'Jørgen', uuid: 'DiOHXZRe7iP7FHxkG7xEigQoLFF3' },
         { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
     ]);
-    // const [shows,   setShows  ] = useState(() => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
-    // const [history, setHistory] = useState(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
 
     const [shows] = useCollectionData(showsQuery);
     const historyCD = useCollectionData(historyQuery);
@@ -494,14 +492,6 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
         h.date.toDate() :
         new Date(h.date)
     }));
-
-    const setShows   = () => {};
-    const setHistory = () => {};
-
-    useEffect(() => {
-        setShows(  () => parseShows(  localStorage.getItem(`${wheelName}-shows`  )));
-        setHistory(() => parseHistory(localStorage.getItem(`${wheelName}-history`)));
-    }, [wheelName]);
 
     const colors = [
         '#caa05a',
@@ -513,48 +503,6 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
         '#8ea091',
         '#8B9863'
     ];
-
-    /*
-    const exportData = () => {
-        return window.alert('probly don\'t work no more, pal');
-        const data = JSON.stringify({ users, shows, history });
-        const anchor = document.createElement('a');
-        anchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
-        anchor.setAttribute('download', `${wheelName} Anime Roulette Data.json`);
-        anchor.innerText = `Click here to download data export of ${wheelName}`;
-        anchor.style.display = 'none';
-        document.body.appendChild(anchor);
-        anchor.click();
-        document.body.removeChild(anchor);
-    };
-    */
-
-    /*
-    const importData = () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.innerText = `Click here to upload data to ${wheelName}`;
-        input.style.display = 'none';
-        document.body.appendChild(input);
-        input.click();
-        input.addEventListener('change', e => {
-            const file = e.target.files[0];
-            document.body.removeChild(input);
-            if (!file) return;
-            file.text()
-                .then(text => {
-                    //localStorage.setItem(`${wheelName}-shows`, '[]');
-                    //localStorage.setItem(`${wheelName}-history`, '[]');
-
-                    const { users, shows, history } = JSON.parse(text);
-                    setUsers(() => users);
-                    setShows(() => shows);
-                    setHistory(() => history.map(show => ({ ...show, date: new Date(show.date) })));
-                })
-                .catch(console.log);
-        })
-    };
-    */
 
     const removeShow = uuid => firestore.collection(`shows-${wheelName}`)
         .doc(uuid).delete()
