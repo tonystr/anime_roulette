@@ -299,6 +299,7 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
                 }}
                 updateShowProp={updateInspectingShowProp}
                 show={rotate && winner}
+                users={users}
                 beginWatching={rotate ? () => {
                     addHistory({ ...winner, state: 'Watching' });
                     removeShow(winner.uuid);
@@ -377,6 +378,7 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
                     onRequestClose={() => setInspectingShow(null)}
                     show={inspectingShow}
                     updateShowProp={updateInspectingShowProp}
+                    users={users}
                     beginWatching={inspectingShow ? () => {
                         addHistory({ ...inspectingShow, date: new Date() });
                         removeShow(inspectingShow.uuid);
@@ -473,6 +475,7 @@ function History({ users, shows, history, updateHistoryProp, ...props }) {
                 onRequestClose={() => setInspectingShow(null)}
                 show={inspectingShow}
                 updateShowProp={updateInspectingShowProp}
+                users={users}
             />
         </div>
     );
