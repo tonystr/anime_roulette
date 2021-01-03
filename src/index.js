@@ -578,11 +578,83 @@ function SignOut({ className='', ...props }) {
     );
 }
 
+function NoWheels({ uid }) {
+    const [requestName, setRequestName] = useState('');
+    const [ownName, setOwnName] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    const requestAccess = () => {
+        const docRef = firestore.collection('wheels').doc(requestName);
+        docRef.get().then(docSnap => {
+            if (!docSnap.exists) {
+                setError(() => 'Error: Wheel does not exist. Check your spelling');
+                return;
+            }
+
+            const accessRequest = docSnap.data()?.accessRequest || [];
+            console.log(accessRequest);
+
+            if (accessRequest.includes(uid)) {
+                setError(() => 'You have already requested access to this wheel. Wait for the owner to accept');
+                return;
+            }
+
+            docRef.update({
+                accessRequest: [...accessRequest, uid]
+            });
+
+            setError(() => '');
+            setSuccess(() => `Successfully requested access to ${requestName}. Wait for the owner to accept your request.`);
+
+            console.log('requested access to join wheel');
+        });
+    };
+
+    useEffect(() => {
+        if (error) setSuccess(() => '');
+    }, [error]);
+
+    useEffect(() => {
+        if (!ownName) return;
+
+        firestore.collection('wheels').doc(ownName).get().then(
+            docSnap => setError(() => docSnap.exists ? 'Error: Wheel name taken' : '')
+        );
+
+    }, [ownName]);
+
+    return (
+        <div className='no-wheels'>
+            <h2>You don't have access to any wheels</h2>
+            <div>
+                <label htmlFor='request-access'>Request access:</label>
+                <input
+                    value={requestName}
+                    onChange={e => setRequestName(e.target.value)}
+                    type='text'
+                    id='request-access'
+                    onKeyDown={e => e.key === 'Enter' && requestAccess()}
+                />
+            </div>
+            <div className='or'>or</div>
+            <div>
+                <label htmlFor='make-your-own'>Make your own:</label>
+                <input value={ownName} onChange={e => setOwnName(e.target.value)} type='text' id='make-your-own' />
+            </div>
+            <div className='error'>{error}</div>
+            <div className='success'>{success}</div>
+        </div>
+    );
+}
+
 function PageRenderer() {
-    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Test Wheel');
+    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'No wheel selected');
     const [user] = useAuthState(auth);
 
-    const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
+    //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
+    const [userData] = useDocumentData(firestore.collection('users').doc(user?.uid));
+    const wheels = userData?.wheels || [];
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
@@ -600,8 +672,8 @@ function PageRenderer() {
                     {user && (
                         <div className='wheel-name clickable-faded'>
                             {wheelName}
-                            <select defaultValue={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                {wheels.map(wheel => <option>{wheel}</option>)}
+                            <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                                {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
                             </select>
                         </div>
                     )}
@@ -612,11 +684,14 @@ function PageRenderer() {
                 </div>
             </header>
             {user ?
-                <WheelPage
-                    wheelName={wheelName}
-                    showsQuery={showsQuery}
-                    historyQuery={historyQuery}
-                /> :
+                (wheels.length < 1 ?
+                    <NoWheels uid={user.uid} /> :
+                    <WheelPage
+                        wheelName={wheelName}
+                        showsQuery={showsQuery}
+                        historyQuery={historyQuery}
+                    />
+                ) :
                 <SignIn />}
         </div>
     );

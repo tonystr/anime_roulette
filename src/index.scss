@@ -21,6 +21,16 @@ code {
     outline: none;
 }
 
+.no-wheels {
+    .error {
+        color: #ff5057;
+    }
+
+    .success {
+        color: #87b6f3;
+    }
+}
+
 .clickable-faded {
     color: #6a6a66;
     cursor: pointer;

@@ -85,7 +85,7 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                                     e.target.value
                                 )}
                             >
-                                {users.map(user => <option value={user.uuid}>{user.name}</option>)}
+                                {users.map(user => <option key={user.uuid} value={user.uuid}>{user.name}</option>)}
                             </select>
                             {show.owner?.name || findUser(show.owner)?.name}
                         </span>
