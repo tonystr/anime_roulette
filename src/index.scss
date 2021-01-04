@@ -22,6 +22,69 @@ code {
 }
 
 .no-wheels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    h2 {
+        margin-bottom: 1.2rem;
+    }
+
+    > div {
+        margin-top: .6rem;
+    }
+
+    label {
+        margin-right: .4rem;
+        font-size: 1rem;
+    }
+
+    button {
+        color: #fff;
+        background-color: #3d645d;
+        border-radius: 4px;
+        font-size: 1rem;
+        border: none;
+        transition: color .14s, background-color .14s;
+        padding: 4px 8px;
+        cursor: pointer;
+        margin-left: .4rem;
+
+        &.disabled {
+            background-color: transparent;
+            color: #a3a39a;
+            cursor: not-allowed;
+
+            &:hover {
+                background-color: #683342;
+                color: #a3a39a;
+            }
+        }
+
+        &:hover {
+            background-color: #68bd95;
+            color: #fff;
+        }
+    }
+
+    input[type='text'] {
+        color: #e3e3c3;
+        background-color: #333;
+        border-radius: 4px;
+        font-size: 1rem;
+        border: none;
+        transition: color .14s, background-color .14s;
+        padding: 4px 8px;
+
+        &:hover,
+        &:focus,
+        &:focus-within {
+            background-color: #3a3a3a;
+            color: #ffffff;
+        }
+    }
+
     .error {
         color: #ff5057;
     }

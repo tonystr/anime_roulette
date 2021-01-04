@@ -27,28 +27,6 @@ const auth = firebase.auth();
 const firestore = firebase.firestore();
 //window.firestore = firestore;
 
-function tryParseJSON(source, test=null) {
-    let json = null;
-    try {
-        json = JSON.parse(source);
-        if (test && !test(json)) {
-            return null;
-        }
-    } catch(err) {
-        return null;
-    }
-    return json;
-}
-
-function parseHistory(historySauce) {
-    const json = tryParseJSON(historySauce, Array.isArray);
-    return json ? json.map(h => ({ ...h, date: new Date(h.date) })) : [];
-}
-
-function parseShows(showsSauce) {
-    return tryParseJSON(showsSauce, Array.isArray) || [];
-}
-
 function arrayReverse(array) {
     const newArray = array.slice();
     newArray.reverse();
@@ -583,8 +561,11 @@ function NoWheels({ uid }) {
     const [ownName, setOwnName] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [requestDisabled, setRequestDisabled] = useState(true);
+    const [ownDisabled, setOwnDisabled] = useState(true);
 
     const requestAccess = () => {
+        if (requestDisabled) return;
         const docRef = firestore.collection('wheels').doc(requestName);
         docRef.get().then(docSnap => {
             if (!docSnap.exists) {
@@ -611,16 +592,31 @@ function NoWheels({ uid }) {
         });
     };
 
+    const createWheel = () => {
+        if (ownDisabled) return;
+        window.alert('TODO: implement this');
+    };
+
+    useEffect(() => {
+        if (requestDisabled === !requestName) return;
+        setRequestDisabled(() => !requestName);
+    }, [requestName]);
+
     useEffect(() => {
         if (error) setSuccess(() => '');
     }, [error]);
 
     useEffect(() => {
-        if (!ownName) return;
+        if (!ownName) {
+            setError(() => '');
+            setOwnDisabled(() => true);
+            return;
+        }
 
-        firestore.collection('wheels').doc(ownName).get().then(
-            docSnap => setError(() => docSnap.exists ? 'Error: Wheel name taken' : '')
-        );
+        firestore.collection('wheels').doc(ownName).get().then(docSnap => {
+            setError(() => docSnap.exists ? 'Error: Wheel name taken' : '');
+            setOwnDisabled(() => docSnap.exists);
+        });
 
     }, [ownName]);
 
@@ -634,13 +630,23 @@ function NoWheels({ uid }) {
                     onChange={e => setRequestName(e.target.value)}
                     type='text'
                     id='request-access'
+                    placeholder='Wheel name'
                     onKeyDown={e => e.key === 'Enter' && requestAccess()}
                 />
+                <button type='submit' className={requestDisabled ? 'disabled' : ''} onClick={requestAccess}>Request</button>
             </div>
             <div className='or'>or</div>
             <div>
                 <label htmlFor='make-your-own'>Make your own:</label>
-                <input value={ownName} onChange={e => setOwnName(e.target.value)} type='text' id='make-your-own' />
+                <input
+                    value={ownName}
+                    placeholder='Wheel name'
+                    onChange={e => setOwnName(e.target.value)}
+                    type='text'
+                    id='make-your-own'
+                    onKeyDown={e => e.key === 'Enter' && createWheel()}
+                />
+                <button type='submit' className={ownDisabled ? 'disabled' : ''} onClick={createWheel}>Create</button>
             </div>
             <div className='error'>{error}</div>
             <div className='success'>{success}</div>
