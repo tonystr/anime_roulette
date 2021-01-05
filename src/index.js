@@ -620,7 +620,7 @@ function NoWheels({ uid }) {
     }, [ownName]);
 
     return (
-        <div className='no-wheels'>
+        <div className='no-wheels page-form'>
             <h2>You don't have access to any wheels</h2>
             <div>
                 <label htmlFor='request-access'>Request access:</label>
@@ -680,11 +680,31 @@ function AccessRequests({ wheelName, userUid }) {
                     {userNames[uuid] ? <span className='username'>{userNames[uuid]}</span> : 'Someone'}
                     &nbsp;is requesting access to this wheel.
                     <button>Accept</button> /
-                    <button>Deny</button>
+                    <button onClick={() => {
+                        const newRequests = requests.filter(user => user !== uuid);
+                        firestore.doc(`wheels/${wheelName}`).update({
+                            accessRequests: newRequests
+                        });
+                    }}>Deny</button>
                 </div>
             ))}
         </div>
     ) : null;
+}
+
+function RegisterUser() {
+    return (
+        <div className='register-user page-form'>
+            <h2>Welcome to anime roulette! Please register a username</h2>
+            <div>
+                <label htmlFor='register-username'>Username:</label>
+                <input type='text' id='register-username' />
+            </div>
+            <div>
+                (this can not be changed later, and is visible to other users)
+            </div>
+        </div>
+    );
 }
 
 function PageRenderer() {
@@ -703,6 +723,19 @@ function PageRenderer() {
     useEffect(() => {
         localStorage.setItem('wheel-name', wheelName);
     }, [wheelName]);
+
+    const renderPage = () => {
+        if (!user) return <SignIn />;
+        if (!userData) return <RegisterUser />
+        if (wheels.length < 1) return <NoWheels uid={user.uid} />;
+        return (
+            <WheelPage
+                wheelName={wheelName}
+                showsQuery={showsQuery}
+                historyQuery={historyQuery}
+            />
+        );
+    }
 
     return (
         <div>
@@ -723,16 +756,7 @@ function PageRenderer() {
                     <SignOut />
                 </div>
             </header>
-            {user ?
-                (wheels.length < 1 ?
-                    <NoWheels uid={user.uid} /> :
-                    <WheelPage
-                        wheelName={wheelName}
-                        showsQuery={showsQuery}
-                        historyQuery={historyQuery}
-                    />
-                ) :
-                <SignIn />}
+            {renderPage()}
         </div>
     );
 }
