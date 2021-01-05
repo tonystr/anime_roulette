@@ -161,11 +161,36 @@ code {
     }
 }
 
+@keyframes slide-in-left {
+    0% {
+        opacity: 0;
+        transform: translateX(-111%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 header {
     display: flex;
 
-    * {
+    > * {
         width: 33.3334%;
+    }
+
+    .access-requests {
+        color: #e3e3c3;
+        margin: 1rem 2rem;
+
+        .request {
+            animation: slide-in-left .5s;
+        }
+
+        .username {
+            color: #fff;
+        }
     }
 
     .export-import {

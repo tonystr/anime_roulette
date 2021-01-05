@@ -573,16 +573,15 @@ function NoWheels({ uid }) {
                 return;
             }
 
-            const accessRequest = docSnap.data()?.accessRequest || [];
-            console.log(accessRequest);
+            const accessRequests = docSnap.data()?.accessRequests || [];
 
-            if (accessRequest.includes(uid)) {
+            if (accessRequests.includes(uid)) {
                 setError(() => 'You have already requested access to this wheel. Wait for the owner to accept');
                 return;
             }
 
             docRef.update({
-                accessRequest: [...accessRequest, uid]
+                accessRequests: [...accessRequests, uid]
             });
 
             setError(() => '');
@@ -654,6 +653,40 @@ function NoWheels({ uid }) {
     );
 }
 
+function AccessRequests({ wheelName, userUid }) {
+    const [userNames, setUserNames] = useState({});
+
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
+    const requests = wheel?.accessRequests;
+    const wheelOwner = wheel?.owner;
+
+    useEffect(() => {
+        if (!requests) return;
+        for (const uuid of requests) {
+            firestore.doc(`users/${uuid}`).get().then(docSnap => {
+                if (!docSnap.exists) {
+                    console.log('not exists');
+                    return;
+                }
+                setUserNames(prev => ({ ...prev, [uuid]: docSnap.data().name }))
+            }).catch(console.error);
+        }
+    }, [requests]);
+
+    return userUid !== null && userUid === wheelOwner && requests ? (
+        <div className='access-requests'>
+            {requests.map(uuid => (
+                <div key={uuid} className='request'>
+                    {userNames[uuid] ? <span className='username'>{userNames[uuid]}</span> : 'Someone'}
+                    &nbsp;is requesting access to this wheel.
+                    <button>Accept</button> /
+                    <button>Deny</button>
+                </div>
+            ))}
+        </div>
+    ) : null;
+}
+
 function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'No wheel selected');
     const [user] = useAuthState(auth);
@@ -674,7 +707,7 @@ function PageRenderer() {
     return (
         <div>
             <header>
-                <div>
+                <div className='wheel-meta'>
                     {user && (
                         <div className='wheel-name clickable-faded'>
                             {wheelName}
@@ -683,6 +716,7 @@ function PageRenderer() {
                             </select>
                         </div>
                     )}
+                    <AccessRequests wheelName={wheelName} userUid={user?.uid} />
                 </div>
                 <h1>{wheelTitle}</h1>
                 <div className="export-import">
