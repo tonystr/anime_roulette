@@ -25,7 +25,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-//window.firestore = firestore;
+window.firestore = firestore;
 
 function arrayReverse(array) {
     const newArray = array.slice();
@@ -722,6 +722,7 @@ function AccessRequests({ wheelName, userUid }) {
     useEffect(() => {
         if (!requests) return;
         for (const uuid of requests) {
+            if (userNames[uuid] !== undefined) continue;
             firestore.doc(`users/${uuid}`).get().then(docSnap => {
                 if (!docSnap.exists) {
                     console.log('not exists');
@@ -732,19 +733,29 @@ function AccessRequests({ wheelName, userUid }) {
         }
     }, [requests]);
 
+    const accept = uuid => {
+        const newRequests = requests.filter(user => user !== uuid);
+        firestore.doc(`wheels/${wheelName}`).update({
+            accessRequests: newRequests
+        });
+    };
+
+    const reject = uuid => {
+        const newRequests = requests.filter(user => user !== uuid);
+        firestore.doc(`wheels/${wheelName}`).update({
+            accessRequests: newRequests,
+            users: [...wheel.users, uuid]
+        });
+    };
+
     return userUid !== null && userUid === wheelOwner && requests ? (
         <div className='access-requests'>
             {requests.map(uuid => (
                 <div key={uuid} className='request'>
                     {userNames[uuid] ? <span className='username'>{userNames[uuid]}</span> : 'Someone'}
                     &nbsp;is requesting access to this wheel.
-                    <button>Accept</button> /
-                    <button onClick={() => {
-                        const newRequests = requests.filter(user => user !== uuid);
-                        firestore.doc(`wheels/${wheelName}`).update({
-                            accessRequests: newRequests
-                        });
-                    }}>Deny</button>
+                    <button className='blop' onClick={() => accept(uuid)}>Accept</button> /
+                    <button className='blop' onClick={() => reject(uuid)}>Deny  </button>
                 </div>
             ))}
         </div>
@@ -754,6 +765,8 @@ function AccessRequests({ wheelName, userUid }) {
 function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'No wheel selected');
     const [user] = useAuthState(auth);
+
+    console.log(user?.uid);
 
     //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
     const [userData] = useDocumentData(firestore.collection('users').doc(user?.uid));

@@ -21,6 +21,35 @@ code {
     outline: none;
 }
 
+.page-form button,
+button.blop {
+    color: #fff;
+    background-color: #3d645d;
+    border-radius: 4px;
+    font-size: 1rem;
+    border: none;
+    transition: color .14s, background-color .14s;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-left: .4rem;
+
+    &.disabled {
+        background-color: transparent;
+        color: #a3a39a;
+        cursor: not-allowed;
+
+        &:hover {
+            background-color: #683342;
+            color: #a3a39a;
+        }
+    }
+
+    &:hover {
+        background-color: #68bd95;
+        color: #fff;
+    }
+}
+
 .page-form {
     display: flex;
     justify-content: center;
@@ -43,34 +72,6 @@ code {
     label {
         margin-right: .4rem;
         font-size: 1rem;
-    }
-
-    button {
-        color: #fff;
-        background-color: #3d645d;
-        border-radius: 4px;
-        font-size: 1rem;
-        border: none;
-        transition: color .14s, background-color .14s;
-        padding: 4px 8px;
-        cursor: pointer;
-        margin-left: .4rem;
-
-        &.disabled {
-            background-color: transparent;
-            color: #a3a39a;
-            cursor: not-allowed;
-
-            &:hover {
-                background-color: #683342;
-                color: #a3a39a;
-            }
-        }
-
-        &:hover {
-            background-color: #68bd95;
-            color: #fff;
-        }
     }
 
     input[type='text'] {
