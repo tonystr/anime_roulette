@@ -27,6 +27,11 @@ code {
     align-items: center;
     flex-direction: column;
 
+    .faded {
+        margin-top: 3.4rem;
+        color: #a3a39a;
+    }
+
     h2 {
         margin-bottom: 1.2rem;
     }
