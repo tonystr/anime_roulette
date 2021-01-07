@@ -766,8 +766,6 @@ function PageRenderer() {
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'No wheel selected');
     const [user] = useAuthState(auth);
 
-    console.log(user?.uid);
-
     //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
     const [userData] = useDocumentData(firestore.collection('users').doc(user?.uid));
     const wheels = userData?.wheels || [];
