@@ -564,6 +564,8 @@ function NoWheels({ uid }) {
     const [requestDisabled, setRequestDisabled] = useState(true);
     const [ownDisabled, setOwnDisabled] = useState(true);
 
+    // Amazing
+
     const requestAccess = () => {
         if (requestDisabled) return;
         const docRef = firestore.collection('wheels').doc(requestName);
