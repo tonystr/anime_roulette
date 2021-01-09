@@ -328,6 +328,29 @@ function UserShows({ users, shows, renderShows, addShow }) {
     ));
 }
 
+function ShowInput({ value, style, show, updateShowProp, ...props }) {
+    const [localValue, setLocalValue] = useState(value);
+    const [editing, setEditing] = useState(false);
+
+    useEffect(() => {
+        if (!editing) {
+            setLocalValue(() => value);
+        }
+    }, [value, editing]);
+
+    return (
+        <input
+            type='text'
+            value={localValue}
+            onChange={e => setLocalValue(() => e.target.value)}
+            style={style}
+            onBlur={e => updateShowProp(show.uuid, 'name', e.target.value)}
+            onKey={e => e.key === 'Enter' && updateShowProp(show.uuid, 'name', e.target.value)}
+            {...props}
+        />
+    );
+}
+
 function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
@@ -343,11 +366,11 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
         const i = shows.findIndex(s => s === show);
         return (
             <div className='show' key={show.uuid}>
-                <input
-                    type='text'
+                <ShowInput
+                    show={show}
                     value={show.name}
-                    onChange={e => updateShowProp(show.uuid, 'name', e.target.value)}
                     style={{ borderLeftColor: pickColor(i, colors, shows) }}
+                    updateShowProp={updateShowProp}
                 />
                 <button className='delete' onClick={e => removeShow(show.uuid)}>×</button>
                 <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
@@ -801,6 +824,7 @@ function PageRenderer() {
                         <div className='wheel-name clickable-faded'>
                             {wheelName}
                             <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                                <option>No wheel selected</option>
                                 {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
                             </select>
                         </div>
