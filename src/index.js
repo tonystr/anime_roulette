@@ -297,7 +297,7 @@ function AddNewButton({ user, addShow }) {
         addShow({
             name: add,
             uuid: uuidv4(),
-            owner: user.uuid,
+            owner: user.uuid || user,
             date: new Date()
         });
         setAdd(() => '');
@@ -328,7 +328,7 @@ function UserShows({ users, shows, renderShows, addShow }) {
     ));
 }
 
-function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, ...props }) {
+function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
     const [editUsers, setEditUsers] = useState(false);
@@ -387,7 +387,7 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
-                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={users[0]} addShow={addShow} />]}
+                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} />]}
             </div>
             <ReactModal
                 className='edit-users-modal modal-screen'
@@ -466,7 +466,7 @@ function translateCDDates([ array=[] ]) {
     }));
 }
 
-function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
+function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery, userUid }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
         { name: 'Espen' , uuid: 'ArklXKxySSfXCn1JQHcYBiBJrbp1' },
@@ -516,7 +516,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery }) {
 
     return (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} wheelName={wheelName} />
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} wheelName={wheelName} userUid={userUid} />
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
         </main>
@@ -563,8 +563,6 @@ function NoWheels({ uid }) {
     const [success, setSuccess] = useState('');
     const [requestDisabled, setRequestDisabled] = useState(true);
     const [ownDisabled, setOwnDisabled] = useState(true);
-
-    // Amazing
 
     const requestAccess = () => {
         if (requestDisabled) return;
@@ -790,6 +788,7 @@ function PageRenderer() {
                 wheelName={wheelName}
                 showsQuery={showsQuery}
                 historyQuery={historyQuery}
+                userUid={user.uid}
             />
         );
     }
