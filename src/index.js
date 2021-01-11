@@ -362,7 +362,7 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
 
-    // shinji
+    // shinji is cool
 
     const renderShows = show => {
         const i = shows.findIndex(s => s === show);
