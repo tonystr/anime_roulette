@@ -330,13 +330,13 @@ function UserShows({ users, shows, renderShows, addShow }) {
 
 function ShowInput({ value, style, show, updateShowProp, ...props }) {
     const [localValue, setLocalValue] = useState(value);
-    const [editing, setEditing] = useState(false);
+    // const [editing, setEditing] = useState(false);
 
-    useEffect(() => {
-        if (!editing) {
-            setLocalValue(() => value);
-        }
-    }, [value, editing]);
+    // useEffect(() => {
+    //     if (!editing) {
+    //         setLocalValue(() => value);
+    //     }
+    // }, [value, editing]);
 
     return (
         <input
@@ -345,7 +345,7 @@ function ShowInput({ value, style, show, updateShowProp, ...props }) {
             onChange={e => setLocalValue(() => e.target.value)}
             style={style}
             onBlur={e => updateShowProp(show.uuid, 'name', e.target.value)}
-            onKey={e => e.key === 'Enter' && updateShowProp(show.uuid, 'name', e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && updateShowProp(show.uuid, 'name', e.target.value)}
             {...props}
         />
     );
@@ -361,8 +361,6 @@ function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp,
         updateShowProp(show.uuid, prop, value);
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
-
-    // shinji is cooler than me
 
     const renderShows = show => {
         const i = shows.findIndex(s => s === show);
@@ -513,28 +511,30 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery, userUid 
         '#8B9863'
     ];
 
-    const removeShow = uuid => firestore.collection(`shows-${wheelName}`)
+    const wheelRef = firestore.collection('wheels').doc(wheelName)
+
+    const removeShow = uuid => wheelRef.collection(`shows`)
         .doc(uuid).delete()
         .then(() => console.log('Document successfully deleted!'))
         .catch(err => console.error('Error removing document: ', err));
 
-    const addShow = show => firestore.collection(`shows-${wheelName}`)
+    const addShow = show => wheelRef.collection('shows')
         .doc(show.uuid).set(show)
         .then(() => console.log('Document successfully added!'))
         .catch(err => console.error('Error adding document: ', err));
 
-    const updateShowProp = (uuid, prop, value) => firestore.collection(`shows-${wheelName}`)
+    const updateShowProp = (uuid, prop, value) => wheelRef.collection('shows')
         .doc(uuid).update({ [prop]: value })
         .then(() => console.log('Document successfully updated!'))
         .catch(err => console.error('Error updating document: ', err));
 
 
-    const addHistory = show => firestore.collection(`history-${wheelName}`)
+    const addHistory = show => wheelRef.collection('history')
         .doc(show.uuid).set(show)
         .then(() => console.log('Document successfully added!'))
         .catch(err => console.error('Error adding document: ', err));
 
-    const updateHistoryProp = (uuid, prop, value) => firestore.collection(`history-${wheelName}`)
+    const updateHistoryProp = (uuid, prop, value) => wheelRef.collection('history')
         .doc(uuid).update({ [prop]: value })
         .then(() => console.log('Document successfully updated!'))
         .catch(err => console.error('Error updating document: ', err));
@@ -624,7 +624,7 @@ function NoWheels({ uid }) {
     useEffect(() => {
         if (requestDisabled === !requestName) return;
         setRequestDisabled(() => !requestName);
-    }, [requestName]);
+    }, [requestName, requestDisabled]);
 
     useEffect(() => {
         if (error) setSuccess(() => '');
@@ -756,7 +756,7 @@ function AccessRequests({ wheelName, userUid }) {
                 setUserNames(prev => ({ ...prev, [uuid]: docSnap.data().name }))
             }).catch(console.error);
         }
-    }, [requests]);
+    }, [requests, userNames]);
 
     const accept = uuid => {
         const newRequests = requests.filter(user => user !== uuid);
@@ -797,8 +797,9 @@ function PageRenderer() {
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
-    const showsQuery = firestore.collection(`shows-${wheelName}`).orderBy('date');
-    const historyQuery = firestore.collection(`history-${wheelName}`).orderBy('date');
+    const wheelRef = firestore.collection('wheels').doc(wheelName);
+    const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
+    const historyQuery = wheelRef.collection('history').orderBy('date');
 
     useEffect(() => {
         localStorage.setItem('wheel-name', wheelName);

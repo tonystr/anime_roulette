@@ -1,0 +1,20 @@
+
+function moveData(wheelName) {
+    const showsColRef = firestore.collection('wheels').doc(wheelName).collection('shows');
+
+    firestore.collection(`shows-${wheelName}`).get().then(querySnapshots => {
+    	querySnapshots.forEach(doc => {
+    		const data = doc.data();
+    		showsColRef.doc(data.uuid).set(data);
+    	});
+    });
+
+    const historyColRef = firestore.collection('wheels').doc(wheelName).collection('history');
+
+    firestore.collection(`history-${wheelName}`).get().then(querySnapshots => {
+        querySnapshots.forEach(doc => {
+            const data = doc.data();
+            historyColRef.doc(data.uuid).set(data);
+        });
+    });
+}
