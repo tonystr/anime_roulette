@@ -25,7 +25,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-window.firestore = firestore;
+// window.firestore = firestore;
 
 function arrayReverse(array) {
     const newArray = array.slice();
@@ -761,15 +761,15 @@ function AccessRequests({ wheelName, userUid }) {
     const accept = uuid => {
         const newRequests = requests.filter(user => user !== uuid);
         firestore.doc(`wheels/${wheelName}`).update({
-            accessRequests: newRequests
+            accessRequests: newRequests,
+            users: [...wheel.users, uuid]
         });
     };
 
     const reject = uuid => {
         const newRequests = requests.filter(user => user !== uuid);
         firestore.doc(`wheels/${wheelName}`).update({
-            accessRequests: newRequests,
-            users: [...wheel.users, uuid]
+            accessRequests: newRequests
         });
     };
 
