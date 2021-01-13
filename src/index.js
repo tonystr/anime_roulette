@@ -511,7 +511,8 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery, userUid 
         '#8B9863'
     ];
 
-    const wheelRef = firestore.collection('wheels').doc(wheelName)
+
+    const wheelRef = firestore.collection('wheels').doc(wheelName);
 
     const removeShow = uuid => wheelRef.collection(`shows`)
         .doc(uuid).delete()
@@ -581,7 +582,7 @@ function SignOut({ className='', ...props }) {
     );
 }
 
-function NoWheels({ uid }) {
+function NoWheels({ uid, selectWheelName }) {
     const [requestName, setRequestName] = useState('');
     const [ownName, setOwnName] = useState('');
     const [error, setError] = useState('');
@@ -611,6 +612,7 @@ function NoWheels({ uid }) {
 
             setError(() => '');
             setSuccess(() => `Successfully requested access to ${requestName}. Wait for the owner to accept your request.`);
+            selectWheelName(requestName);
 
             console.log('requested access to join wheel');
         });
@@ -795,6 +797,8 @@ function PageRenderer() {
     const [userData] = useDocumentData(firestore.collection('users').doc(user?.uid));
     const wheels = userData?.wheels || [];
 
+    const [wheel] = useDocumentData(firestore.collection('wheels').doc(wheelName));
+
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
     const wheelRef = firestore.collection('wheels').doc(wheelName);
@@ -808,7 +812,12 @@ function PageRenderer() {
     const renderPage = () => {
         if (!user) return <SignIn />;
         if (!userData) return <RegisterUser userUid={user.uid} />
-        if (wheels.length < 1) return <NoWheels uid={user.uid} />;
+        if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) return (
+            <NoWheels uid={user.uid} selectWheelName={name => {
+                setWheelName(() => name);
+                firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
+            }} />
+        );
         return (
             <WheelPage
                 wheelName={wheelName}
