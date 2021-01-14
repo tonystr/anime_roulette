@@ -582,7 +582,7 @@ function SignOut({ className='', ...props }) {
     );
 }
 
-function NoWheels({ uid, selectWheelName }) {
+function ManageWheels({ uid, selectWheelName, noWheels=false }) {
     const [requestName, setRequestName] = useState('');
     const [ownName, setOwnName] = useState('');
     const [error, setError] = useState('');
@@ -648,7 +648,7 @@ function NoWheels({ uid, selectWheelName }) {
 
     return (
         <div className='no-wheels page-form'>
-            <h2>You don't have access to any wheels</h2>
+            <h2>{noWheels ? 'You don\'t have access to any wheels' : 'Select a wheel from the top-left menu, or'}</h2>
             <div>
                 <label htmlFor='request-access'>Request access:</label>
                 <input
@@ -690,8 +690,8 @@ function RegisterUser({ userUid }) {
             return;
         }
 
-        if (!username.match(/\w/)) {
-            setError(() => 'Username must include word characters (a-z, 0-9, _)');
+        if (!username.match(/^[\w\s]+$/)) {
+            setError(() => 'Username must only include word characters (a-z, 0-9, _)');
             return;
         }
 
@@ -703,7 +703,7 @@ function RegisterUser({ userUid }) {
         console.log(firestore.collection('users').doc(userUid));
 
         firestore.collection('users').doc(userUid).set({
-            name: username
+            name: username.trim()
         }).catch(err => {
             setError(() => 'Error registering username.');
             console.log(err);
@@ -790,14 +790,14 @@ function AccessRequests({ wheelName, userUid }) {
 }
 
 function PageRenderer() {
-    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'No wheel selected');
-    const [user] = useAuthState(auth);
+    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Select wheel');
+    const [user, userLoading] = useAuthState(auth);
 
     //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
-    const [userData] = useDocumentData(firestore.collection('users').doc(user?.uid));
+    const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid));
     const wheels = userData?.wheels || [];
 
-    const [wheel] = useDocumentData(firestore.collection('wheels').doc(wheelName));
+    const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
@@ -810,10 +810,11 @@ function PageRenderer() {
     }, [wheelName]);
 
     const renderPage = () => {
+        if (userLoading || wheelLoading || userDataLoading) return <div class='loading'>Loading...</div>;
         if (!user) return <SignIn />;
         if (!userData) return <RegisterUser userUid={user.uid} />
         if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) return (
-            <NoWheels uid={user.uid} selectWheelName={name => {
+            <ManageWheels uid={user.uid} noWheels={wheels.length < 1} selectWheelName={name => {
                 setWheelName(() => name);
                 firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
             }} />
@@ -836,7 +837,7 @@ function PageRenderer() {
                         <div className='wheel-name clickable-faded'>
                             {wheelName}
                             <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                <option>No wheel selected</option>
+                                <option>Select wheel</option>
                                 {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
                             </select>
                         </div>
