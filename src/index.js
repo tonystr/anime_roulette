@@ -25,7 +25,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-window.firestore = firestore;
+//window.firestore = firestore;
 
 function arrayReverse(array) {
     const newArray = array.slice();
