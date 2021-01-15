@@ -4,9 +4,9 @@ import { ReactComponent as ArrowDown } from './icons/arrow_down.svg';
 import { ReactComponent as UserIcon  } from './icons/user.svg';
 import ReactModal from 'react-modal';
 import ShowInpsectorModal, { monthNames } from './components/ShowInspectorModal';
+import AddNewButton from './components/AddNewButton';
 import FacebookLogo from './icons/facebook_logo.png';
 import GoogleLogo from './icons/google_logo.png';
-import { v4 as uuidv4 } from 'uuid';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
@@ -151,10 +151,6 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
         [rotate, wheelName]
     );
 
-    //const setRotating = useCallback(
-    //    [rotate.spinning, wheelName]
-    //);
-
     // Draw wheel
     useEffect(() => {
         if (!canvasRef || !canvasRef.current || (rotate && rotate.spinning) || !shows) return;
@@ -287,32 +283,6 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
                 } : null}
             />
         </div>
-    );
-}
-
-function AddNewButton({ user, addShow }) {
-    const [add, setAdd] = useState('');
-
-    const addNew = () => {
-        addShow({
-            name: add,
-            uuid: uuidv4(),
-            owner: user.uuid || user,
-            date: new Date()
-        });
-        setAdd(() => '');
-    };
-
-    return (
-        <input
-            type='text'
-            className='show add-new'
-            placeholder='Add Show +'
-            value={add}
-            onChange={e => setAdd(() => e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && add && addNew()}
-            onBlur={e => add && addNew()}
-        />
     );
 }
 
