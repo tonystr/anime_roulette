@@ -25,7 +25,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-// window.firestore = firestore;
+window.firestore = firestore;
 
 function arrayReverse(array) {
     const newArray = array.slice();
@@ -764,7 +764,7 @@ function PageRenderer() {
     const [user, userLoading] = useAuthState(auth);
 
     //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
-    const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid));
+    const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
 
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
@@ -780,7 +780,7 @@ function PageRenderer() {
     }, [wheelName]);
 
     const renderPage = () => {
-        if (userLoading || wheelLoading || userDataLoading) return <div class='loading'>Loading...</div>;
+        if (userLoading || wheelLoading || userDataLoading) return <div className='loading'>Loading...</div>;
         if (!user) return <SignIn />;
         if (!userData) return <RegisterUser userUid={user.uid} />
         if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) return (
