@@ -760,7 +760,8 @@ function AccessRequests({ wheelName, userUid }) {
 }
 
 function PageRenderer() {
-    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || 'Select wheel');
+    const noWheelName = 'Select wheel';
+    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || noWheelName);
     const [user, userLoading] = useAuthState(auth);
 
     //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
@@ -780,15 +781,18 @@ function PageRenderer() {
     }, [wheelName]);
 
     const renderPage = () => {
-        if (userLoading || wheelLoading || userDataLoading) return <div className='loading'>Loading...</div>;
+        const loadingDiv = <div className='loading'>Loading...</div>;
+        if (userLoading || wheelLoading || userDataLoading) return loadingDiv;
         if (!user) return <SignIn />;
         if (!userData) return <RegisterUser userUid={user.uid} />
-        if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) return (
-            <ManageWheels uid={user.uid} noWheels={wheels.length < 1} selectWheelName={name => {
-                setWheelName(() => name);
-                firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
-            }} />
-        );
+        if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) {
+            return (
+                <ManageWheels uid={user.uid} noWheels={wheels.length < 1} selectWheelName={name => {
+                    setWheelName(() => name);
+                    firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
+                }} />
+            );
+        }
         return (
             <WheelPage
                 wheelName={wheelName}
@@ -812,9 +816,11 @@ function PageRenderer() {
                                     {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
                                 </select>
                             </span>
-                            <button className='clickable-faded manage-wheels'>
-                                manage wheels
-                            </button>
+                            {/*!manageWheels && (
+                                <button onClick={() => setWheelName(() => noWheelName)} className='clickable-faded manage-wheels'>
+                                    manage wheels
+                                </button>
+                            )*/}
                         </div>
                     )}
                     <AccessRequests wheelName={wheelName} userUid={user?.uid} />
