@@ -804,12 +804,17 @@ function PageRenderer() {
             <header>
                 <div className='wheel-meta'>
                     {user && (
-                        <div className='wheel-name clickable-faded'>
-                            {wheelName}
-                            <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                <option>Select wheel</option>
-                                {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
-                            </select>
+                        <div className='wheel-name'>
+                            <span className='select clickable-faded'>
+                                {wheelName}
+                                <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                                    <option>Select wheel</option>
+                                    {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
+                                </select>
+                            </span>
+                            <button className='clickable-faded manage-wheels'>
+                                manage wheels
+                            </button>
                         </div>
                     )}
                     <AccessRequests wheelName={wheelName} userUid={user?.uid} />

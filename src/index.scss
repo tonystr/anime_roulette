@@ -190,11 +190,51 @@ button.blop {
     }
 }
 
+select option {
+    background-color: #262628;
+    color: #e3e3c3;
+    font-size: .8rem;
+}
+
 header {
     display: flex;
 
     > * {
         width: 33.3334%;
+    }
+
+    .wheel-meta {
+        .select {
+            position: relative;
+        }
+
+        .manage-wheels {
+            opacity: 0;
+            transition: all .14s;
+            margin-left: 2rem;
+        }
+
+        &:hover .manage-wheels {
+            opacity: 1;
+        }
+    }
+
+    .wheel-name {
+        margin: 1rem 2rem;
+        position: relative;
+
+        select {
+            background: none;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
     }
 
     .access-requests {
@@ -219,24 +259,6 @@ header {
 
         .clickable-faded {
             margin-right: 2rem;
-        }
-    }
-
-    .wheel-name {
-        margin: 1rem 2rem;
-        position: relative;
-
-        select {
-            background: none;
-            border: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            cursor: pointer;
-            opacity: 0;
         }
     }
 }
