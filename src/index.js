@@ -213,7 +213,7 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
                 return;
             }
 
-            let easeInOutQuint = x => x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
+            let easeInOutQuint = x => (x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2);
             let time = easeInOutQuint((date - rotate.date) / (rotate.endDate - rotate.date));
 
             const targetIndex = Math.floor((1 - (((rotate.offset + time * (Math.PI * 2 * 13 + rotate.rng * Math.PI * 2)) / (Math.PI * 2) + .25) % 1)) * shows.length);
