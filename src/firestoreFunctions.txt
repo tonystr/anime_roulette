@@ -18,3 +18,22 @@ function moveData(wheelName) {
         });
     });
 }
+
+
+function renameWheel(fromWheelName, toWheelName) {
+    firestore.collection('wheels').doc(fromWheelName).get().then(snap => {
+			const toWheelRef = firestore.collection('wheels').doc(toWheelName);
+			toWheelRef.set(snap.data());
+			const toHistoryRef = toWheelRef.collection('history');
+			const toShowsRef = toWheelRef.collection('shows');
+
+			const fromWheelRef = firestore.collection('wheels').doc(fromWheelName);
+			fromWheelRef.collection('history').get().then(snap => snap.forEach(doc => {
+				toHistoryRef.doc(doc.id).set(doc.data());
+			}));
+
+			fromWheelRef.collection('shows').get().then(snap => snap.forEach(doc => {
+				toShowsRef.doc(doc.id).set(doc.data());
+			}));
+		})
+}

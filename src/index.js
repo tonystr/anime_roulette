@@ -25,7 +25,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-//window.firestore = firestore;
+// window.firestore = firestore;
 
 function arrayReverse(array) {
     const newArray = array.slice();
@@ -552,7 +552,11 @@ function SignOut({ className='', ...props }) {
     );
 }
 
-function ManageWheels({ uid, selectWheelName, noWheels=false }) {
+function convertWheelName(name) {
+    return name.trim().toLowerCase().replace(/\s+/g, '_');
+}
+
+function ManageWheels({ uid, selectWheelName, userWheels=[], noWheels=false }) {
     const [requestName, setRequestName] = useState('');
     const [ownName, setOwnName] = useState('');
     const [error, setError] = useState('');
@@ -565,14 +569,14 @@ function ManageWheels({ uid, selectWheelName, noWheels=false }) {
         const docRef = firestore.collection('wheels').doc(requestName);
         docRef.get().then(docSnap => {
             if (!docSnap.exists) {
-                setError(() => 'Error: Wheel does not exist. Check your spelling');
+                setError(() => 'Wheel does not exist. Check your spelling.');
                 return;
             }
 
             const accessRequests = docSnap.data()?.accessRequests || [];
 
             if (accessRequests.includes(uid)) {
-                setError(() => 'You have already requested access to this wheel. Wait for the owner to accept');
+                setError(() => 'You have already requested access to this wheel. Wait for the owner to accept.');
                 return;
             }
 
@@ -584,13 +588,34 @@ function ManageWheels({ uid, selectWheelName, noWheels=false }) {
             setSuccess(() => `Successfully requested access to ${requestName}. Wait for the owner to accept your request.`);
             selectWheelName(requestName);
 
-            console.log('requested access to join wheel');
+            console.log('Requested access to join wheel.');
         });
     };
 
     const createWheel = () => {
         if (ownDisabled) return;
-        window.alert('TODO: implement this next');
+        const ownConverted = convertWheelName(ownName);
+        if (!ownConverted) {
+            setError(() => 'Invalid name. Check your input.');
+            return;
+        }
+        const title = ownName.trim();
+        firestore.collection('wheels').doc(ownConverted).set({
+            title,
+            owner: uid,
+            rotate: {
+                date: new Date(),
+                endDate: +(new Date()),
+                offset: Math.PI,
+                rng: 0,
+                spinning: false
+            },
+            users: [uid]
+        });
+        firestore.collection('users').doc(uid).update({
+            wheels: [...userWheels, ownConverted]
+        });
+        selectWheelName(ownConverted);
     };
 
     useEffect(() => {
@@ -787,7 +812,7 @@ function PageRenderer() {
         if (!userData) return <RegisterUser userUid={user.uid} />
         if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) {
             return (
-                <ManageWheels uid={user.uid} noWheels={wheels.length < 1} selectWheelName={name => {
+                <ManageWheels uid={user.uid} noWheels={wheels.length < 1} userWheels={wheels} selectWheelName={name => {
                     setWheelName(() => name);
                     firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
                 }} />
