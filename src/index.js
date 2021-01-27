@@ -459,13 +459,17 @@ function translateCDDates([ array=[] ]) {
     }));
 }
 
-function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery, userUid }) {
+function WheelPage({ wheelName, setWheelName, userUid }) {
     const [users, setUsers] = useState(() => [
         { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
         { name: 'Espen' , uuid: 'ArklXKxySSfXCn1JQHcYBiBJrbp1' },
         { name: 'Jørgen', uuid: 'DiOHXZRe7iP7FHxkG7xEigQoLFF3' },
         { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
     ]);
+
+    const wheelRef = firestore.collection('wheels').doc(wheelName);
+    const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
+    const historyQuery = wheelRef.collection('history').orderBy('date');
 
     const shows   = translateCDDates(useCollectionData(showsQuery));
     const history = translateCDDates(useCollectionData(historyQuery));
@@ -481,8 +485,7 @@ function WheelPage({ wheelName, setWheelName, showsQuery, historyQuery, userUid 
         '#8B9863'
     ];
 
-
-    const wheelRef = firestore.collection('wheels').doc(wheelName);
+    console.log('render');
 
     const removeShow = uuid => wheelRef.collection(`shows`)
         .doc(uuid).delete()
@@ -807,10 +810,6 @@ function PageRenderer() {
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
-    const wheelRef = firestore.collection('wheels').doc(wheelName);
-    const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
-    const historyQuery = wheelRef.collection('history').orderBy('date');
-
     useEffect(() => {
         localStorage.setItem('wheel-name', wheelName);
     }, [wheelName]);
@@ -831,8 +830,6 @@ function PageRenderer() {
         return (
             <WheelPage
                 wheelName={wheelName}
-                showsQuery={showsQuery}
-                historyQuery={historyQuery}
                 userUid={user.uid}
             />
         );
