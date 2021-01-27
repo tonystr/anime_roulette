@@ -788,10 +788,20 @@ function PageRenderer() {
     const noWheelName = 'Select wheel';
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || noWheelName);
     const [user, userLoading] = useAuthState(auth);
+    const [wheelTitles, setWheelTitles] = useState({});
 
-    //const wheels = ['Test Wheel', 'Animal Abuse', 'Third one for show', 'smile'];
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
+
+    useEffect(() => {
+        for (const wheelId of wheels) {
+            if (!wheelTitles[wheelId]) {
+                firestore.collection('wheels').doc(wheelId).get().then(snap => {
+                    setWheelTitles(prev => ({ ...prev, [wheelId]: snap.data().title }));
+                });
+            }
+        }
+    }, [wheels.length]);
 
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
 
@@ -835,10 +845,10 @@ function PageRenderer() {
                     {user && (
                         <div className='wheel-name'>
                             <span className='select clickable-faded'>
-                                {wheelName}
+                                {wheelTitles[wheelName]}
                                 <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                    <option>Select wheel</option>
-                                    {wheels.map(wheel => <option key={wheel}>{wheel}</option>)}
+                                    <option>{noWheelName}</option>
+                                    {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
                                 </select>
                             </span>
                             {/*!manageWheels && (
