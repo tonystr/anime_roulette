@@ -485,8 +485,6 @@ function WheelPage({ wheelName, setWheelName, userUid }) {
         '#8B9863'
     ];
 
-    console.log('render');
-
     const removeShow = uuid => wheelRef.collection(`shows`)
         .doc(uuid).delete()
         .then(() => console.log('Document successfully deleted!'))
@@ -848,11 +846,12 @@ function PageRenderer() {
                                     {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
                                 </select>
                             </span>
-                            {/*!manageWheels && (
-                                <button onClick={() => setWheelName(() => noWheelName)} className='clickable-faded manage-wheels'>
-                                    manage wheels
+                            <span className='faded'>
+                                |
+                                <button onClick={() => {}} className='clickable-faded manage-wheel'>
+                                    manage
                                 </button>
-                            )*/}
+                            </span>
                         </div>
                     )}
                     <AccessRequests wheelName={wheelName} userUid={user?.uid} />
