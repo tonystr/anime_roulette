@@ -785,11 +785,21 @@ function AccessRequests({ wheelName, userUid }) {
     ) : null;
 }
 
+function ManageWheel({ escape }) {
+    return (
+        <div>
+            <h2>Manage wheel</h2>
+            <button onClick={escape}>Escape</button>
+        </div>
+    );
+}
+
 function PageRenderer() {
     const noWheelName = 'Select wheel';
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || noWheelName);
     const [user, userLoading] = useAuthState(auth);
     const [wheelTitles, setWheelTitles] = useState({});
+    const [manageWheel, setManageWheel] = useState(false);
 
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
@@ -825,6 +835,9 @@ function PageRenderer() {
                 }} />
             );
         }
+        if (manageWheel) {
+            return <ManageWheel escape={() => setManageWheel(() => false)} />
+        }
         return (
             <WheelPage
                 wheelName={wheelName}
@@ -847,8 +860,8 @@ function PageRenderer() {
                                 </select>
                             </span>
                             <span className='faded'>
-                                |
-                                <button onClick={() => {}} className='clickable-faded manage-wheel'>
+                                <span className='colorized'>|</span>
+                                <button onClick={() => setManageWheel(() => true)} className='clickable-faded manage-wheel'>
                                     manage
                                 </button>
                             </span>

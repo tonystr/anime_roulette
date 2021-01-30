@@ -210,13 +210,15 @@ header {
 
         .faded {
             margin-left: 1rem;
-            color: #3a3a36;
             opacity: 0;
             transition: .14s opacity;
+
+            .colorized {
+                color: #3a3a36;
+            }
         }
 
         .manage-wheel {
-            color: #6a6a66;
             transition: all .14s;
             margin-left: 1rem;
             padding: 0;
