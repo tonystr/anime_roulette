@@ -4,8 +4,6 @@ import ShowInpsectorModal from './ShowInspectorModal';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import firestore from '../firestore';
 
-export { pickColor };
-
 export default function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
