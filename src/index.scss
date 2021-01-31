@@ -745,6 +745,24 @@ header h1 {
         width: 40px;
         height: auto;
         top: 0;
+        z-index: 12;
+        pointer-events: all;
+        stroke: #262628;
+        transition: stroke .08s;
+    }
+
+    .arrow.has-winner {
+        svg#arrow-down {
+            cursor: pointer;
+
+            &:hover {
+                stroke: #68bd95;
+            }
+        }
+
+        .line {
+            border-color: #68bd95;
+        }
     }
 
     .arrow {
@@ -752,9 +770,27 @@ header h1 {
         z-index: 10;
         left: 0;
         right: 0;
+        bottom: 50.1%;
         display: flex;
-        justify-content: center;
+        align-items: center;
+        flex-direction: column;
         top: -4vh;
+        pointer-events: none;
+
+        .line {
+            position: absolute;
+            z-index: 7;
+            top: 0;
+            bottom: 0;
+            // #e3e3c3
+            border-left: 2px dashed #262628;
+            opacity: 0;
+            transition: opacity .14s;
+
+            &.arrow-hover {
+                opacity: 1;
+            }
+        }
     }
 }
 

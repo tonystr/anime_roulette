@@ -9,6 +9,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
     const [size, setSize] = useState(960);
     const [arrowColor, setArrowColor] = useState('#262628');
     const [showWinner, setShowWinner] = useState(false);
+    const [arrowHover, setArrowHover] = useState(false);
     const [winner, setWinner] = useState(null);
 
     //const [rotate.spinning, setRotatingLocal] = useState(false);
@@ -127,8 +128,14 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
     return (
         <div {...props} id='wheel-width'>
             <div className='wheel-box'>
-                <div className='arrow'>
-                    <ArrowDown style={{ fill: arrowColor }} />
+                <div className={'arrow' + (winner ? ' has-winner' : '')}>
+                    <div className={'line' + (arrowHover ? ' arrow-hover' : '')} />
+                    <ArrowDown
+                        onClick={() => winner && setShowWinner(() => true)}
+                        onMouseEnter={() => setArrowHover(() => true)}
+                        onMouseLeave={() => setArrowHover(() => false)}
+                        style={{ fill: arrowColor }}
+                    />
                 </div>
                 <canvas
                     id='wheel'
