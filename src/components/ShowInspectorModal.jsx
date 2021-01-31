@@ -19,7 +19,6 @@ const monthNames = [
 export { monthNames };
 
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
-
     const findUser = uuid => users.find(u => u.uuid === uuid);
 
     return (

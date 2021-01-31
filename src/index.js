@@ -7,31 +7,11 @@ import ShowInpsectorModal, { monthNames } from './components/ShowInspectorModal'
 import AddNewButton from './components/AddNewButton';
 import FacebookLogo from './icons/facebook_logo.png';
 import GoogleLogo from './icons/google_logo.png';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/auth';
+import firestore, { firebase, auth } from './firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
-
-firebase.initializeApp({
-    apiKey: 'AIzaSyCKEr3NLxFL9SXJuONJONhQAZct6Yqt2AY',
-    authDomain: 'anime-roulette.firebaseapp.com',
-    projectId: 'anime-roulette',
-    storageBucket: 'anime-roulette.appspot.com',
-    messagingSenderId: '5143254771',
-    appId: '1:5143254771:web:bc9f978bb85bff4cdb8986'
-});
-const auth = firebase.auth();
-const firestore = firebase.firestore();
-// window.firestore = firestore;
-
-function arrayReverse(array) {
-    const newArray = array.slice();
-    newArray.reverse();
-    return newArray;
-}
 
 function pickColor(i, colors, shows) {
     return colors[i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2];
@@ -266,11 +246,7 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
             </div>
             <ShowInpsectorModal
                 isOpen={showWinner}
-                onRequestClose={() => {
-                    setShowWinner(() => false);
-                    //setRotate(() => null);
-                    //setWinner(() => null);
-                }}
+                onRequestClose={() => setShowWinner(() => false)}
                 updateShowProp={updateInspectingShowProp}
                 show={rotate && winner}
                 users={users}
@@ -278,7 +254,6 @@ function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, ad
                     addHistory({ ...winner, state: 'Watching' });
                     removeShow(winner.uuid);
                     setShowWinner(() => false);
-                    //setRotate(() => null);
                     setWinner(() => null);
                 } : null}
             />
@@ -300,13 +275,6 @@ function UserShows({ users, shows, renderShows, addShow }) {
 
 function ShowInput({ value, style, show, updateShowProp, ...props }) {
     const [localValue, setLocalValue] = useState(value);
-    // const [editing, setEditing] = useState(false);
-
-    // useEffect(() => {
-    //     if (!editing) {
-    //         setLocalValue(() => value);
-    //     }
-    // }, [value, editing]);
 
     return (
         <input
@@ -431,7 +399,7 @@ function History({ users, shows, history, updateHistoryProp, ...props }) {
             <div {...props}>
                 <h2>History</h2>
                 <div className='list'>
-                    {arrayReverse(history).map(show => (
+                    {[...history].reverse().map(show => (
                         <div key={show.uuid} className='show' onClick={() => setInspectingShow(show)}>
                             <span className='title'>{parseShowTitle(show.name)}</span>
                             <span className='date'>
