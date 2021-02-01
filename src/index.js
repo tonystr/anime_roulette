@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 // Components
-import Wheel   from './components/Wheel.jsx';
-import Shows   from './components/Shows.jsx';
-import History from './components/History.jsx';
+import Wheel   from './components/Wheel';
+import Shows   from './components/Shows';
+import History from './components/History';
+import ManageWheels from './components/ManageWheels';
 
 import FacebookLogo from './icons/facebook_logo.png';
 import GoogleLogo from './icons/google_logo.png';
@@ -111,129 +112,6 @@ function SignOut({ className='', ...props }) {
             className={'clickable-faded ' + className}
             onClick={() => auth.signOut()}
         >Sign out</button>
-    );
-}
-
-function convertWheelName(name) {
-    return name.trim().toLowerCase().replace(/\s+/g, '_');
-}
-
-function ManageWheels({ uid, selectWheelName, userWheels=[], noWheels=false }) {
-    const [requestName, setRequestName] = useState('');
-    const [ownName, setOwnName] = useState('');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [requestDisabled, setRequestDisabled] = useState(true);
-    const [ownDisabled, setOwnDisabled] = useState(true);
-
-    const requestAccess = () => {
-        if (requestDisabled) return;
-        const docRef = firestore.collection('wheels').doc(requestName);
-        docRef.get().then(docSnap => {
-            if (!docSnap.exists) {
-                setError(() => 'Wheel does not exist. Check your spelling.');
-                return;
-            }
-
-            const accessRequests = docSnap.data()?.accessRequests || [];
-
-            if (accessRequests.includes(uid)) {
-                setError(() => 'You have already requested access to this wheel. Wait for the owner to accept.');
-                return;
-            }
-
-            docRef.update({
-                accessRequests: [...accessRequests, uid]
-            });
-
-            setError(() => '');
-            setSuccess(() => `Successfully requested access to ${requestName}. Wait for the owner to accept your request.`);
-            selectWheelName(requestName);
-
-            console.log('Requested access to join wheel.');
-        });
-    };
-
-    const createWheel = () => {
-        if (ownDisabled) return;
-        const ownConverted = convertWheelName(ownName);
-        if (!ownConverted) {
-            setError(() => 'Invalid name. Check your input.');
-            return;
-        }
-        const title = ownName.trim();
-        firestore.collection('wheels').doc(ownConverted).set({
-            title,
-            owner: uid,
-            rotate: {
-                date: new Date(),
-                endDate: +(new Date()),
-                offset: Math.PI,
-                rng: 0,
-                spinning: false
-            },
-            users: [uid]
-        });
-        firestore.collection('users').doc(uid).update({
-            wheels: [...userWheels, ownConverted]
-        });
-        selectWheelName(ownConverted);
-    };
-
-    useEffect(() => {
-        if (requestDisabled === !requestName) return;
-        setRequestDisabled(() => !requestName);
-    }, [requestName, requestDisabled]);
-
-    useEffect(() => {
-        if (error) setSuccess(() => '');
-    }, [error]);
-
-    useEffect(() => {
-        if (!ownName) {
-            setError(() => '');
-            setOwnDisabled(() => true);
-            return;
-        }
-
-        firestore.collection('wheels').doc(ownName).get().then(docSnap => {
-            setError(() => docSnap.exists ? 'Error: Wheel name taken' : '');
-            setOwnDisabled(() => docSnap.exists);
-        });
-
-    }, [ownName]);
-
-    return (
-        <div className='no-wheels page-form'>
-            <h2>{noWheels ? 'You don\'t have access to any wheels' : 'Select a wheel from the top-left menu, or'}</h2>
-            <div>
-                <label htmlFor='request-access'>Request access:</label>
-                <input
-                    value={requestName}
-                    onChange={e => setRequestName(e.target.value)}
-                    type='text'
-                    id='request-access'
-                    placeholder='Wheel name'
-                    onKeyDown={e => e.key === 'Enter' && requestAccess()}
-                />
-                <button type='submit' className={requestDisabled ? 'disabled' : ''} onClick={requestAccess}>Request</button>
-            </div>
-            <div className='or'>or</div>
-            <div>
-                <label htmlFor='make-your-own'>Make your own:</label>
-                <input
-                    value={ownName}
-                    placeholder='Wheel name'
-                    onChange={e => setOwnName(e.target.value)}
-                    type='text'
-                    id='make-your-own'
-                    onKeyDown={e => e.key === 'Enter' && createWheel()}
-                />
-                <button type='submit' className={ownDisabled ? 'disabled' : ''} onClick={createWheel}>Create</button>
-            </div>
-            <div className='error'>{error}</div>
-            <div className='success'>{success}</div>
-        </div>
     );
 }
 
@@ -414,7 +292,7 @@ function PageRenderer() {
                     {user && (
                         <div className='wheel-name'>
                             <span className='select clickable-faded'>
-                                {wheelTitles[wheelName]}
+                                {wheelTitles[wheelName] || wheelName}
                                 <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
                                     <option>{noWheelName}</option>
                                     {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
@@ -422,7 +300,7 @@ function PageRenderer() {
                             </span>
                             <span className='faded'>
                                 <span className='colorized'>|</span>
-                                <button onClick={() => setManageWheel(() => true)} className='clickable-faded manage-wheel'>
+                                <button onClick={() => setManageWheel(prev => !prev)} className='clickable-faded manage-wheel'>
                                     manage
                                 </button>
                             </span>
