@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import firestore, { firebase, auth } from '../firestore';
+import firestore from '../firestore';
 
 function convertWheelName(name) {
     return name.trim().toLowerCase().replace(/\s+/g, '_');

@@ -5,12 +5,11 @@ import Wheel   from './components/Wheel';
 import Shows   from './components/Shows';
 import History from './components/History';
 import ManageWheels from './components/ManageWheels';
+import AccessRequests from './components/AccessRequests';
 
 import FacebookLogo from './icons/facebook_logo.png';
 import GoogleLogo from './icons/google_logo.png';
-import firestore, { firebase, auth } from './firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData, useDocumentData } from 'react-firebase-hooks/firestore';
+import firestore, { firebase, auth, useCollectionData, useDocumentData, useAuthState } from './firestore';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 
@@ -172,56 +171,6 @@ function RegisterUser({ userUid }) {
             </div>
         </div>
     );
-}
-
-function AccessRequests({ wheelName, userUid }) {
-    const [userNames, setUserNames] = useState({});
-
-    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
-    const requests = wheel?.accessRequests;
-    const wheelOwner = wheel?.owner;
-
-    useEffect(() => {
-        if (!requests) return;
-        for (const uuid of requests) {
-            if (userNames[uuid] !== undefined) continue;
-            firestore.doc(`users/${uuid}`).get().then(docSnap => {
-                if (!docSnap.exists) {
-                    console.log('not exists');
-                    return;
-                }
-                setUserNames(prev => ({ ...prev, [uuid]: docSnap.data().name }))
-            }).catch(console.error);
-        }
-    }, [requests, userNames]);
-
-    const accept = uuid => {
-        const newRequests = requests.filter(user => user !== uuid);
-        firestore.doc(`wheels/${wheelName}`).update({
-            accessRequests: newRequests,
-            users: [...wheel.users, uuid]
-        });
-    };
-
-    const reject = uuid => {
-        const newRequests = requests.filter(user => user !== uuid);
-        firestore.doc(`wheels/${wheelName}`).update({
-            accessRequests: newRequests
-        });
-    };
-
-    return userUid !== null && userUid === wheelOwner && requests ? (
-        <div className='access-requests'>
-            {requests.map(uuid => (
-                <div key={uuid} className='request'>
-                    {userNames[uuid] ? <span className='username'>{userNames[uuid]}</span> : 'Someone'}
-                    &nbsp;is requesting access to this wheel.
-                    <button className='blop' onClick={() => accept(uuid)}>Accept</button> /
-                    <button className='blop' onClick={() => reject(uuid)}>Deny  </button>
-                </div>
-            ))}
-        </div>
-    ) : null;
 }
 
 function ManageWheel({ escape }) {
