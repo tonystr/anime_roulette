@@ -8,11 +8,9 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [arrowColor, setArrowColor] = useState('#262628');
+    const [winner, setWinner] = useState(null);
     const [showWinner, setShowWinner] = useState(false);
     const [arrowHover, setArrowHover] = useState(false);
-    const [winner, setWinner] = useState(null);
-
-    //const [rotate.spinning, setRotatingLocal] = useState(false);
     const [rotate, setRotateLocal] = useState(null);
 
     const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
@@ -187,7 +185,8 @@ function compareRotates(r1, r2) {
 }
 
 function pickColor(i, colors, shows) {
-    return colors[i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2];
+    const index = i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2;
+    return shows.length >= 1 ? colors[index] : '#313132';
 }
 
 const extendContext = (ctx, size) => ({
@@ -239,6 +238,16 @@ const extendContext = (ctx, size) => ({
     drawWheel(shows, colors, wheelAngle = 0) {
         ctx.clearRect(0, 0, size, size);
         const half = size / 2;
+
+        if (shows.length === 0) {
+            const toRad = 2 * Math.PI;
+            this.drawPieSlice(
+                half, half, half,
+                -.013,
+                2 * Math.PI,
+                '#6a6a66'
+            );
+        }
 
         for (let i = 0; i < shows.length; i++) {
             const toRad = t => (t / shows.length) * 2 * Math.PI;

@@ -727,7 +727,7 @@ header h1 {
     transition: filter .2s, opacity .6s;
 
     &.empty {
-        opacity: 0;
+        opacity: .16;
     }
 
     &:hover {
