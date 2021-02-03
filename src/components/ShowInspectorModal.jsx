@@ -18,6 +18,14 @@ const monthNames = [
 
 export { monthNames };
 
+const parseShowTitle = name => {
+    const match = name.match(/(\s*\(\d+\)\s*$)/);
+    if (match) {
+        return name.slice(0, match.index).trim();
+    }
+    return name.trim();
+}
+
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
     const findUser = uuid => users.find(u => u.uuid === uuid);
 
@@ -32,7 +40,10 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                     <input
                         className='show-name'
                         defaultValue={show.name}
-                        onChange={e => updateShowProp(show, 'name', e.target.value)}
+                        onChange={e => {
+                            updateShowProp(show, 'name',  e.target.value);
+                            updateShowProp(show, 'title', parseShowTitle(e.target.value));
+                        }}
                     />
                     {beginWatching ? (
                         <button className='begin-wating' onClick={beginWatching}>Start watching</button>

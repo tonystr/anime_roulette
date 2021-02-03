@@ -63,7 +63,7 @@ export default function Shows({ users, setUsers, shows, removeShow, addHistory, 
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
-                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} />]}
+                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} disabled={testLimit(shows)} />]}
             </div>
             <ReactModal
                 className='edit-users-modal modal-screen'
@@ -121,6 +121,10 @@ function ShowInput({ value, style, show, updateShowProp, ...props }) {
     );
 }
 
+function testLimit(shows) {
+    return shows.length >= 24;
+}
+
 function UserShows({ users, shows, renderShows, addShow }) {
     return users.map((user, i) => (
         <div className='user-shows' key={user.name}>
@@ -128,7 +132,7 @@ function UserShows({ users, shows, renderShows, addShow }) {
             {shows && shows
                 .filter(show => show.owner === user.uuid)
                 .map(renderShows)}
-            <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} />
+            <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} disabled={testLimit(shows)}  />
         </div>
     ));
 }

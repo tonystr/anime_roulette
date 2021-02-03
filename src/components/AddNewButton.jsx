@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-export default function AddNewButton({ user, addShow }) {
+export default function AddNewButton({ user, addShow, disabled=false, disabledMessage='Show limit reached (24)' }) {
     const [add, setAdd] = useState('');
 
     const parseShowTitle = name => {
@@ -23,7 +23,11 @@ export default function AddNewButton({ user, addShow }) {
         setAdd(() => '');
     };
 
-    return (
+    return disabled ? (
+        <div className='add-new disabled'>
+            {disabledMessage}
+        </div>
+    ) : (
         <input
             type='text'
             className='show add-new'

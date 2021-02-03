@@ -8,6 +8,11 @@ $c_text_bright: #ffffff;
     100% { opacity: 1 }
 }
 
+@keyframes fade-in {
+    0%   { opacity: 0 }
+    100% { opacity: 1 }
+}
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -733,9 +738,18 @@ header h1 {
         opacity: 1;
     }
 
-    .add-new:focus {
-        padding: .5rem 1rem;
-        opacity: 1;
+    .add-new {
+        &:focus {
+            padding: .5rem 1rem;
+            opacity: 1;
+        }
+
+        &.disabled {
+            animation: fade-in .6s;
+            color: #af4040;
+            border-left-color: #262628 !important;
+            cursor: not-allowed !important;
+        }
     }
 
     .user-shows {
