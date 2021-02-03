@@ -95,14 +95,27 @@ export default function Shows({ users, setUsers, shows, removeShow, addHistory, 
 function ShowInput({ value, style, show, updateShowProp, ...props }) {
     const [localValue, setLocalValue] = useState(value);
 
+    const parseShowTitle = name => {
+        const match = name.match(/(\s*\(\d+\)\s*$)/);
+        if (match) {
+            return name.slice(0, match.index).trim();
+        }
+        return name.trim();
+    }
+
+    const updateValue = value => {
+        updateShowProp(show.uuid, 'name', value.trim());
+        updateShowProp(show.uuid, 'title', parseShowTitle(value));
+    }
+
     return (
         <input
             type='text'
             value={localValue}
             onChange={e => setLocalValue(() => e.target.value)}
             style={style}
-            onBlur={e => updateShowProp(show.uuid, 'name', e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && updateShowProp(show.uuid, 'name', e.target.value)}
+            onBlur={e => updateValue(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && updateValue(e.target.value)}
             {...props}
         />
     );

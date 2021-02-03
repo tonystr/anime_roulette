@@ -196,6 +196,7 @@ function PageRenderer() {
         for (const wheelId of wheels) {
             if (!wheelTitles[wheelId]) {
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
+                    if (!snap.exists) return;
                     setWheelTitles(prev => ({ ...prev, [wheelId]: snap.data().title }));
                 });
             }

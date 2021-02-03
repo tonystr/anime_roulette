@@ -251,17 +251,18 @@ const extendContext = (ctx, size) => ({
 
         for (let i = 0; i < shows.length; i++) {
             const toRad = t => (t / shows.length) * 2 * Math.PI;
+            const show = shows[i];
             this.drawPieSlice(
                 half, half, half,
                 toRad(i) - .013 + wheelAngle,
                 toRad(i + 1)    + wheelAngle,
-                pickColor(i, colors, shows)
+                show?.color ?? pickColor(i, colors, shows)
             );
             const angle = toRad(i + .5) + wheelAngle;
             this.drawTextRotated(
                 half + Math.cos(angle) * half / 1.9,
                 half + Math.sin(angle) * half / 1.9,
-                shows[i].name,
+                show?.title || show.name,
                 angle
             );
         }

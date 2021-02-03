@@ -13,9 +13,9 @@ export default function History({ users, shows, history, updateHistoryProp, ...p
     const parseShowTitle = name => {
         const match = name.match(/(\s*\(\d+\)\s*$)/);
         if (match) {
-            return name.slice(0, match.index);
+            return name.slice(0, match.index).trim();
         }
-        return name;
+        return name.trim();
     }
 
     return (
