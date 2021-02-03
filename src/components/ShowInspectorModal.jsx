@@ -18,28 +18,6 @@ const monthNames = [
 
 export { monthNames };
 
-function ColorInput({ value, updateValue }) {
-    const [localValue, setLocalValue] = useState(value);
-
-    useEffect(() => {
-        if (localValue === value) return;
-
-        const timer = setTimeout(() => {
-            updateValue(localValue);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [localValue, value, updateValue]);
-
-    return (
-        <input
-            value={localValue}
-            onChange={e => setLocalValue(() => e.target.value)}
-            type='color'
-        />
-    );
-}
-
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
     const findUser = uuid => users.find(u => u.uuid === uuid);
 
@@ -55,10 +33,6 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                         className='show-name'
                         defaultValue={show.name}
                         onChange={e => updateShowProp(show, 'name', e.target.value)}
-                    />
-                    <ColorInput
-                        value={show.color ?? '#313132'}
-                        updateValue={value => updateShowProp(show, 'color', value)}
                     />
                     {beginWatching ? (
                         <button className='begin-wating' onClick={beginWatching}>Start watching</button>
@@ -83,6 +57,12 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                         onKeyDown={e => e.key === 'Enter' && e.target.value && updateShowProp(show, 'banner', e.target.value)}
                         onBlur={e => e.target.value && updateShowProp(show, 'banner', e.target.value)}
                     />
+                    <div className='buttons-overlay'>
+                        <ColorInput
+                            value={show.color ?? '#8b4049'}
+                            updateValue={value => updateShowProp(show, 'color', value)}
+                        />
+                    </div>
                 </div>
                 {show.state === 'Watching' && (
                     <div className='links'>
@@ -128,5 +108,29 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                 </div>
             </>)}
         </ReactModal>
+    );
+};
+
+function ColorInput({ value, updateValue }) {
+    const [localValue, setLocalValue] = useState(value);
+
+    useEffect(() => {
+        if (localValue === value) return;
+
+        const timer = setTimeout(() => {
+            updateValue(localValue);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [localValue, value, updateValue]);
+
+    return (
+        <div className='color-picker' style={localValue ? { backgroundColor: localValue } : null}>
+            <input
+                value={localValue}
+                onChange={e => setLocalValue(() => e.target.value)}
+                type='color'
+            />
+        </div>
     );
 }

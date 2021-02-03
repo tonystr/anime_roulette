@@ -391,6 +391,39 @@ header h1 {
         outline: none;
     }
 
+    .buttons-overlay {
+        margin: .6rem 2rem;
+        display: flex;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .color-picker {
+        margin: 0;
+        padding: 0;
+        border: 2px solid #1b1b1c;
+        width:  1.5rem;
+        height: 1.5rem;
+        margin-top: 3px;
+        border-radius: 50%;
+        position: relative;
+        cursor: pointer;
+        transition: .08s border-color, .08s box-shadow;
+
+        &:hover {
+            border-color: #fff;
+            box-shadow: 0 0 4px #000;
+        }
+
+        input {
+            width: 2rem;
+            height: 2rem;
+            opacity: 0;
+            cursor: pointer;
+        }
+    }
+
     .banner {
         max-width: 50rem;
     }
