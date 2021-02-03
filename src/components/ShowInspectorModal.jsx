@@ -58,6 +58,7 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                         onBlur={e => e.target.value && updateShowProp(show, 'banner', e.target.value)}
                     />
                     <div className='buttons-overlay'>
+                        {show.color && <button onClick={() => updateShowProp(show, 'color', null)} className='clear-color' title='Clear color'></button>}
                         <ColorInput
                             value={show.color ?? '#8b4049'}
                             updateValue={value => updateShowProp(show, 'color', value)}
@@ -113,16 +114,22 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
 
 function ColorInput({ value, updateValue }) {
     const [localValue, setLocalValue] = useState(value);
+    const [focus, setFocus] = useState(false);
 
     useEffect(() => {
         if (localValue === value) return;
+
+        if (!focus) {
+            setLocalValue(() => value);
+            return;
+        }
 
         const timer = setTimeout(() => {
             updateValue(localValue);
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [localValue, value, updateValue]);
+    }, [localValue, value, focus, updateValue]);
 
     return (
         <div className='color-picker' style={localValue ? { backgroundColor: localValue } : null}>
@@ -130,6 +137,8 @@ function ColorInput({ value, updateValue }) {
                 value={localValue}
                 onChange={e => setLocalValue(() => e.target.value)}
                 type='color'
+                onFocus={() => setFocus(() => true)}
+                onBlur={() => setFocus(() => false)}
             />
         </div>
     );

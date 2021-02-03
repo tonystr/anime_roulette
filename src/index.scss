@@ -397,6 +397,50 @@ header h1 {
         position: absolute;
         top: 0;
         right: 0;
+        background-color: #262628;
+        border-radius: 14px;
+
+        &:hover .clear-color {
+            border: 2px solid #262628;
+            width: 28px;
+            opacity: 1;
+            margin-right: 2px;
+        }
+    }
+
+    .clear-color {
+        color: #af4040;
+        font-size: 1.4rem;
+        cursor: pointer;
+        background-color: #333333;
+        width:  28px;
+        height: 28px;
+        border: 2px solid #262628;
+        padding: 0;
+        position: relative;
+        border-radius: 50%;
+
+        transition: width .14s, border .14s, opacity .14s, color .14s, background-color .14s;
+
+        opacity: 0;
+        border-left: 0;
+        border-right: 0;
+        margin-right: 0px;
+        width: 0;
+
+        &:hover {
+            color: #ff3030;
+            background-color: #543344;
+        }
+
+        &::after {
+            content: '×';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: -1px;
+            text-align: center;
+        }
     }
 
     .color-picker {
@@ -405,7 +449,6 @@ header h1 {
         border: 2px solid #1b1b1c;
         width:  1.5rem;
         height: 1.5rem;
-        margin-top: 3px;
         border-radius: 50%;
         position: relative;
         cursor: pointer;

@@ -4,21 +4,8 @@ import ShowInpsectorModal from './ShowInspectorModal';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import firestore from '../firestore';
 
-// https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favoidfakefood.files.wordpress.com%2F2015%2F04%2Fcereal_fruit_loops_1920x1200.jpg&f=1&nofb=1
-const imgUrl = 'http://3.bp.blogspot.com/-4MQx-I1Npf8/TzBZxhsJA6I/AAAAAAAAAxI/T_bsySURVuI/s1600/Nisemonogatari+05.png';
-let img = null;
-
 const imageCache = {};
 const imageLoading = {};
-
-loadImage({ src: imgUrl, maxSeconds : 10 }, status => {
-    if (status.err) {
-        //console.log(status.err);
-        return;
-    }
-    //console.log(status.img);
-    img = status.img;
-});
 
 export default function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
@@ -303,7 +290,7 @@ const extendContext = (ctx, size) => ({
                     toRad(i) - .013 + wheelAngle,
                     toRad(i + 1)    + wheelAngle,
                     image,
-                    .1
+                    .15
                 );
             }
 
