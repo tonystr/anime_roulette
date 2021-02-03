@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactModal from 'react-modal';
 
 const monthNames = [
@@ -18,6 +18,27 @@ const monthNames = [
 
 export { monthNames };
 
+function ColorInput({ value, updateValue }) {
+    const [localValue, setLocalValue] = useState(value);
+    const [timer,      setTimer     ] = useState(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            updateValue(localValue);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [localValue, timer]);
+
+    return (
+        <input
+            value={localValue}
+            onChange={e => setLocalValue(() => e.target.value)}
+            type='color'
+        />
+    );
+}
+
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
     const findUser = uuid => users.find(u => u.uuid === uuid);
 
@@ -34,6 +55,10 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                         defaultValue={show.name}
                         onChange={e => updateShowProp(show, 'name', e.target.value)}
                     />
+                    <ColorInput
+                        value={show.color ?? '#313132'}
+                        updateValue={value => updateShowProp(show, 'color', value)}
+                    />
                     {beginWatching ? (
                         <button className='begin-wating' onClick={beginWatching}>Start watching</button>
                     ) : (
@@ -47,7 +72,6 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                             <option>Dropped</option>
                         </select>
                     )}
-
                 </h2>
                 <div className='middle' style={!show.banner ? { backgroundColor: show.color } : null}>
                     {show.banner && <img className='banner' alt='banner' src={show.banner} />}
@@ -98,7 +122,6 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                                 {monthNames[show.date.getMonth()]}.&nbsp;
                                 {show.date.getFullYear()}
                             </span>
-                            .
                         </div>
                     )}
                 </div>
