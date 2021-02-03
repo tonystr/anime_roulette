@@ -4,6 +4,22 @@ import ShowInpsectorModal from './ShowInspectorModal';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import firestore from '../firestore';
 
+// https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favoidfakefood.files.wordpress.com%2F2015%2F04%2Fcereal_fruit_loops_1920x1200.jpg&f=1&nofb=1
+const imgUrl = 'http://3.bp.blogspot.com/-4MQx-I1Npf8/TzBZxhsJA6I/AAAAAAAAAxI/T_bsySURVuI/s1600/Nisemonogatari+05.png';
+let img = null;
+
+const imageCache = {};
+const imageLoading = {};
+
+loadImage({ src: imgUrl, maxSeconds : 10 }, status => {
+    if (status.err) {
+        //console.log(status.err);
+        return;
+    }
+    //console.log(status.img);
+    img = status.img;
+});
+
 export default function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, addHistory, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
@@ -12,9 +28,24 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
     const [showWinner, setShowWinner] = useState(false);
     const [arrowHover, setArrowHover] = useState(false);
     const [rotate, setRotateLocal] = useState(null);
+    const [imagesLoaded, setImagesLoaded] = useState(0);
 
     const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
     const rotateServer = wheel ? wheel.rotate || null : rotate;
+
+    useEffect(() => {
+        for (const show of shows) {
+            if (show.banner && !imageCache[show.banner] && !imageLoading[show.banner]) {
+                imageLoading[show.banner] = true;
+                loadImage({ src: show.banner, maxSeconds : 10 }, status => {
+                    if (status.err) return console.log(status.err);
+                    imageCache[show.banner] = status.img;
+                    imageLoading[show.banner] = false;
+                    setImagesLoaded(prev => prev + 1);
+                });
+            }
+        }
+    }, [shows]);
 
     useEffect(() => {
         if (compareRotates(rotateServer, rotate) || !rotateServer) return;
@@ -56,7 +87,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
 
-    }, [canvasRef, size, rotate, rotate?.spinning, shows, colors]);
+    }, [canvasRef, size, rotate, rotate?.spinning, shows, colors, imagesLoaded]);
 
     // Resize
     useEffect(() => {
@@ -211,8 +242,9 @@ const extendContext = (ctx, size) => ({
         ctx.closePath();
         ctx.fill();
     },
-    drawPieSliceImage(x, y, radius, startAngle, endAngle, image) {
+    drawPieSliceImage(x, y, radius, startAngle, endAngle, image, alpha=1) {
         ctx.save();
+        ctx.globalAlpha = alpha;
 
         ctx.beginPath();
         ctx.moveTo(x, y);
@@ -222,7 +254,11 @@ const extendContext = (ctx, size) => ({
         ctx.clip();
         ctx.translate(x, y);
         ctx.rotate((startAngle + endAngle) / 2);
-        ctx.drawImage(image, 0, -image.height / 2);
+        const height = radius * 2; // image.height * (radius / image.width);
+        const width = (image.width / image.height) * height;
+        ctx.drawImage(image, -width / 3, -height / 2, width, height);
+
+        ctx.globalAlpha = 1;
         ctx.restore();
     },
     drawTextRotated(x, y, text, angle, color) {
@@ -257,7 +293,20 @@ const extendContext = (ctx, size) => ({
                 toRad(i + 1)    + wheelAngle,
                 show?.color ?? pickColor(i, colors, shows)
             );
+
             const angle = toRad(i + .5) + wheelAngle;
+
+            const image = imageCache[show.banner];
+            if (image) {
+                this.drawPieSliceImage(
+                    half, half, half,
+                    toRad(i) - .013 + wheelAngle,
+                    toRad(i + 1)    + wheelAngle,
+                    image,
+                    .1
+                );
+            }
+
             this.drawTextRotated(
                 half + Math.cos(angle) * half / 1.9,
                 half + Math.sin(angle) * half / 1.9,
@@ -267,3 +316,42 @@ const extendContext = (ctx, size) => ({
         }
     }
 });
+
+function loadImage(options, callback) {
+    let seconds = 0;
+    let maxSeconds = 10;
+    let complete = false;
+    let done = false;
+
+    if (options.maxSeconds) {
+        maxSeconds = options.maxSeconds;
+    }
+
+    const tryImage = () => {
+        if (done) return;
+        if (seconds >= maxSeconds) {
+            callback({ err: 'timeout' });
+            done = true;
+            return;
+        }
+        if (complete && img.complete) {
+            if (img.width && img.height) {
+                callback({ img: img });
+                done = true;
+                return;
+            }
+            callback({ err: '404' });
+            done = true;
+            return;
+        } else if (img.complete) {
+            complete = true;
+        }
+        seconds++;
+        callback.tryImage = setTimeout(tryImage, 1000);
+    }
+
+    var img = new Image();
+    img.onload = tryImage();
+    img.src = options.src;
+    tryImage();
+}
