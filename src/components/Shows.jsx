@@ -134,5 +134,6 @@ function UserShows({ users, shows, renderShows, addShow }) {
 }
 
 function pickColor(i, colors, shows) {
-    return colors[i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2];
+    const index = i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2;
+    return shows.length >= 1 ? (shows[i]?.color ?? colors[index]) : '#313132';
 }

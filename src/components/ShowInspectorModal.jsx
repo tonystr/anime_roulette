@@ -20,15 +20,16 @@ export { monthNames };
 
 function ColorInput({ value, updateValue }) {
     const [localValue, setLocalValue] = useState(value);
-    const [timer,      setTimer     ] = useState(null);
 
     useEffect(() => {
+        if (localValue === value) return;
+
         const timer = setTimeout(() => {
             updateValue(localValue);
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [localValue, timer]);
+    }, [localValue, value, updateValue]);
 
     return (
         <input

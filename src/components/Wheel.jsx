@@ -186,7 +186,7 @@ function compareRotates(r1, r2) {
 
 function pickColor(i, colors, shows) {
     const index = i % colors.length + (shows.length % colors.length < 2 && i >= colors.length) * 2;
-    return shows.length >= 1 ? colors[index] : '#313132';
+    return shows.length >= 1 ? (shows[i]?.color ?? colors[index]) : '#313132';
 }
 
 const extendContext = (ctx, size) => ({
@@ -240,7 +240,6 @@ const extendContext = (ctx, size) => ({
         const half = size / 2;
 
         if (shows.length === 0) {
-            const toRad = 2 * Math.PI;
             this.drawPieSlice(
                 half, half, half,
                 -.013,
