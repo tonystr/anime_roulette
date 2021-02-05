@@ -6,6 +6,7 @@ import Shows   from './components/Shows';
 import History from './components/History';
 import ManageWheels from './components/ManageWheels';
 import AccessRequests from './components/AccessRequests';
+import ManageWheel from './components/ManageWheel';
 
 import FacebookLogo from './icons/facebook_logo.png';
 import GoogleLogo from './icons/google_logo.png';
@@ -173,15 +174,6 @@ function RegisterUser({ userUid }) {
     );
 }
 
-function ManageWheel({ escape }) {
-    return (
-        <div>
-            <h2>Manage wheel</h2>
-            <button onClick={escape}>Escape</button>
-        </div>
-    );
-}
-
 function PageRenderer() {
     const noWheelName = 'Select wheel';
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || noWheelName);
@@ -224,8 +216,8 @@ function PageRenderer() {
                 }} />
             );
         }
-        if (manageWheel) {
-            return <ManageWheel escape={() => setManageWheel(() => false)} />
+        if (manageWheel && user?.uid) {
+            return <ManageWheel escape={() => setManageWheel(() => false)} userUid={user.uid} wheelId={wheelName} resetWheelName={() => setWheelName(noWheelName)} />
         }
         return (
             <WheelPage
