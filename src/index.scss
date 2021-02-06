@@ -884,6 +884,12 @@ header h1 {
     }
 }
 
+#manage-wheel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .show-users-button {
     background: none;
     border: none;

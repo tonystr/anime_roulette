@@ -17,7 +17,7 @@ export default function ManageWheel({ escape, userUid, wheelId, resetWheelName }
     }
 
     return (
-        <div>
+        <div id='manage-wheel'>
             <h2>Manage wheel</h2>
             <button onClick={escape}>Return</button>
             <button onClick={deleteWheel}>Delete Wheel</button>
