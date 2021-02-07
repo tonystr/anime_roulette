@@ -16,6 +16,8 @@ export default function ManageWheel({ escape, userUid, wheelId, resetWheelName }
         });
     }
 
+    // Atyom
+
     return (
         <div id='manage-wheel'>
             <h2>Manage wheel</h2>
