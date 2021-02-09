@@ -120,10 +120,12 @@ function SignIn() {
 }
 
 function SignOut({ className='', ...props }) {
-    return auth.currentUser && (
+    return auth.currentUser ? (
         <button {...props}
             className={'clickable-faded ' + className}
             onClick={() => auth.signOut()}
-        >Sign out</button>
-    );
+        >
+            Sign out
+        </button>
+    ) : null;
 }
