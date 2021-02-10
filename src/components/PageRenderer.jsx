@@ -96,6 +96,7 @@ export default function PageRenderer() {
 };
 
 function SignIn() {
+    // Garlic
     return (
         <div className='sign-in-panel'>
             <h2>Sign in with</h2>
