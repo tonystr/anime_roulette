@@ -96,7 +96,7 @@ export default function PageRenderer() {
 };
 
 function SignIn() {
-    // Garlic is good
+    // Garlic is good fzop
     return (
         <div className='sign-in-panel'>
             <h2>Sign in with</h2>
