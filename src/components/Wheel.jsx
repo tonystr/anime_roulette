@@ -56,6 +56,8 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
         [rotate, wheelName]
     );
 
+    // GArtf
+
     // Draw wheel
     useEffect(() => {
         if (!canvasRef || !canvasRef.current || (rotate && rotate.spinning) || !shows) return;
