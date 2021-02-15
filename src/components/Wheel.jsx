@@ -56,7 +56,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
         [rotate, wheelName]
     );
 
-    // GArtf
+    // GArtf iual
 
     // Draw wheel
     useEffect(() => {
