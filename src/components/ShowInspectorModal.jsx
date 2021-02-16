@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import spinnerIconSource from '../icons/spinner.gif';
 import ReactModal from 'react-modal';
 
 const monthNames = [
@@ -27,7 +28,19 @@ const parseShowTitle = name => {
 }
 
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
+    const [bannerLoaded, setBannerLoaded] = useState(false); // null = error
     const findUser = uuid => users.find(u => u.uuid === uuid);
+
+    const updateBanner = (...args) => {
+        if (show.banner === args[2]) return;
+        setBannerLoaded(() => false);
+        updateShowProp(...args);
+        console.log('update banner§');
+    }
+
+    if (show && props.isOpen) {
+        console.log(bannerLoaded);
+    }
 
     return (
         <ReactModal
@@ -60,13 +73,16 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                     )}
                 </h2>
                 <div className='middle' style={!show.banner ? { backgroundColor: show.color } : null}>
-                    {show.banner && <img className='banner' alt='banner' src={show.banner} />}
+                    {!bannerLoaded && bannerLoaded !== null && <div className='spinner-wrapper'><img className='spinner' width={40} height={40} src={spinnerIconSource} alt='Loading...' /></div>}
+                    {show.banner && <img className='banner' alt='' src={show.banner} onLoad={() => setBannerLoaded(() => true)} onError={() => setBannerLoaded(() => null)} />}
+                    {bannerLoaded === null && <h3 className='banner-message load-failure'>Failed to load image. Check your URL, or try a different one.</h3>}
                     <input
                         className={'banner-url hover-input ' + (show.banner ? '' : 'visible')}
                         type='text'
                         placeholder='Insert banner url...'
-                        onKeyDown={e => e.key === 'Enter' && e.target.value && updateShowProp(show, 'banner', e.target.value)}
-                        onBlur={e => e.target.value && updateShowProp(show, 'banner', e.target.value)}
+                        onChange={e => e.target.value && updateBanner(show, 'banner', e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && e.target.value && updateBanner(show, 'banner', e.target.value)}
+                        onBlur={e => e.target.value && updateBanner(show, 'banner', e.target.value)}
                     />
                     <div className='buttons-overlay'>
                         {show.color && <button onClick={() => updateShowProp(show, 'color', null)} className='clear-color' title='Clear color'></button>}
