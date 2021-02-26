@@ -37,7 +37,6 @@ export default function PageRenderer() {
     }, [wheelName]);
 
     const renderPage = () => {
-        const loadingDiv = <div className='loading'>Loading...</div>;
         if (userLoading || wheelLoading || userDataLoading) return loadingDiv;
         if (!user) return <SignIn />;
         if (!userData) return <RegisterUser userUid={user.uid} />
@@ -88,7 +87,9 @@ export default function PageRenderer() {
                     <SignOut />
                 </div>
             </header>
-            {renderPage()}
+            {(userLoading || wheelLoading || userDataLoading) ?
+                <div className='loading'>Loading...</div> :
+                renderPage()}
         </div>
     );
 };
