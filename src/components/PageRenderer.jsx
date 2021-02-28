@@ -37,7 +37,6 @@ export default function PageRenderer() {
     }, [wheelName]);
 
     const renderPage = () => {
-        if (userLoading || wheelLoading || userDataLoading) return loadingDiv;
         if (!user) return <SignIn />;
         if (!userData) return <RegisterUser userUid={user.uid} />
         if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) {
