@@ -94,7 +94,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
         return () => window.removeEventListener('resize', handleResize);
     }, [canvasRef, size]);
 
-    // Rotation
+    // Rotation of doom
     useEffect(() => {
         if (!canvasRef || !rotate || !shows) return;
 
