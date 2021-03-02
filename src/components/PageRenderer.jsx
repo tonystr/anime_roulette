@@ -13,9 +13,17 @@ export default function PageRenderer() {
     const [user, userLoading] = useAuthState(auth);
     const [wheelTitles, setWheelTitles] = useState({});
     const [manageWheel, setManageWheel] = useState(false);
-
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
+    const [users, setUsers] = useState(() => [
+        { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
+        { name: 'Espen' , uuid: 'ArklXKxySSfXCn1JQHcYBiBJrbp1' },
+        { name: 'Jørgen', uuid: 'DiOHXZRe7iP7FHxkG7xEigQoLFF3' },
+        { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
+    ]);
+    const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
+
+    const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
     useEffect(() => {
         for (const wheelId of wheels) {
@@ -28,9 +36,17 @@ export default function PageRenderer() {
         }
     }, [wheels.length]);
 
-    const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
-
-    const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
+    useEffect(() => {
+        if (!wheel?.users) return;
+        setUsers(() => wheel.users.map(uuid => ({ name: 'User', uuid })));
+        for (const uuid of wheel.users) {
+            firestore.collection('users').doc(uuid).get().then(docSnap => {
+                const userDoc = docSnap.data();
+                const name = userDoc.name;
+                setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
+            })
+        }
+    }, [wheel?.users]);
 
     useEffect(() => {
         localStorage.setItem('wheel-name', wheelName);
@@ -48,12 +64,21 @@ export default function PageRenderer() {
             );
         }
         if (manageWheel && user?.uid) {
-            return <ManageWheel escape={() => setManageWheel(() => false)} userUid={user.uid} wheelId={wheelName} resetWheelName={() => setWheelName(noWheelName)} />
+            return (
+                <ManageWheel
+                    escape={() => setManageWheel(() => false)}
+                    userUid={user.uid}
+                    wheelId={wheelName}
+                    resetWheelName={() => setWheelName(noWheelName)}
+                    users={users}
+                />
+            );
         }
         return (
             <WheelPage
                 wheelName={wheelName}
                 userUid={user.uid}
+                users={users}
             />
         );
     }

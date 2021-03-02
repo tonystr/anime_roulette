@@ -4,14 +4,7 @@ import Wheel   from './Wheel';
 import Shows   from './Shows';
 import History from './History';
 
-export default function WheelPage({ wheelName, setWheelName, userUid }) {
-    const [users, setUsers] = useState(() => [
-        { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
-        { name: 'Espen' , uuid: 'ArklXKxySSfXCn1JQHcYBiBJrbp1' },
-        { name: 'Jørgen', uuid: 'DiOHXZRe7iP7FHxkG7xEigQoLFF3' },
-        { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
-    ]);
-
+export default function WheelPage({ users, wheelName, setWheelName, userUid }) {
     const wheelRef = firestore.collection('wheels').doc(wheelName);
     const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
     const historyQuery = wheelRef.collection('history').orderBy('date');
@@ -58,7 +51,7 @@ export default function WheelPage({ wheelName, setWheelName, userUid }) {
 
     return (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} setUsers={setUsers} wheelName={wheelName} userUid={userUid} />
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelName} userUid={userUid} />
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
         </main>

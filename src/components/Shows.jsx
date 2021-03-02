@@ -4,10 +4,12 @@ import { ReactComponent as UserIcon  } from '../icons/user.svg';
 import ShowInpsectorModal from './ShowInspectorModal';
 import AddNewButton from './AddNewButton';
 
-export default function Shows({ users, setUsers, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, ...props }) {
+export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
     const [editUsers, setEditUsers] = useState(false);
+
+    const setUsers = () => window.alert('this not exist atm');
 
     const updateInspectingShowProp = (show, prop, value) => {
         if (show[prop] === value) return;
