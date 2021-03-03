@@ -64,15 +64,19 @@ export default function PageRenderer() {
             );
         }
         if (manageWheel && user?.uid) {
-            return (
-                <ManageWheel
-                    escape={() => setManageWheel(() => false)}
-                    userUid={user.uid}
-                    wheelId={wheelName}
-                    resetWheelName={() => setWheelName(noWheelName)}
-                    users={users}
-                />
-            );
+            if (wheel?.owner !== user.uid) {
+                setManageWheel(() => false);
+            } else {
+                return (
+                    <ManageWheel
+                        escape={() => setManageWheel(() => false)}
+                        userUid={user.uid}
+                        wheelId={wheelName}
+                        resetWheelName={() => setWheelName(noWheelName)}
+                        users={users}
+                    />
+                );
+            }
         }
         return (
             <WheelPage
