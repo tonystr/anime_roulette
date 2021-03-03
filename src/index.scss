@@ -909,6 +909,33 @@ header h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    button {
+        margin: .5rem;
+        padding: .35rem .6rem;
+        border-radius: 4px;
+        font-size: inherit;
+        border: none;
+        background-color: #3a3a3a;
+        color: #e3e3c3; // #a3a39a
+        cursor: pointer;
+        transition: color .14s, background-color .14s;
+
+        &:hover {
+            background-color: #7d8c7f;
+            color: #fff;
+        }
+
+        &.danger {
+            background-color: #543344;
+            color: #ff3030;
+
+            &:hover {
+                background-color: #a43344;
+                color: #fff;
+            }
+        }
+    }
 }
 
 .show-users-button {
