@@ -100,12 +100,14 @@ export default function PageRenderer() {
                                     {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
                                 </select>
                             </span>
-                            <span className='faded'>
-                                <span className='colorized'>|</span>
-                                <button onClick={() => setManageWheel(prev => !prev)} className='clickable-faded manage-wheel'>
-                                    manage
-                                </button>
-                            </span>
+                            {user?.uid && wheel?.owner === user.uid && (
+                                <span className='faded'>
+                                    <span className='colorized'>|</span>
+                                    <button onClick={() => setManageWheel(prev => !prev)} className='clickable-faded manage-wheel'>
+                                        manage
+                                    </button>
+                                </span>
+                            )}
                         </div>
                     )}
                     <AccessRequests wheelName={wheelName} userUid={user?.uid} />
