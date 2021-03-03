@@ -20,9 +20,16 @@ export default function ManageWheel({ escape, userUid, wheelId, resetWheelName, 
     return (
         <div id='manage-wheel'>
             <h2>Manage wheel</h2>
-            {users.map(user => (
-                <div>{user.name} [{user.uuid}]</div>
-            ))}
+            <ul className='users'>
+                {users.map(user => (
+                    <li>
+                        <span className='username'>{user.name}</span>
+                        {user.uuid === userUid ?
+                            <span className='owner-tag'>Owner</span> :
+                            <button className='kick-button' onClick={() => {}}>Kick</button>}
+                    </li>
+                ))}
+            </ul>
             <button onClick={escape}>Return to wheel</button>
             <button onClick={deleteWheel} className='danger'>Delete Wheel</button>
         </div>
