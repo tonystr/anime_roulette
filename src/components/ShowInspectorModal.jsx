@@ -29,7 +29,7 @@ const parseShowTitle = name => {
 
 export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
     const [bannerLoaded, setBannerLoaded] = useState(false); // null = error
-    const findUser = uuid => users.find(u => u.uuid === uuid);
+    const findUser = uuid => users.find(u => u.uuid === uuid) ?? { uuid: null, name: '<deleted user>' };
 
     const updateBanner = (...args) => {
         if (show.banner === args[2]) return;

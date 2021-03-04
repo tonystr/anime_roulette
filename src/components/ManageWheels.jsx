@@ -15,7 +15,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
 
     const requestAccess = () => {
         if (requestDisabled) return;
-        const docRef = firestore.collection('wheels').doc(requestName);
+        const docRef = firestore.collection('wheels').doc(convertWheelName(requestName));
         docRef.get().then(docSnap => {
             if (!docSnap.exists) {
                 setError(() => 'Wheel does not exist. Check your spelling.');
@@ -35,7 +35,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
 
             setError(() => '');
             setSuccess(() => `Successfully requested access to ${requestName}. Wait for the owner to accept your request.`);
-            selectWheelName(requestName);
+            selectWheelName(convertWheelName(requestName));
 
             console.log('Requested access to join wheel.');
         });

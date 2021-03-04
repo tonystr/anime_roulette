@@ -51,7 +51,7 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
                 <div className='top-bar'>
                     <h2>Shows</h2>
                     <button className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></button>
-                    <button className='clickable-faded edit' onClick={() => {
+                    {/*<button className='clickable-faded edit' onClick={() => {
                         setEditUsers(() => true);
 
                         //const collection = firestore.collection('users');
@@ -61,7 +61,7 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
                         //    .then(querySnapshot => querySnapshot.forEach(user => (
                         //        console.log(user.data())
                         //    )));
-                    }}>edit users</button>
+                    }}>edit users</button>*/}
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :

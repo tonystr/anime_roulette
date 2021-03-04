@@ -926,8 +926,7 @@ header h1 {
             display: flex;
             justify-content: space-between;
 
-            &:not(:first-child):not(:last-child) {
-                border-top: 2px solid $border_color;
+            &:not(:last-child) {
                 border-bottom: 2px solid $border_color;
             }
         }
