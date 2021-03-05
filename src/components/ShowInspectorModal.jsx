@@ -73,14 +73,14 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                         <div className='spinner-wrapper'><img className='spinner' width={40} height={40} src={spinnerIconSource} alt='Loading...' /></div>
                     )}
                     {show.banner && <img className='banner' alt='' src={show.banner} onLoad={() => setBannerLoaded(() => true)} onError={() => setBannerLoaded(() => null)} />}
-                    {bannerLoaded === null && <h3 className='banner-message load-failure'>Failed to load image. Check your URL, or try a different one.</h3>}
+                    {bannerLoaded === null && show.banner && <h3 className='banner-message load-failure'>Failed to load image. Check your URL, or try a different one.</h3>}
                     <input
                         className={'banner-url hover-input ' + (show.banner ? '' : 'visible')}
                         type='text'
                         placeholder='Insert banner url...'
-                        onChange={e => e.target.value && updateBanner(show, 'banner', e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && e.target.value && updateBanner(show, 'banner', e.target.value)}
-                        onBlur={e => e.target.value && updateBanner(show, 'banner', e.target.value)}
+                        onChange={e => updateBanner(show, 'banner', e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && updateBanner(show, 'banner', e.target.value)}
+                        onBlur={e => updateBanner(show, 'banner', e.target.value)}
                     />
                     <div className='buttons-overlay'>
                         {show.color && <button onClick={() => updateShowProp(show, 'color', null)} className='clear-color' title='Clear color'></button>}
@@ -92,7 +92,11 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                 </div>
                 {show.state === 'Watching' && (
                     <div className='links'>
-                        {show.watchingUrl && <span>Watching at <a href={show.watchingUrl} rel="noreferrer" target='_blank'>{(show.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}</a></span>}
+                        {show.watchingUrl && (
+                            <span>Watching at <a href={show.watchingUrl} rel="noreferrer" target='_blank'>
+                                {(show.watchingUrl.match(/\w+(\.\w+)+/) || [])[0]}
+                            </a></span>
+                        )}
                         <input
                             className={'watching-url hover-input ' + (show.watchingUrl ? '' : 'visible')}
                             type='text'
