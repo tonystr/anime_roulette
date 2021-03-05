@@ -38,7 +38,7 @@ export default function ManageWheel({ escape, userUid, wheelId, resetWheelName, 
             <h2>Manage wheel</h2>
             <ul className='users'>
                 {users.map(user => (
-                    <li>
+                    <li key={user.uuid}>
                         <span className='username'>{user.name}</span>
                         {user.uuid === userUid ?
                             <span className='owner-tag'>Owner</span> :

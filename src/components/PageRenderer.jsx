@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import firestore, { firebase, auth, useDocumentData, useAuthState } from '../firestore';
+import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
 import RegisterUser from './RegisterUser';
 import ManageWheels from './ManageWheels';
 import AccessRequests from './AccessRequests';

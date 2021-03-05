@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import firestore, { useCollectionData } from '../firestore';
 import Wheel   from './Wheel';
 import Shows   from './Shows';

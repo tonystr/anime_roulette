@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactModal from 'react-modal';
 import { ReactComponent as UserIcon  } from '../icons/user.svg';
 import ShowInpsectorModal from './ShowInspectorModal';
 import AddNewButton from './AddNewButton';

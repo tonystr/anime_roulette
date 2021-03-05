@@ -38,10 +38,6 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
         console.log('update banner§');
     }
 
-    if (show && props.isOpen) {
-        console.log(bannerLoaded);
-    }
-
     return (
         <ReactModal
             className='show-inspector modal-screen'
@@ -73,7 +69,9 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                     )}
                 </h2>
                 <div className='middle' style={!show.banner ? { backgroundColor: show.color } : null}>
-                    {!bannerLoaded && bannerLoaded !== null && <div className='spinner-wrapper'><img className='spinner' width={40} height={40} src={spinnerIconSource} alt='Loading...' /></div>}
+                    {!bannerLoaded && bannerLoaded !== null && show.banner && (
+                        <div className='spinner-wrapper'><img className='spinner' width={40} height={40} src={spinnerIconSource} alt='Loading...' /></div>
+                    )}
                     {show.banner && <img className='banner' alt='' src={show.banner} onLoad={() => setBannerLoaded(() => true)} onError={() => setBannerLoaded(() => null)} />}
                     {bannerLoaded === null && <h3 className='banner-message load-failure'>Failed to load image. Check your URL, or try a different one.</h3>}
                     <input
