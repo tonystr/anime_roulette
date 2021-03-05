@@ -7,9 +7,6 @@ import AddNewButton from './AddNewButton';
 export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
-    const [editUsers, setEditUsers] = useState(false);
-
-    const setUsers = () => window.alert('this not exist atm');
 
     const updateInspectingShowProp = (show, prop, value) => {
         if (show[prop] === value) return;
@@ -17,79 +14,42 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
 
-    const renderShows = show => {
-        const i = shows.findIndex(s => s === show);
-        return (
-            <div className='show' key={show.uuid}>
-                <ShowInput
-                    show={show}
-                    value={show.name}
-                    style={{ borderLeftColor: pickColor(i, colors, shows) }}
-                    updateShowProp={updateShowProp}
-                />
-                <button className='delete' onClick={e => removeShow(show.uuid)}>×</button>
-                <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
-                <ShowInpsectorModal
-                    isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
-                    onRequestClose={() => setInspectingShow(null)}
-                    show={inspectingShow}
-                    updateShowProp={updateInspectingShowProp}
-                    users={users}
-                    beginWatching={inspectingShow ? () => {
-                        addHistory({ ...inspectingShow, date: new Date() });
-                        removeShow(inspectingShow.uuid);
-                        setInspectingShow(null);
-                    } : null}
-                />
-            </div>
-        );
-    };
+    const renderShows = show => (
+        <div className='show' key={show.uuid}>
+            <ShowInput
+                show={show}
+                value={show.name}
+                style={{ borderLeftColor: pickColor(shows.findIndex(s => s === show), colors, shows) }}
+                updateShowProp={updateShowProp}
+            />
+            <button className='delete' onClick={e => removeShow(show.uuid)}>×</button>
+            <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
+            <ShowInpsectorModal
+                isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
+                onRequestClose={() => setInspectingShow(null)}
+                show={inspectingShow}
+                updateShowProp={updateInspectingShowProp}
+                users={users}
+                beginWatching={inspectingShow ? () => {
+                    addHistory({ ...inspectingShow, date: new Date() });
+                    removeShow(inspectingShow.uuid);
+                    setInspectingShow(null);
+                } : null}
+            />
+        </div>
+    );
 
     return (
         <div {...props}>
             <div className='shows-list'>
                 <div className='top-bar'>
                     <h2>Shows</h2>
-                    <button className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon  /></button>
-                    {/*<button className='clickable-faded edit' onClick={() => {
-                        setEditUsers(() => true);
-
-                        //const collection = firestore.collection('users');
-                        //collection
-                        //    .where('wheels', 'array-contains', wheelName)
-                        //    .get()
-                        //    .then(querySnapshot => querySnapshot.forEach(user => (
-                        //        console.log(user.data())
-                        //    )));
-                    }}>edit users</button>*/}
+                    <button className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon /></button>
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
                     [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} disabled={testLimit(shows)} />]}
             </div>
-            <ReactModal
-                className='edit-users-modal modal-screen'
-                ariaHideApp={false}
-                isOpen={editUsers}
-                onRequestClose={() => setEditUsers(() => false)}
-            >
-                <h2>Manage Users</h2>
-                <div className='users-list'>
-                    {users.map(user => (
-                        <div key={user.uuid}>
-                            <input
-                                type='text'
-                                defaultValue={user.name}
-                                onChange={e => setUsers(prev => prev.map(
-                                    u => u.uuid === user.uuid ?
-                                    { ...user, name: e.target.value } :
-                                    { ...u }
-                                ))}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </ReactModal>
         </div>
     );
 };
