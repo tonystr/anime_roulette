@@ -27,9 +27,15 @@ const parseShowTitle = name => {
     return name.trim();
 }
 
-export default function ShowInpsectorModal({ show, updateShowProp, users, beginWatching = null, ...props }) {
+export default function ShowInpsectorModal({ show, updateShowProp, users, deleteShow, beginWatching = null, ...props }) {
     const [bannerLoaded, setBannerLoaded] = useState(false); // null = error
     const findUser = uuid => users.find(u => u.uuid === uuid) ?? { uuid: null, name: '<deleted user>' };
+
+    const handleDeleteShow = () => {
+        if (!window.confirm('Are you sure you want to delete this show?')) return;
+        deleteShow(show.uuid);
+        props.onRequestClose();
+    }
 
     const updateBanner = (...args) => {
         if (show.banner === args[2]) return;
@@ -57,15 +63,18 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, beginW
                     {beginWatching ? (
                         <button className='begin-wating' onClick={beginWatching}>Start watching</button>
                     ) : (
-                        <select
-                            className='state'
-                            defaultValue={show.state}
-                            onChange={e => updateShowProp(show, 'state', e.target.value)}
-                        >
-                            <option>Watching</option>
-                            <option>Completed</option>
-                            <option>Dropped</option>
-                        </select>
+                        <div className='right-side'>
+                            {deleteShow && <button className='delete' onClick={handleDeleteShow}>×</button>}
+                            <select
+                                className='state'
+                                defaultValue={show.state}
+                                onChange={e => updateShowProp(show, 'state', e.target.value)}
+                            >
+                                <option>Watching</option>
+                                <option>Completed</option>
+                                <option>Dropped</option>
+                            </select>
+                        </div>
                     )}
                 </h2>
                 <div className='middle' style={!show.banner ? { backgroundColor: show.color } : null}>

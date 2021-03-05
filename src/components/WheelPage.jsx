@@ -49,11 +49,16 @@ export default function WheelPage({ users, wheelName, setWheelName, userUid }) {
         .then(() => console.log('Document successfully updated!'))
         .catch(err => console.error('Error updating document: ', err));
 
+    const deleteHistoryShow = uuid => wheelRef.collection('history')
+        .doc(uuid).delete()
+        .then(() => console.log('Document successfully updated!'))
+        .catch(err => console.error('Error updating document: ', err));
+
     return (
         <main id='home' role='main'>
             <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelName} userUid={userUid} />
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
-            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} />
+            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} deleteShow={deleteHistoryShow} />
         </main>
     );
 };

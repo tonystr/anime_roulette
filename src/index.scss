@@ -375,6 +375,24 @@ header h1 {
 .show-inspector {
     justify-content: space-between;
 
+    .delete {
+        border: none;
+        background: transparent;
+        color: #af4040;
+        font-size: inherit;
+        border-radius: 50%;
+        margin-right: .6rem;
+        width:  2.2rem;
+        height: 2.2rem;
+        transition: color .14s, background-color .14s;
+
+        &:hover {
+            color: #ff3030 !important;
+            background-color: #543344;
+            cursor: pointer;
+        }
+    }
+
     .begin-wating {
         border: none;
         background-color: #3d645d;
@@ -598,6 +616,10 @@ header h1 {
         }
     }
 
+    .right-side {
+        display: flex;
+    }
+
     .state {
         border: none;
         background-color: #3a3a3a;
@@ -605,7 +627,6 @@ header h1 {
         color: $c_text;
         font-size: 1.1rem;
         padding: .1rem .3rem;
-        margin-left: 2rem;
         border-radius: 4px;
         cursor: pointer;
     }

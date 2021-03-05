@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ShowInpsectorModal, { monthNames } from './ShowInspectorModal';
 
-export default function History({ users, shows, history, updateHistoryProp, ...props }) {
+export default function History({ users, shows, history, updateHistoryProp, deleteShow, ...props }) {
     const [inspectingShow, setInspectingShow] = useState(null);
 
     const updateInspectingShowProp = (show, prop, value) => {
@@ -38,6 +38,7 @@ export default function History({ users, shows, history, updateHistoryProp, ...p
                 onRequestClose={() => setInspectingShow(null)}
                 show={inspectingShow}
                 updateShowProp={updateInspectingShowProp}
+                deleteShow={deleteShow}
                 users={users}
             />
         </div>
