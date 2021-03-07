@@ -41,7 +41,6 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, delete
         if (show.banner === args[2]) return;
         setBannerLoaded(() => false);
         updateShowProp(...args);
-        console.log('update banner§');
     }
 
     return (
