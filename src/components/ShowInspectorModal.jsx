@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import spinnerIconSource from '../icons/spinner.gif';
 import ReactModal from 'react-modal';
+import confirmAction from '../scripts/confirmAction';
 
 const monthNames = [
     'Jan',
@@ -32,7 +33,7 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, delete
     const findUser = uuid => users.find(u => u.uuid === uuid) ?? { uuid: null, name: '<deleted user>' };
 
     const handleDeleteShow = () => {
-        if (!window.confirm('Are you sure you want to delete this show?')) return;
+        if (!confirmAction('Are you sure you want to delete this show?')) return;
         deleteShow(show.uuid);
         props.onRequestClose();
     }
