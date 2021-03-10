@@ -5,8 +5,9 @@ import confirmAction from '../scripts/confirmAction';
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function ManageWheel({ escape, userUid, wheelId, resetWheelName, users }) {
-    const deleteWheel = () => {
-        if (!confirmAction(`Are you sure you want to delete ${wheelId}?`)) return;
+    const deleteWheel = () => confirmAction(`Are you sure you want to delete ${wheelId}?`).then(confirmed => {
+        if (!confirmed) return;
+
         firestore.collection('wheels').doc(wheelId).update({
             deleted: true
         });
@@ -18,20 +19,20 @@ export default function ManageWheel({ escape, userUid, wheelId, resetWheelName, 
             });
             resetWheelName();
         });
-    };
-
-    // here be it
+    });
 
     const kickUser = user => {
         if (user.uuid === userUid) return window.alert('I have no idea how you managed to try to kick yourself, but ya can\'t, buddy. Tell me what you did to get this message because that\'s surely a bug. Anyway if you want to kick yourself, you need to delete the wheel. Should be a big red button on the bottom of this page or whatever. Have a good ' + weekDay[(new Date()).getDay()] + '.');
-        if (!confirmAction(`Are you sure you want to kick ${user.name} [uid:${user.uuid}]?`)) return;
+        confirmAction(`Are you sure you want to kick ${user.name} [uid:${user.uuid}]?`).then(confirmed => {
+            if (!confirmed) return;
 
-        const wheelRef = firestore.doc(`wheels/${wheelId}`);
-        wheelRef.get().then(docSnap => {
-            const users = docSnap?.data()?.users;
-            if (!users) return;
-            wheelRef.update({
-                users: users.filter(uid => uid !== user.uuid)
+            const wheelRef = firestore.doc(`wheels/${wheelId}`);
+            wheelRef.get().then(docSnap => {
+                const users = docSnap?.data()?.users;
+                if (!users) return;
+                wheelRef.update({
+                    users: users.filter(uid => uid !== user.uuid)
+                });
             });
         });
     }

@@ -32,11 +32,12 @@ export default function ShowInpsectorModal({ show, updateShowProp, users, delete
     const [bannerLoaded, setBannerLoaded] = useState(false); // null = error
     const findUser = uuid => users.find(u => u.uuid === uuid) ?? { uuid: null, name: '<deleted user>' };
 
-    const handleDeleteShow = () => {
-        if (!confirmAction('Are you sure you want to delete this show?')) return;
+    const handleDeleteShow = () => confirmAction('Are you sure you want to delete this show?').then(confirmed => {
+        if (!confirmed) return;
+
         deleteShow(show.uuid);
         props.onRequestClose();
-    }
+    });
 
     const updateBanner = (...args) => {
         if (show.banner === args[2]) return;
