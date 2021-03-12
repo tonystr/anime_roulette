@@ -120,7 +120,6 @@ export default function PageRenderer() {
             {(userLoading || wheelLoading || userDataLoading) ?
                 <div className='loading'>Loading...</div> :
                 renderPage()}
-            <div id='confirm-modal'></div>
         </div>
     );
 };
