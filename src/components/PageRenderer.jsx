@@ -15,12 +15,7 @@ export default function PageRenderer() {
     const [manageWheel, setManageWheel] = useState(false);
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
-    const [users, setUsers] = useState(() => [
-        { name: 'Tony'  , uuid: 'ZO1t12VfzKfA3z4DSRkhwH8Hghu2' },
-        { name: 'Espen' , uuid: 'ArklXKxySSfXCn1JQHcYBiBJrbp1' },
-        { name: 'Jørgen', uuid: 'DiOHXZRe7iP7FHxkG7xEigQoLFF3' },
-        { name: 'Sigurd', uuid: '9893123siggurdnouuidda!2121x' }
-    ]);
+    const [users, setUsers] = useState(() => []);
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
