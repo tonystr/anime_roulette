@@ -15,7 +15,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
 
     const requestAccess = () => {
         if (requestDisabled) return;
-        const docRef = firestore.collection('wheels').doc(convertWheelName(requestName));
+        const docRef = firestore.doc(`wheels/${convertWheelName(requestName)}`)
         docRef.get().then(docSnap => {
             if (!docSnap.exists) {
                 setError(() => 'Wheel does not exist. Check your spelling.');
@@ -29,9 +29,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
                 return;
             }
 
-            docRef.update({
-                accessRequests: [...accessRequests, uid]
-            });
+            docRef.update({ accessRequests: [...accessRequests, uid] });
 
             setError(() => '');
             setSuccess(() => `Successfully requested access to ${requestName}. Wait for the owner to accept your request.`);
@@ -49,7 +47,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
             return;
         }
         const title = ownName.trim();
-        firestore.collection('wheels').doc(ownConverted).set({
+        firestore.doc(`wheels/${ownConverted}`).set({
             title,
             owner: uid,
             rotate: {
@@ -61,9 +59,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
             },
             users: [uid]
         });
-        firestore.collection('users').doc(uid).update({
-            wheels: [...userWheels, ownConverted]
-        });
+        firestore.doc(`users/${uid}`).update({ wheels: [...userWheels, ownConverted] });
         selectWheelName(ownConverted);
     };
 
