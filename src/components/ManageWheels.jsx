@@ -86,6 +86,8 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWh
 
     }, [ownName]);
 
+    // Still alive
+
     return (
         <div className='no-wheels page-form'>
             <h2>{noWheels ? 'You don\'t have access to any wheels' : 'Select a wheel from the top-left menu, or'}</h2>
