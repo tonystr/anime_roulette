@@ -21,8 +21,8 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
                 style={{ borderLeftColor: pickColor(shows.findIndex(s => s === show), colors, shows) }}
                 updateShowProp={updateShowProp}
             />
-            <button className='delete' onClick={e => removeShow(show.uuid)}>×</button>
-            <button className='clickable-faded edit' onClick={() => setInspectingShow(() => show)}>edit</button>
+            <button className='delete' title='Delete Show' onClick={e => removeShow(show.uuid)}>×</button>
+            <button className='clickable-faded edit' title='Edit Show' onClick={() => setInspectingShow(() => show)}>edit</button>
             <ShowInpsectorModal
                 isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
                 onRequestClose={() => setInspectingShow(null)}
@@ -43,7 +43,7 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
             <div className='shows-list'>
                 <div className='top-bar'>
                     <h2>Shows</h2>
-                    <button className='show-users-button' onClick={() => setShowUsers(prev => !prev)}><UserIcon /></button>
+                    <button className='show-users-button' title='Toggle Usernames' onClick={() => setShowUsers(prev => !prev)}><UserIcon /></button>
                 </div>
                 {showUsers ?
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :

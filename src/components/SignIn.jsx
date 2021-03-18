@@ -7,6 +7,9 @@ import GoogleLogo from '../icons/google_logo.png';
 export default function SignIn() {
     return (
         <div className='sign-in-panel'>
+            <div className='background'>
+                <img src='./nadeko.png' alt='' />
+            </div>
             <h2>Sign in with</h2>
 
             <button className='sign-in google' onClick={() => {

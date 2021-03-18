@@ -13,6 +13,12 @@ $c_text_bright: #ffffff;
     100% { opacity: 1 }
 }
 
+@keyframes fade-in-slow {
+    0%   { opacity: 0 }
+    50%  { opacity: 0 }
+    100% { opacity: 1 }
+}
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -150,6 +156,23 @@ button.blop {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+
+    .background {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        bottom: 0;
+        overflow: hidden;
+        z-index: -40;
+        animation: fade-in-slow .8s;
+
+        img {
+            position: absolute;
+            top: 0;
+            max-width: 100%;
+            opacity: .07;
+        }
+    }
 
     .sign-in {
         display: flex;
