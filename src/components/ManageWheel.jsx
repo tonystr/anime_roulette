@@ -4,7 +4,7 @@ import confirmAction from '../scripts/confirmAction';
 
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function ManageWheel({ escape, userUid, wheelId, resetWheelName, users }) {
+export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWheelName, users }) {
     const deleteWheel = () => confirmAction(`Are you sure you want to delete ${wheelId}?`).then(confirmed => {
         if (!confirmed) return;
 
@@ -39,7 +39,7 @@ export default function ManageWheel({ escape, userUid, wheelId, resetWheelName, 
 
     return (
         <div id='manage-wheel'>
-            <h2>Manage wheel</h2>
+            <h2>Manage wheel <span className='wheel-title'>{wheel?.title}</span></h2>
             <ul className='users'>
                 {users.map(user => (
                     <li key={user.uuid}>

@@ -964,6 +964,10 @@ header h1 {
     flex-direction: column;
     align-items: center;
 
+    .wheel-title {
+        color: #eeeff2;
+    }
+
     .users {
         padding: 0;
         margin: 1rem 0;

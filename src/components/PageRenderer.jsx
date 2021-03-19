@@ -67,6 +67,7 @@ export default function PageRenderer() {
                         escape={() => setManageWheel(() => false)}
                         userUid={user.uid}
                         wheelId={wheelName}
+                        wheel={wheel}
                         resetWheelName={() => setWheelName(noWheelName)}
                         users={users}
                     />
