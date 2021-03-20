@@ -19,6 +19,7 @@ function moveData(wheelName) {
     });
 }
 
+// Like this
 
 function renameWheel(fromWheelName, toWheelName) {
     firestore.collection('wheels').doc(fromWheelName).get().then(snap => {
