@@ -150,12 +150,36 @@ button.blop {
     }
 }
 
-.sign-in-panel {
-    min-height: 69vh;
+.sign-in-page {
     display: flex;
     justify-content: center;
-    align-items: center;
     flex-direction: column;
+    min-height: 69vh;
+
+    .middle-center {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        align-items: baseline;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 1.6rem;
+    }
+
+    // border-right: 2px solid #282828;
+
+    .info {
+        width: 335px;
+        padding: 0 2rem;
+        font-size: 1.2rem;
+        margin-bottom: 1.6rem;
+
+        p {
+            margin: 0;
+        }
+    }
 
     .background {
         position: absolute;
@@ -176,6 +200,12 @@ button.blop {
             opacity: .07;
         }
     }
+}
+
+.sign-in-panel {
+    width: 300px;
+    padding: 0 calc(2rem + 17.5px);
+
 
     .sign-in {
         display: flex;
