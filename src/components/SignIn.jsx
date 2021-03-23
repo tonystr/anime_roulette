@@ -18,6 +18,7 @@ export default function SignIn() {
                         Add series you want to watch to the wheel, and click the wheel to pick a series randomly!
                     </p>
                 </div>
+                <div className='vertical-seperator' />
                 <div className='sign-in-panel'>
                     <h2>Sign in with</h2>
 
