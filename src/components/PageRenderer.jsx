@@ -6,6 +6,7 @@ import AccessRequests from './AccessRequests';
 import WheelPage from './WheelPage';
 import ManageWheel from './ManageWheel';
 import SignIn from './SignIn';
+import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 
 export default function PageRenderer() {
     const noWheelName = 'Select wheel';
@@ -17,6 +18,7 @@ export default function PageRenderer() {
     const wheels = userData?.wheels || [];
     const [users, setUsers] = useState(() => []);
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
+    const [iconUrl, setIconUrl] = useState('https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
@@ -70,6 +72,8 @@ export default function PageRenderer() {
                         wheel={wheel}
                         resetWheelName={() => setWheelName(noWheelName)}
                         users={users}
+                        iconUrl={iconUrl}
+                        setIconUrl={setIconUrl}
                     />
                 );
             }
@@ -84,38 +88,45 @@ export default function PageRenderer() {
     }
 
     return (
-        <div>
-            <header>
-                <div className='wheel-meta'>
-                    {user && (
-                        <div className='wheel-name'>
-                            <span className='select clickable-faded'>
-                                {wheelTitles[wheelName] || wheelName}
-                                <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                    <option>{noWheelName}</option>
-                                    {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
-                                </select>
-                            </span>
-                            {user?.uid && wheel?.owner === user.uid && (
-                                <span className='faded'>
-                                    <span className='colorized'>|</span>
-                                    <button onClick={() => setManageWheel(prev => !prev)} className='clickable-faded manage-wheel'>
-                                        manage
-                                    </button>
+        <div className='page-wrapper'>
+            <aside>
+                <div className='hamburger'>
+                    <HamburgerMenuIcon width='24' height='24' />
+                </div>
+            </aside>
+            <div className='main-content'>
+                <header>
+                    <div className='wheel-meta'>
+                        {user && (
+                            <div className='wheel-name'>
+                                <span className='select clickable-faded'>
+                                    {wheelTitles[wheelName] || wheelName}
+                                    <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
+                                        <option>{noWheelName}</option>
+                                        {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
+                                    </select>
                                 </span>
-                            )}
-                        </div>
-                    )}
-                    <AccessRequests wheelName={wheelName} userUid={user?.uid} />
-                </div>
-                <h1>{wheelTitle}</h1>
-                <div className="export-import">
-                    <SignOut />
-                </div>
-            </header>
-            {(userLoading || wheelLoading || userDataLoading) ?
-                <div className='loading'>Loading...</div> :
-                renderPage()}
+                                {user?.uid && wheel?.owner === user.uid && (
+                                    <span className='faded'>
+                                        <span className='colorized'>|</span>
+                                        <button onClick={() => setManageWheel(prev => !prev)} className='clickable-faded manage-wheel'>
+                                            manage
+                                        </button>
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                        <AccessRequests wheelName={wheelName} userUid={user?.uid} />
+                    </div>
+                    <h1>{wheelTitle}</h1>
+                    <div className="export-import">
+                        <SignOut />
+                    </div>
+                </header>
+                {(userLoading || wheelLoading || userDataLoading) ?
+                    <div className='loading'>Loading...</div> :
+                    renderPage()}
+            </div>
         </div>
     );
 };

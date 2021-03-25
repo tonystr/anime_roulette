@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import firestore from '../firestore';
 import confirmAction from '../scripts/confirmAction';
 
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWheelName, users }) {
+export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWheelName, users, iconUrl, setIconUrl }) {
     const deleteWheel = () => confirmAction(`Are you sure you want to delete ${wheelId}?`).then(confirmed => {
         if (!confirmed) return;
 
@@ -37,8 +37,6 @@ export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWhee
         });
     }
 
-    const iconUrl = 'https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113';
-
     return (
         <div id='manage-wheel'>
             <h2>Manage wheel <span className='wheel-title'>{wheel?.title}</span></h2>
@@ -48,7 +46,7 @@ export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWhee
                 </div>
                 <div>
                     <h3>Wheel icon</h3>
-                    <input type='text' className='ginput' value={iconUrl} />
+                    <input type='text' className='ginput' value={iconUrl} onChange={e => setIconUrl(() => e.target.value)} />
                 </div>
             </div>
             <ul className='users'>

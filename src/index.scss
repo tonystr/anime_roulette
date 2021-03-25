@@ -38,6 +38,34 @@ code {
     outline: none;
 }
 
+aside {
+    flex-shrink: 0;
+    background-color: #191919;
+    width: 70px;
+
+    .hamburger {
+        margin: 1.3rem 23px;
+        display: inline-block;
+        fill: #8ea091;
+        transition: fill .1s;
+
+        &:hover {
+            fill: #ddd;
+            cursor: pointer;
+        }
+    }
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+
+    .main-content {
+        width: 100%;
+    }
+}
+
 .loading {
     animation: loading-fade 1.5s infinite;
     text-align: center;
@@ -1131,9 +1159,10 @@ header h1 {
     margin-left: 2rem;
     cursor: pointer;
     fill: #8ea091;
+    transition: fill .1s;
 
     &:hover {
-        fill: #caa05a;
+        fill: #ddd;
     }
 
     svg {
