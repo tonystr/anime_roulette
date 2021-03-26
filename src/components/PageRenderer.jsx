@@ -19,6 +19,7 @@ export default function PageRenderer() {
     const [users, setUsers] = useState(() => []);
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
     const [iconUrl, setIconUrl] = useState('https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
+    const [showAside, setShowAside] = useState(true);
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
@@ -89,9 +90,9 @@ export default function PageRenderer() {
 
     return (
         <div className='page-wrapper'>
-            <aside>
+            <aside className={showAside ? '' : 'hidden'}>
                 <div className='hamburger'>
-                    <HamburgerMenuIcon width='24' height='24' />
+                    <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
                 </div>
             </aside>
             <div className='main-content'>

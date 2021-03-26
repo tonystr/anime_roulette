@@ -42,6 +42,13 @@ aside {
     flex-shrink: 0;
     background-color: #191919;
     width: 70px;
+    transition: width .2s;
+
+    &.hidden {
+        width: 0;
+
+
+    }
 
     .hamburger {
         margin: 1.3rem 23px;
