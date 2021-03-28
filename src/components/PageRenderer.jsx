@@ -94,12 +94,26 @@ export default function PageRenderer() {
                 <div className='hamburger'>
                     <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
                 </div>
+                <div className='content'>
+                    <div className='wheel-button'>
+                        <img src={'https://media.discordapp.net/attachments/392980753228496896/825683468503089202/unknown.png'} alt='Anime Abuse Wheel' />
+                    </div>
+                    <div className='wheel-button selected'>
+                        <img src={iconUrl} alt='That Wheel' />
+                    </div>
+                    <div className='wheel-button'>
+                        <img src={'https://media.discordapp.net/attachments/392980753228496896/825679987248070665/unknown.png'} alt='Jogg Wheel' />
+                    </div>
+                    <div className='wheel-button'>
+                        <img src={'https://media.discordapp.net/attachments/392980753228496896/825685542535823409/unknown.png'} alt='We Wheel' />
+                    </div>
+                </div>
             </aside>
             <div className='main-content'>
                 <header>
                     <div className='wheel-meta'>
                         {user && (
-                            <div className='wheel-name'>
+                            <div className={'wheel-name' + (showAside ? '' : ' aside-hidden')}>
                                 <span className='select clickable-faded'>
                                     {wheelTitles[wheelName] || wheelName}
                                     <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
