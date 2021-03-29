@@ -12,23 +12,34 @@ export default function PageRenderer() {
     const noWheelName = 'Select wheel';
     const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || noWheelName);
     const [user, userLoading] = useAuthState(auth);
+
     const [wheelTitles, setWheelTitles] = useState({});
+    const [wheelIcons, setWheelIcons] = useState({});
+
     const [manageWheel, setManageWheel] = useState(false);
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
     const [users, setUsers] = useState(() => []);
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
-    const [iconUrl, setIconUrl] = useState(null); //'https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
+    const [iconUrl, setIconUrl] = useState(null);
     const [showAside, setShowAside] = useState(true);
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
+    // Load wheel titles and icons
     useEffect(() => {
         for (const wheelId of wheels) {
-            if (!wheelTitles[wheelId]) {
+            if (!wheelTitles[wheelId] || !wheelIcons[wheelId]) {
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) return;
-                    setWheelTitles(prev => ({ ...prev, [wheelId]: snap.data().title }));
+                    const { title, icon } = snap.data();
+                    if (title) setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
+                    if (icon) {
+                        setWheelIcons(prev => ({ ...prev, [wheelId]: icon }));
+                        if (wheelId === wheelName) {
+                            setIconUrl(() => icon);
+                        }
+                    }
                 });
             }
         }
@@ -48,6 +59,7 @@ export default function PageRenderer() {
 
     useEffect(() => {
         localStorage.setItem('wheel-name', wheelName);
+        setIconUrl(() => wheelIcons[wheelName]);
     }, [wheelName]);
 
     const renderPage = () => {
@@ -88,8 +100,14 @@ export default function PageRenderer() {
         );
     }
 
-    const iconTitle = (wheel?.title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
+    //wheel?.
+    const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
+     //'https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
+    /*  <img src={'https://media.discordapp.net/attachments/392980753228496896/825683468503089202/unknown.png'} alt='Anime Abuse Wheel' />
+        <img src={'https://media.discordapp.net/attachments/392980753228496896/825679987248070665/unknown.png'} alt='Jogg Wheel' />
+        <img src={'https://media.discordapp.net/attachments/392980753228496896/825685542535823409/unknown.png'} alt='We Wheel' />
+    */
     return (
         <div className='page-wrapper'>
             <aside className={showAside ? '' : 'hidden'}>
@@ -97,21 +115,13 @@ export default function PageRenderer() {
                     <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
                 </div>
                 <div className='content'>
-                    <div className='wheel-button'>
-                        <img src={'https://media.discordapp.net/attachments/392980753228496896/825683468503089202/unknown.png'} alt='Anime Abuse Wheel' />
-                    </div>
-                    <div className='wheel-button selected'>
-                        {iconUrl ?
-                            <img src={iconUrl} alt={iconTitle} /> :
-                            <span className='icon-title'>{iconTitle}</span>}
-
-                    </div>
-                    <div className='wheel-button'>
-                        <img src={'https://media.discordapp.net/attachments/392980753228496896/825679987248070665/unknown.png'} alt='Jogg Wheel' />
-                    </div>
-                    <div className='wheel-button'>
-                        <img src={'https://media.discordapp.net/attachments/392980753228496896/825685542535823409/unknown.png'} alt='We Wheel' />
-                    </div>
+                    {wheels.map(wheelId => (
+                        <div className={`wheel-button ${wheelId == wheelName ? 'selected' : ''}`}>
+                            {wheelIcons[wheelId] ?
+                                <img src={wheelIcons[wheelId]} alt={iconTitle(wheelTitles[wheelId])} /> :
+                                <span className='icon-title'>{iconTitle(wheelTitles[wheelId])}</span>}
+                        </div>
+                    ))}
                 </div>
             </aside>
             <div className='main-content'>
