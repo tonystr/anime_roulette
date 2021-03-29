@@ -7,6 +7,12 @@ const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday
 export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWheelName, users, iconUrl, setIconUrl }) {
     const iconTitle = (wheel.title || '?').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
+    const updateShowProp = (prop, value) => firestore
+        .doc(`wheels/${wheelId}`)
+        .update({ [prop]: value })
+        .then(() => console.log('Document successfully updated!'))
+        .catch(err => console.error('Error updating document: ', err));
+
     const deleteWheel = () => confirmAction(`Are you sure you want to delete ${wheelId}?`).then(confirmed => {
         if (!confirmed) return;
 
@@ -45,7 +51,7 @@ export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWhee
             <div className='manage-icon'>
                 <div className='wheel-icon'>
                     {iconUrl ?
-                        <img src={iconUrl} alt='' /> :
+                        <img src={iconUrl} alt={iconTitle} /> :
                         <div className='icon-title'>{iconTitle}</div>}
                 </div>
                 <div>
@@ -54,7 +60,10 @@ export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWhee
                         type='text'
                         className='ginput'
                         value={iconUrl}
-                        onChange={e => setIconUrl(() => e.target.value)}
+                        onChange={e => {
+                            setIconUrl(() => e.target.value);
+                            updateShowProp('icon', e.target.value);
+                        }}
                         placeholder='Insert Icon Url...'
                     />
                 </div>

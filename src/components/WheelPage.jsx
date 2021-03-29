@@ -5,7 +5,7 @@ import Shows   from './Shows';
 import History from './History';
 
 export default function WheelPage({ users, wheelName, setWheelName, userUid }) {
-    const wheelRef = firestore.collection('wheels').doc(wheelName);
+    const wheelRef = firestore.collection('wheels').doc(wheelName);            
     const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
     const historyQuery = wheelRef.collection('history').orderBy('date');
 

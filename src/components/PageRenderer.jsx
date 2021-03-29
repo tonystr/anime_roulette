@@ -29,21 +29,23 @@ export default function PageRenderer() {
     // Load wheel titles and icons
     useEffect(() => {
         for (const wheelId of wheels) {
-            if (!wheelTitles[wheelId] || !wheelIcons[wheelId]) {
+            const isSelectedWheel = wheelId === wheelName;
+            if (!wheelTitles[wheelId] || !wheelIcons[wheelId] || (isSelectedWheel && wheelIcons[wheelId] !== iconUrl)) {
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) return;
+                    console.log('querying for ' + wheelId);
                     const { title, icon } = snap.data();
                     if (title) setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
                     if (icon) {
                         setWheelIcons(prev => ({ ...prev, [wheelId]: icon }));
-                        if (wheelId === wheelName) {
+                        if (isSelectedWheel) {
                             setIconUrl(() => icon);
                         }
                     }
                 });
             }
         }
-    }, [wheels.length]);
+    }, [wheels.length, iconUrl]);
 
     useEffect(() => {
         if (!wheel?.users) return;
@@ -117,6 +119,7 @@ export default function PageRenderer() {
                 <div className='content'>
                     {wheels.map(wheelId => (
                         <div
+                            key={wheelId}
                             className={`wheel-button ${wheelId == wheelName ? 'selected' : ''}`}
                             onClick={() => setWheelName(wheelId)}
                         >
