@@ -116,7 +116,10 @@ export default function PageRenderer() {
                 </div>
                 <div className='content'>
                     {wheels.map(wheelId => (
-                        <div className={`wheel-button ${wheelId == wheelName ? 'selected' : ''}`}>
+                        <div
+                            className={`wheel-button ${wheelId == wheelName ? 'selected' : ''}`}
+                            onClick={() => setWheelName(wheelId)}
+                        >
                             {wheelIcons[wheelId] ?
                                 <img src={wheelIcons[wheelId]} alt={iconTitle(wheelTitles[wheelId])} /> :
                                 <span className='icon-title'>{iconTitle(wheelTitles[wheelId])}</span>}
