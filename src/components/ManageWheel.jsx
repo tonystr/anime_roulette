@@ -5,6 +5,8 @@ import confirmAction from '../scripts/confirmAction';
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWheelName, users, iconUrl, setIconUrl }) {
+    const iconTitle = (wheel.title || '?').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
+
     const deleteWheel = () => confirmAction(`Are you sure you want to delete ${wheelId}?`).then(confirmed => {
         if (!confirmed) return;
 
@@ -42,11 +44,19 @@ export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWhee
             <h2>Manage wheel <span className='wheel-title'>{wheel?.title}</span></h2>
             <div className='manage-icon'>
                 <div className='wheel-icon'>
-                    <img src={iconUrl} alt='' />
+                    {iconUrl ?
+                        <img src={iconUrl} alt='' /> :
+                        <div className='icon-title'>{iconTitle}</div>}
                 </div>
                 <div>
                     <h3>Wheel icon</h3>
-                    <input type='text' className='ginput' value={iconUrl} onChange={e => setIconUrl(() => e.target.value)} />
+                    <input
+                        type='text'
+                        className='ginput'
+                        value={iconUrl}
+                        onChange={e => setIconUrl(() => e.target.value)}
+                        placeholder='Insert Icon Url...'
+                    />
                 </div>
             </div>
             <ul className='users'>

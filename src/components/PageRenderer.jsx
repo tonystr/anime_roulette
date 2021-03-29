@@ -18,7 +18,7 @@ export default function PageRenderer() {
     const wheels = userData?.wheels || [];
     const [users, setUsers] = useState(() => []);
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
-    const [iconUrl, setIconUrl] = useState('https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
+    const [iconUrl, setIconUrl] = useState(null); //'https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
     const [showAside, setShowAside] = useState(true);
 
     const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
@@ -88,6 +88,8 @@ export default function PageRenderer() {
         );
     }
 
+    const iconTitle = (wheel?.title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
+
     return (
         <div className='page-wrapper'>
             <aside className={showAside ? '' : 'hidden'}>
@@ -99,7 +101,10 @@ export default function PageRenderer() {
                         <img src={'https://media.discordapp.net/attachments/392980753228496896/825683468503089202/unknown.png'} alt='Anime Abuse Wheel' />
                     </div>
                     <div className='wheel-button selected'>
-                        <img src={iconUrl} alt='That Wheel' />
+                        {iconUrl ?
+                            <img src={iconUrl} alt={iconTitle} /> :
+                            <span className='icon-title'>{iconTitle}</span>}
+
                     </div>
                     <div className='wheel-button'>
                         <img src={'https://media.discordapp.net/attachments/392980753228496896/825679987248070665/unknown.png'} alt='Jogg Wheel' />
