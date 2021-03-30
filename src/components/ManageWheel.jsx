@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
-import firestore from '../firestore';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import firestore, { useDocumentData } from '../firestore';
 import confirmAction from '../scripts/confirmAction';
 
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWheelName, users, iconUrl, setIconUrl }) {
-    const iconTitle = (wheel.title || '?').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
+export default function ManageWheel({ userUid, resetWheelName, iconUrl, setIconUrl }) {
+    const [users, setUsers] = useState(() => []);
+    const { wheelId } = useParams();
+    const [wheel] /* , wheelLoading */ = useDocumentData(firestore.doc(`wheels/${wheelId}`));
+    const iconTitle = (wheel?.title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
+
+    useEffect(() => {
+        if (!wheel?.users) return;
+        setUsers(() => wheel.users.map(uuid => ({ name: 'User', uuid })));
+        for (const uuid of wheel.users) {
+            firestore.collection('users').doc(uuid).get().then(docSnap => {
+                const userDoc = docSnap.data();
+                const name = userDoc.name;
+                setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
+            })
+        }
+    }, [wheel?.users]);
 
     const updateShowProp = (prop, value) => firestore
         .doc(`wheels/${wheelId}`)
@@ -78,7 +94,7 @@ export default function ManageWheel({ escape, userUid, wheel, wheelId, resetWhee
                     </li>
                 ))}
             </ul>
-            <button onClick={escape}>Return to wheel</button>
+            <Link to={`/wheels/${wheelId}`}><button>Return to wheel</button></Link>
             <button onClick={deleteWheel} className='danger'>Delete Wheel</button>
         </div>
     );

@@ -109,8 +109,15 @@ export default function PageRenderer() {
                                 }}
                             />
                         ) : <Redirect to='/' />} />
-                        <Route path='/wheels/:wheelId' render={() => user && (
+                        <Route exact path='/wheels/:wheelId' render={() => user && (
                             <WheelPage userUid={user.uid} />
+                        )} />
+                        <Route path='/wheels/:wheelId/settings' render={() => user && (
+                            <ManageWheel
+                                escape={() => null /* redirect */}
+                                userUid={user.uid}
+                                resetWheelName={() => /* ?? setWheelName(noWheelName) */null}
+                            />
                         )} />
                     </main>
                 </div>
