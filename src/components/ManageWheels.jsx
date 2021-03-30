@@ -5,13 +5,14 @@ function convertWheelName(name) {
     return name.trim().toLowerCase().replace(/\s+/g, '_');
 }
 
-export default function ManageWheels({ uid, selectWheelName, userWheels=[], noWheels=false }) {
+export default function ManageWheels({ uid, selectWheelName, userWheels=[] }) {
     const [requestName, setRequestName] = useState('');
     const [ownName, setOwnName] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [requestDisabled, setRequestDisabled] = useState(true);
     const [ownDisabled, setOwnDisabled] = useState(true);
+    const noWheels = userWheels.length < 1
 
     const requestAccess = () => {
         if (requestDisabled) return;

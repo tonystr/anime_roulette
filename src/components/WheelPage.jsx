@@ -3,9 +3,13 @@ import firestore, { useCollectionData } from '../firestore';
 import Wheel   from './Wheel';
 import Shows   from './Shows';
 import History from './History';
+import { useParams } from 'react-router-dom';
 
-export default function WheelPage({ users, wheelName, setWheelName, userUid }) {
-    const wheelRef = firestore.collection('wheels').doc(wheelName);            
+export default function WheelPage({ users, setWheelName, userUid }) {
+    const { wheelId } = useParams();
+    const wheelName = wheelId;
+
+    const wheelRef = firestore.collection('wheels').doc(wheelName);
     const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
     const historyQuery = wheelRef.collection('history').orderBy('date');
 

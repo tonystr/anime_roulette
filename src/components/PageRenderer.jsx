@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
+import { BrowserRouter, Route, Link, NavLink, Redirect } from 'react-router-dom';
 import RegisterUser from './RegisterUser';
 import ManageWheels from './ManageWheels';
 import AccessRequests from './AccessRequests';
@@ -22,9 +23,6 @@ export default function PageRenderer() {
     const [users, setUsers] = useState(() => []);
     const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
     const [iconUrl, setIconUrl] = useState(null);
-    const [showAside, setShowAside] = useState(true);
-
-    const wheelTitle = 'Anime Roulette' || 'Roulette Wheel';
 
     // Load wheel titles and icons
     useEffect(() => {
@@ -101,65 +99,111 @@ export default function PageRenderer() {
         );
     }
 
+    return (
+        <BrowserRouter>
+            <div className='page-wrapper'>
+                <Aside
+                    wheels={wheels}
+                    wheelIcons={wheelIcons}
+                    wheelTitles={wheelTitles}
+                    wheelName={wheelName}
+                />
+                <div className='main-content'>
+                    <Header
+                        user={user}
+                        wheelName={wheelName}
+                        wheelTitle={wheelTitles[wheelName] || wheelName}
+                    />
+                    <main>
+                        <Route path='/select_wheel' render={() => user && userData ? (
+                            <ManageWheels
+                                uid={user.uid}
+                                userWheels={wheels}
+                                selectWheelName={name => {
+                                    setWheelName(() => name);
+                                    firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
+                                }}
+                            />
+                        ) : <Redirect to='/' />} />
+                        <Route path='/wheels/:wheelId' render={() => (
+                            <WheelPage
+                                userUid={user.uid}
+                                users={users}
+                            />
+                        )} />
+                    </main>
+                </div>
+            </div>
+        </BrowserRouter>
+    );
+};
+
+function Aside({ wheels, wheelIcons, wheelTitles, wheelName }) {
+    const [showAside, setShowAside] = useState(true);
+
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
     return (
-        <div className='page-wrapper'>
-            <aside className={showAside ? '' : 'hidden'}>
-                <div className='hamburger'>
-                    <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
-                </div>
-                <div className='content'>
-                    {wheels.map(wheelId => (
+        <aside className={showAside ? '' : 'hidden'}>
+            <div className='hamburger'>
+                <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
+            </div>
+            <div className='content'>
+                {wheels.map(wheelId => (
+                    <NavLink to={`/wheels/${wheelId}`}>
                         <div
                             key={wheelId}
-                            className={`wheel-button ${wheelId == wheelName ? 'selected' : ''}`}
-                            onClick={() => setWheelName(wheelId)}
+                            className={`wheel-button ${wheelId === wheelName ? 'selected' : ''}`}
+                            onClick={null/*() => setWheelName(wheelId)*/}
                         >
                             {wheelIcons[wheelId] ?
                                 <img src={wheelIcons[wheelId]} alt={iconTitle(wheelTitles[wheelId])} /> :
                                 <span className='icon-title'>{iconTitle(wheelTitles[wheelId])}</span>}
                         </div>
-                    ))}
-                    <div className='wheel-button add-new' onClick={() => setWheelName('Select wheel')}><span className='icon-title'>+</span></div>
-                </div>
-            </aside>
-            <div className='main-content'>
-                <header>
-                    <div className='wheel-meta'>
-                        {user && (
-                            <div className={'wheel-name' + (showAside ? '' : ' aside-hidden')}>
-                                <span className='select clickable-faded'>
-                                    {wheelTitles[wheelName] || wheelName}
-                                    <select value={wheelName} onChange={e => setWheelName(() => e.target.value)}>
-                                        <option>{noWheelName}</option>
-                                        {wheels.map(wheelId => <option key={wheelId} value={wheelId}>{wheelTitles[wheelId]}</option>)}
-                                    </select>
-                                </span>
-                                {user?.uid && wheel?.owner === user.uid && (
-                                    <span className='faded'>
-                                        <span className='colorized'>|</span>
-                                        <button onClick={() => setManageWheel(prev => !prev)} className='clickable-faded manage-wheel'>
-                                            manage
-                                        </button>
-                                    </span>
-                                )}
-                            </div>
-                        )}
-                        <AccessRequests wheelName={wheelName} userUid={user?.uid} />
-                    </div>
-                    <h1>{wheelTitle}</h1>
-                    <div className="export-import">
-                        <SignOut />
-                    </div>
-                </header>
-                {(userLoading || wheelLoading || userDataLoading) ?
-                    <div className='loading'>Loading...</div> :
-                    renderPage()}
+                    </NavLink>
+                ))}
+                <NavLink to='/select_wheel'>
+                    <div className='wheel-button add-new'><span className='icon-title'>+</span></div>
+                </NavLink>
             </div>
-        </div>
+        </aside>
     );
-};
+}
+
+function Header({ user, wheelName, wheelTitle }) {
+    const websiteTitle = true ? 'Anime Roulette' : 'Roulette Wheel';
+
+    return (
+        <header>
+            <div className='wheel-meta'>
+                {/*user && (
+                    <div className='wheel-name'>
+                        <span className='wheel-title'>
+                            {wheelTitle}
+                        </span>
+                        {/*user?.uid && wheel?.owner === user.uid && (
+                            <span className='faded'>
+                                <span className='colorized'>|</span>
+                                <button onClick={null/*() => setManageWheel(prev => !prev)***} className='clickable-faded manage-wheel'>
+                                    manage
+                                </button>
+                            </span>
+                        )***}
+                    </div>
+                )*/}
+                <AccessRequests wheelName={wheelName} userUid={user?.uid} />
+            </div>
+            <h1>{websiteTitle}</h1>
+            <div className="export-import">
+                <SignOut />
+            </div>
+        </header>
+    )
+}
+
+function Loading() {
+    return <div className='loading'>Loading...</div>;
+}
 
 function SignOut({ className='', ...props }) {
     return auth.currentUser ? (
