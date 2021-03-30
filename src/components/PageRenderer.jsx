@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
-import { BrowserRouter, Route, Link, NavLink, Redirect, DefaultRoute } from 'react-router-dom';
+import { BrowserRouter, Route, NavLink, Redirect } from 'react-router-dom';
 import RegisterUser from './RegisterUser';
 import ManageWheels from './ManageWheels';
 import AccessRequests from './AccessRequests';
@@ -52,7 +52,6 @@ import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 
 export default function PageRenderer() {
     const noWheelName = 'Select wheel';
-    const [wheelName, setWheelName] = useState(() => localStorage.getItem('wheel-name') || noWheelName);
     const [user, userLoading] = useAuthState(auth);
 
     const [wheelTitles, setWheelTitles] = useState({});
@@ -76,21 +75,27 @@ export default function PageRenderer() {
         }
     }, [wheels.length]);
 
+    const passWheelId = func => (({ location }) => func(location.pathname.match(/[^\/]*$/)[0]));
+
     return (
         <BrowserRouter>
             <div className='page-wrapper'>
-                <Route path='/' render={({ location }) => user && <Aside
-                    wheels={wheels}
-                    wheelIcons={wheelIcons}
-                    wheelTitles={wheelTitles}
-                    pathname={location.pathname}
-                />} />
-                <div className='main-content'>
-                    <Header
-                        user={user}
-                        wheelName={wheelName}
-                        wheelTitle={wheelTitles[wheelName] || wheelName}
+                <Route path='/' render={user && passWheelId(selectedWheelId => (
+                    <Aside
+                        wheels={wheels}
+                        wheelIcons={wheelIcons}
+                        wheelTitles={wheelTitles}
+                        selectedWheelId={selectedWheelId}
                     />
+                ))} />
+                <div className='main-content'>
+                    <Route path='/' render={passWheelId(selectedWheelId => (
+                        <Header
+                            user={user}
+                            selectedWheelId={selectedWheelId}
+                            wheelTitle={wheelTitles[selectedWheelId] || selectedWheelId}
+                        />
+                    ))} />
                     <main>
                         <Route path='/' render={() => !user && !userLoading ? <Redirect to='/sign_in' /> : null} />
                         <Route path='/sign_in' render={() => !user || userDataLoading ? <SignIn /> : <Redirect to={`/wheels/${wheels[0]}`} />} />
@@ -99,16 +104,14 @@ export default function PageRenderer() {
                                 uid={user.uid}
                                 userWheels={wheels}
                                 selectWheelName={name => {
-                                    setWheelName(() => name);
+                                    // setWheelName(() => name);
                                     firestore.doc(`users/${user.uid}`).update({ wheels: [...wheels, name] });
                                 }}
                             />
                         ) : <Redirect to='/' />} />
-                        <Route path='/wheels/:wheelId' render={() => user ? (
-                            <WheelPage
-                                userUid={user.uid}
-                            />
-                        ) : null} />
+                        <Route path='/wheels/:wheelId' render={() => user && (
+                            <WheelPage userUid={user.uid} />
+                        )} />
                     </main>
                 </div>
             </div>
@@ -116,9 +119,8 @@ export default function PageRenderer() {
     );
 };
 
-function Aside({ wheels, wheelIcons, wheelTitles, pathname }) {
+function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId }) {
     const [showAside, setShowAside] = useState(true);
-    const selectedWheelId = pathname.match(/[^\/]*$/)[0];
 
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
@@ -148,7 +150,7 @@ function Aside({ wheels, wheelIcons, wheelTitles, pathname }) {
     );
 }
 
-function Header({ user, wheelName, wheelTitle }) {
+function Header({ user, selectedWheelId, wheelTitle }) {
     const websiteTitle = true ? 'Anime Roulette' : 'Roulette Wheel';
 
     return (
@@ -169,7 +171,7 @@ function Header({ user, wheelName, wheelTitle }) {
                         )***}
                     </div>
                 )*/}
-                <AccessRequests wheelName={wheelName} userUid={user?.uid} />
+                <AccessRequests wheelName={selectedWheelId} userUid={user?.uid} />
             </div>
             <h1>{websiteTitle}</h1>
             <div className="export-import">

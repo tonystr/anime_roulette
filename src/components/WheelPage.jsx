@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 export default function WheelPage({ userUid }) {
     const [users, setUsers] = useState(() => []);
     const { wheelId } = useParams();
-    const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelId));
+    const [wheel] /* , wheelLoading */ = useDocumentData(firestore.collection('wheels').doc(wheelId));
 
     useEffect(() => {
         if (!wheel?.users) return;
