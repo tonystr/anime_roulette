@@ -91,6 +91,27 @@ aside {
         cursor: pointer;
         user-select: none;
 
+        &.add-new {
+            background-color: #3a3b3f;
+            transition: all .2s;
+
+            &:hover {
+                background-color: #8ea091;
+
+                .icon-title {
+                    color: #fff;
+                }
+            }
+
+            .icon-title {
+                transition: all .2s;
+                top: -.38rem;
+                left: 1.5px;
+                font-size: 2.5rem;
+                color: #8ea091;
+            }
+        }
+
         &.selected {
             box-shadow: -58px 0 0 2px #8ea091,
                         0 0px 0px #000;

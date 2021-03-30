@@ -33,7 +33,6 @@ export default function PageRenderer() {
             if (!wheelTitles[wheelId] || !wheelIcons[wheelId] || (isSelectedWheel && wheelIcons[wheelId] !== iconUrl)) {
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) return;
-                    console.log('querying for ' + wheelId);
                     const { title, icon } = snap.data();
                     if (title) setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
                     if (icon) {
@@ -102,14 +101,8 @@ export default function PageRenderer() {
         );
     }
 
-    //wheel?.
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
-     //'https://media.discordapp.net/attachments/392980753228496896/824268317949952000/unknown.png?width=112&height=113');
-    /*  <img src={'https://media.discordapp.net/attachments/392980753228496896/825683468503089202/unknown.png'} alt='Anime Abuse Wheel' />
-        <img src={'https://media.discordapp.net/attachments/392980753228496896/825679987248070665/unknown.png'} alt='Jogg Wheel' />
-        <img src={'https://media.discordapp.net/attachments/392980753228496896/825685542535823409/unknown.png'} alt='We Wheel' />
-    */
     return (
         <div className='page-wrapper'>
             <aside className={showAside ? '' : 'hidden'}>
@@ -128,6 +121,7 @@ export default function PageRenderer() {
                                 <span className='icon-title'>{iconTitle(wheelTitles[wheelId])}</span>}
                         </div>
                     ))}
+                    <div className='wheel-button add-new' onClick={() => setWheelName('Select wheel')}><span className='icon-title'>+</span></div>
                 </div>
             </aside>
             <div className='main-content'>
