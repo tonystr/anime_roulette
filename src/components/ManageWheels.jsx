@@ -89,7 +89,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[] }) {
 
     return (
         <div className='no-wheels page-form'>
-            <h2>{noWheels ? 'You don\'t have access to any wheels' : 'Select a wheel from the top-left menu, or'}</h2>
+            <h2>{noWheels ? 'You don\'t have access to any wheels' : 'Select a wheel from the side-menu, or'}</h2>
             <div>
                 <label htmlFor='request-access'>Request access:</label>
                 <input

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
 import { BrowserRouter, Route, NavLink, Redirect } from 'react-router-dom';
 import RegisterUser from './RegisterUser';
@@ -9,78 +9,39 @@ import ManageWheel from './ManageWheel';
 import SignIn from './SignIn';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 
-
-/*
-    const renderPage = () => {
-        if (!user) return <SignIn />;
-        if (!userData) return <RegisterUser userUid={user.uid} />
-        if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) {
-
-            return (
-                <ManageWheels uid={user.uid} noWheels={wheels.length < 1} userWheels={wheels} selectWheelName={name => {
-                    setWheelName(() => name);
-                    firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
-                }} />
-            );
-        }
-        if (manageWheel && user?.uid) {
-            if (wheel?.owner !== user.uid) {
-                setManageWheel(() => false);
-            } else {
-                return (
-                    <ManageWheel
-                        escape={() => setManageWheel(() => false)}
-                        userUid={user.uid}
-                        wheelId={wheelName}
-                        wheel={wheel}
-                        resetWheelName={() => setWheelName(noWheelName)}
-                        users={users}
-                        iconUrl={iconUrl}
-                        setIconUrl={setIconUrl}
-                    />
-                );
-            }
-        }
-        return (
-            <WheelPage
-                userUid={user.uid}
-                users={users}
-            />
-        );
-    }
-*/
-
 export default function PageRenderer() {
-    const noWheelName = 'Select wheel';
     const [user, userLoading] = useAuthState(auth);
 
     const [wheelTitles, setWheelTitles] = useState({});
     const [wheelIcons, setWheelIcons] = useState({});
 
-    const [manageWheel, setManageWheel] = useState(false);
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
-    const wheels = userData?.wheels || [];
+    const wheels = useMemo(() => userData?.wheels || [], [userData]);
 
     // Load wheel titles and icons
     useEffect(() => {
         for (const wheelId of wheels) {
             if (!wheelTitles[wheelId] || !wheelIcons[wheelId]) {
+                // Prevent duplicate requests by setting the props to a truthy value;
+                if (!wheelTitles[wheelId]) wheelTitles[wheelId] = 'Loading...';
+                if (!wheelIcons[ wheelId]) wheelIcons[ wheelId] = 'Loading...';
+
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) return;
                     const { title, icon } = snap.data();
-                    if (title) setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
-                    if (icon) setWheelIcons(prev => ({ ...prev, [wheelId]: icon }));
+                    setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
+                    setWheelIcons( prev => ({ ...prev, [wheelId]: icon  }));
                 });
             }
         }
-    }, [wheels.length]);
+    }, [wheels.length, wheelIcons, wheelTitles, wheels]);
 
-    const passWheelId = func => (({ location }) => func(location.pathname.match(/[^\/]*$/)[0]));
+    const passWheelId = func => (({ location }) => func(location.pathname.match(/[^/]*$/)[0]));
 
     return (
         <BrowserRouter>
             <div className='page-wrapper'>
-                <Route path='/' render={user && passWheelId(selectedWheelId => (
+                <Route path='/' render={user && userData && passWheelId(selectedWheelId => (
                     <Aside
                         wheels={wheels}
                         wheelIcons={wheelIcons}
@@ -97,9 +58,12 @@ export default function PageRenderer() {
                         />
                     ))} />
                     <main>
-                        <Route path='/' render={() => !user && !userLoading ? <Redirect to='/sign_in' /> : null} />
+                        <Route path='/' render={() => !user && !userLoading && <Redirect to='/sign_in' />} />
                         <Route path='/sign_in' render={() => !user || userDataLoading ? <SignIn /> : <Redirect to={`/wheels/${wheels[0]}`} />} />
-                        <Route path='/select_wheel' render={() => user && userData ? (
+                        <Route path='/' render={() => user && !userData && !userDataLoading && <Redirect to='/register' />} />
+                        <Route path='/register' render={() => <RegisterUser userUid={user?.uid} userIsRegistered={!!userData} />} />
+
+                        <Route path='/select_wheel' render={() => user && userData && (
                             <ManageWheels
                                 uid={user.uid}
                                 userWheels={wheels}
@@ -108,13 +72,12 @@ export default function PageRenderer() {
                                     firestore.doc(`users/${user.uid}`).update({ wheels: [...wheels, name] });
                                 }}
                             />
-                        ) : <Redirect to='/' />} />
+                        )} />
                         <Route exact path='/wheels/:wheelId' render={() => user && (
                             <WheelPage userUid={user.uid} />
                         )} />
                         <Route path='/wheels/:wheelId/settings' render={() => user && (
                             <ManageWheel
-                                escape={() => null /* redirect */}
                                 userUid={user.uid}
                                 resetWheelName={() => /* ?? setWheelName(noWheelName) */null}
                             />
@@ -178,7 +141,7 @@ function Header({ user, selectedWheelId, wheelTitle }) {
                         )***}
                     </div>
                 )*/}
-                <AccessRequests wheelName={selectedWheelId} userUid={user?.uid} />
+                {selectedWheelId && user && <AccessRequests wheelName={selectedWheelId} userUid={user?.uid} />}
             </div>
             <h1>{websiteTitle}</h1>
             <div className="export-import">
@@ -186,10 +149,6 @@ function Header({ user, selectedWheelId, wheelTitle }) {
             </div>
         </header>
     )
-}
-
-function Loading() {
-    return <div className='loading'>Loading...</div>;
 }
 
 function SignOut({ className='', ...props }) {

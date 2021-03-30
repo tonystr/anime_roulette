@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import firestore from '../firestore';
 
-export default function RegisterUser({ userUid }) {
+export default function RegisterUser({ userUid, userIsRegistered }) {
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
 
@@ -35,6 +36,7 @@ export default function RegisterUser({ userUid }) {
 
     return (
         <div className='register-user page-form'>
+            {userIsRegistered && <Redirect to='/select_wheel' />}
             <h2>Welcome to anime roulette! Please register a username</h2>
             <div>
                 <label htmlFor='register-username'>Username:</label>
