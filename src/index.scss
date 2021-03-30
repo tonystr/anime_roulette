@@ -83,6 +83,7 @@ aside {
         color: #e3e3c3;
         box-shadow: -68px 0 0 2px #8ea091,
                     0 0px 0px #000;
+        border: none;
         text-align: center;
         vertical-align: middle;
 
@@ -90,6 +91,35 @@ aside {
         border-radius: 50%;
         cursor: pointer;
         user-select: none;
+
+        &:hover .settings-button {
+            opacity: 1;
+        }
+
+        .settings-button {
+            transition: opacity .1s;
+            background: none;
+            position: absolute;
+            z-index: 20;
+            border: none;
+            top: 0;
+            right: 0;
+            margin: 0;
+            padding: 3px;
+            background-color: #515262;
+            opacity: 0;
+            fill: #e3e3c3;
+            border-bottom-left-radius: 8px;
+
+            &:hover {
+                background-color: #8ea091;
+                fill: #fff;
+            }
+
+            svg {
+                width: 18px;
+            }
+        }
 
         &.add-new {
             background-color: #3a3b3f;
@@ -125,7 +155,7 @@ aside {
 
             &.selected {
                 box-shadow: -58px 0 0 2px #8ea091,
-                            0 1px 8px #000;
+                            0 0px 0px #000;
             }
         }
 
