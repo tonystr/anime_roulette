@@ -61,57 +61,30 @@ export default function PageRenderer() {
     const [manageWheel, setManageWheel] = useState(false);
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = userData?.wheels || [];
-    const [users, setUsers] = useState(() => []);
-    const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelName));
-    const [iconUrl, setIconUrl] = useState(null);
 
     // Load wheel titles and icons
     useEffect(() => {
         for (const wheelId of wheels) {
-            const isSelectedWheel = wheelId === wheelName;
-            if (!wheelTitles[wheelId] || !wheelIcons[wheelId] || (isSelectedWheel && wheelIcons[wheelId] !== iconUrl)) {
+            if (!wheelTitles[wheelId] || !wheelIcons[wheelId]) {
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) return;
                     const { title, icon } = snap.data();
                     if (title) setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
-                    if (icon) {
-                        setWheelIcons(prev => ({ ...prev, [wheelId]: icon }));
-                        if (isSelectedWheel) {
-                            setIconUrl(() => icon);
-                        }
-                    }
+                    if (icon) setWheelIcons(prev => ({ ...prev, [wheelId]: icon }));
                 });
             }
         }
-    }, [wheels.length, iconUrl]);
-
-    useEffect(() => {
-        if (!wheel?.users) return;
-        setUsers(() => wheel.users.map(uuid => ({ name: 'User', uuid })));
-        for (const uuid of wheel.users) {
-            firestore.collection('users').doc(uuid).get().then(docSnap => {
-                const userDoc = docSnap.data();
-                const name = userDoc.name;
-                setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
-            })
-        }
-    }, [wheel?.users]);
-
-    useEffect(() => {
-        localStorage.setItem('wheel-name', wheelName);
-        setIconUrl(() => wheelIcons[wheelName]);
-    }, [wheelName]);
-
+    }, [wheels.length]);
 
     return (
         <BrowserRouter>
             <div className='page-wrapper'>
-                {user && <Aside
+                <Route path='/' render={({ location }) => user && <Aside
                     wheels={wheels}
                     wheelIcons={wheelIcons}
                     wheelTitles={wheelTitles}
-                    wheelName={wheelName}
-                />}
+                    pathname={location.pathname}
+                />} />
                 <div className='main-content'>
                     <Header
                         user={user}
@@ -127,14 +100,13 @@ export default function PageRenderer() {
                                 userWheels={wheels}
                                 selectWheelName={name => {
                                     setWheelName(() => name);
-                                    firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
+                                    firestore.doc(`users/${user.uid}`).update({ wheels: [...wheels, name] });
                                 }}
                             />
                         ) : <Redirect to='/' />} />
                         <Route path='/wheels/:wheelId' render={() => user ? (
                             <WheelPage
                                 userUid={user.uid}
-                                users={users}
                             />
                         ) : null} />
                     </main>
@@ -144,8 +116,9 @@ export default function PageRenderer() {
     );
 };
 
-function Aside({ wheels, wheelIcons, wheelTitles, wheelName }) {
+function Aside({ wheels, wheelIcons, wheelTitles, pathname }) {
     const [showAside, setShowAside] = useState(true);
+    const selectedWheelId = pathname.match(/[^\/]*$/)[0];
 
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
@@ -156,10 +129,9 @@ function Aside({ wheels, wheelIcons, wheelTitles, wheelName }) {
             </div>
             <div className='content'>
                 {wheels.map(wheelId => (
-                    <NavLink to={`/wheels/${wheelId}`}>
+                    <NavLink key={wheelId} to={`/wheels/${wheelId}`}>
                         <div
-                            key={wheelId}
-                            className={`wheel-button ${wheelId === wheelName ? 'selected' : ''}`}
+                            className={`wheel-button ${wheelId === selectedWheelId ? 'selected' : ''}`}
                             onClick={null/*() => setWheelName(wheelId)*/}
                         >
                             {wheelIcons[wheelId] ?

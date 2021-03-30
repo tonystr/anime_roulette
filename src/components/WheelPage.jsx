@@ -1,12 +1,26 @@
-import React from 'react';
-import firestore, { useCollectionData } from '../firestore';
+import React, { useState, useEffect } from 'react';
+import firestore, { useCollectionData, useDocumentData } from '../firestore';
 import Wheel   from './Wheel';
 import Shows   from './Shows';
 import History from './History';
 import { useParams } from 'react-router-dom';
 
-export default function WheelPage({ users, userUid }) {
+export default function WheelPage({ userUid }) {
+    const [users, setUsers] = useState(() => []);
     const { wheelId } = useParams();
+    const [wheel, wheelLoading] = useDocumentData(firestore.collection('wheels').doc(wheelId));
+
+    useEffect(() => {
+        if (!wheel?.users) return;
+        setUsers(() => wheel.users.map(uuid => ({ name: 'User', uuid })));
+        for (const uuid of wheel.users) {
+            firestore.collection('users').doc(uuid).get().then(docSnap => {
+                const userDoc = docSnap.data();
+                const name = userDoc.name;
+                setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
+            })
+        }
+    }, [wheel?.users]);
 
     const wheelRef = firestore.doc(`wheels/${wheelId}`);
     const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
