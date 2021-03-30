@@ -5,11 +5,10 @@ import Shows   from './Shows';
 import History from './History';
 import { useParams } from 'react-router-dom';
 
-export default function WheelPage({ users, setWheelName, userUid }) {
+export default function WheelPage({ users, userUid }) {
     const { wheelId } = useParams();
-    const wheelName = wheelId;
 
-    const wheelRef = firestore.collection('wheels').doc(wheelName);
+    const wheelRef = firestore.doc(`wheels/${wheelId}`);
     const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
     const historyQuery = wheelRef.collection('history').orderBy('date');
 
@@ -60,8 +59,8 @@ export default function WheelPage({ users, setWheelName, userUid }) {
 
     return (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelName} userUid={userUid} />
-            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelName} />
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} />
+            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelId} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} deleteShow={deleteHistoryShow} />
         </main>
     );

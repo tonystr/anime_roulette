@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
-import { BrowserRouter, Route, Link, NavLink, Redirect } from 'react-router-dom';
+import { BrowserRouter, Route, Link, NavLink, Redirect, DefaultRoute } from 'react-router-dom';
 import RegisterUser from './RegisterUser';
 import ManageWheels from './ManageWheels';
 import AccessRequests from './AccessRequests';
@@ -8,6 +8,47 @@ import WheelPage from './WheelPage';
 import ManageWheel from './ManageWheel';
 import SignIn from './SignIn';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
+
+
+/*
+    const renderPage = () => {
+        if (!user) return <SignIn />;
+        if (!userData) return <RegisterUser userUid={user.uid} />
+        if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) {
+
+            return (
+                <ManageWheels uid={user.uid} noWheels={wheels.length < 1} userWheels={wheels} selectWheelName={name => {
+                    setWheelName(() => name);
+                    firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
+                }} />
+            );
+        }
+        if (manageWheel && user?.uid) {
+            if (wheel?.owner !== user.uid) {
+                setManageWheel(() => false);
+            } else {
+                return (
+                    <ManageWheel
+                        escape={() => setManageWheel(() => false)}
+                        userUid={user.uid}
+                        wheelId={wheelName}
+                        wheel={wheel}
+                        resetWheelName={() => setWheelName(noWheelName)}
+                        users={users}
+                        iconUrl={iconUrl}
+                        setIconUrl={setIconUrl}
+                    />
+                );
+            }
+        }
+        return (
+            <WheelPage
+                userUid={user.uid}
+                users={users}
+            />
+        );
+    }
+*/
 
 export default function PageRenderer() {
     const noWheelName = 'Select wheel';
@@ -61,53 +102,16 @@ export default function PageRenderer() {
         setIconUrl(() => wheelIcons[wheelName]);
     }, [wheelName]);
 
-    const renderPage = () => {
-        if (!user) return <SignIn />;
-        if (!userData) return <RegisterUser userUid={user.uid} />
-        if (wheels.length < 1 || !wheel || !wheel?.users?.includes(user.uid)) {
-            return (
-                <ManageWheels uid={user.uid} noWheels={wheels.length < 1} userWheels={wheels} selectWheelName={name => {
-                    setWheelName(() => name);
-                    firestore.collection('users').doc(user.uid).update({ wheels: [...wheels, name] });
-                }} />
-            );
-        }
-        if (manageWheel && user?.uid) {
-            if (wheel?.owner !== user.uid) {
-                setManageWheel(() => false);
-            } else {
-                return (
-                    <ManageWheel
-                        escape={() => setManageWheel(() => false)}
-                        userUid={user.uid}
-                        wheelId={wheelName}
-                        wheel={wheel}
-                        resetWheelName={() => setWheelName(noWheelName)}
-                        users={users}
-                        iconUrl={iconUrl}
-                        setIconUrl={setIconUrl}
-                    />
-                );
-            }
-        }
-        return (
-            <WheelPage
-                wheelName={wheelName}
-                userUid={user.uid}
-                users={users}
-            />
-        );
-    }
 
     return (
         <BrowserRouter>
             <div className='page-wrapper'>
-                <Aside
+                {user && <Aside
                     wheels={wheels}
                     wheelIcons={wheelIcons}
                     wheelTitles={wheelTitles}
                     wheelName={wheelName}
-                />
+                />}
                 <div className='main-content'>
                     <Header
                         user={user}
@@ -115,6 +119,8 @@ export default function PageRenderer() {
                         wheelTitle={wheelTitles[wheelName] || wheelName}
                     />
                     <main>
+                        <Route path='/' render={() => !user && !userLoading ? <Redirect to='/sign_in' /> : null} />
+                        <Route path='/sign_in' render={() => !user || userDataLoading ? <SignIn /> : <Redirect to={`/wheels/${wheels[0]}`} />} />
                         <Route path='/select_wheel' render={() => user && userData ? (
                             <ManageWheels
                                 uid={user.uid}
@@ -125,12 +131,12 @@ export default function PageRenderer() {
                                 }}
                             />
                         ) : <Redirect to='/' />} />
-                        <Route path='/wheels/:wheelId' render={() => (
+                        <Route path='/wheels/:wheelId' render={() => user ? (
                             <WheelPage
                                 userUid={user.uid}
                                 users={users}
                             />
-                        )} />
+                        ) : null} />
                     </main>
                 </div>
             </div>
