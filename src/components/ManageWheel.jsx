@@ -5,12 +5,12 @@ import confirmAction from '../scripts/confirmAction';
 
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function ManageWheel({ userUid, resetWheelName }) {
+export default function ManageWheel({ userUid, redirect }) {
     const [users, setUsers] = useState(() => []);
     const [iconUrl, setIconUrl] = useState('');
     const iconUrlLoaded = useRef(false);
     const { wheelId } = useParams();
-    const [wheel] /* , wheelLoading */ = useDocumentData(firestore.doc(`wheels/${wheelId}`));
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const iconTitle = (wheel?.title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
     useEffect(() => {
@@ -41,16 +41,14 @@ export default function ManageWheel({ userUid, resetWheelName }) {
     const deleteWheel = () => confirmAction(`Are you sure you want to delete ${wheelId}?`).then(confirmed => {
         if (!confirmed) return;
 
-        firestore.collection('wheels').doc(wheelId).update({
-            deleted: true
-        });
+        firestore.doc(`wheels/${wheelId}`).update({ deleted: true });
 
-        const userRef = firestore.collection('users').doc(userUid);
+        const userRef = firestore.doc(`users/${userUid}`);
         userRef.get().then(snap => {
             userRef.update({
                 wheels: snap.data().wheels.filter(wheel => wheel !== wheelId)
             });
-            resetWheelName();
+            redirect('/select_wheel');
         });
     });
 

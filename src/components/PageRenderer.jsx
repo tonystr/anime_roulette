@@ -63,12 +63,12 @@ export default function PageRenderer() {
                         <Route path='/' render={() => user && !userData && !userDataLoading && <Redirect to='/register' />} />
                         <Route path='/register' render={() => <RegisterUser userUid={user?.uid} userIsRegistered={!!userData} />} />
 
-                        <Route path='/select_wheel' render={() => user && userData && (
+                        <Route path='/select_wheel' render={({ history }) => user && userData && (
                             <ManageWheels
                                 uid={user.uid}
                                 userWheels={wheels}
                                 selectWheelName={name => {
-                                    // setWheelName(() => name);
+                                    history.push(`/wheels/${name}`);
                                     firestore.doc(`users/${user.uid}`).update({ wheels: [...wheels, name] });
                                 }}
                             />
@@ -76,10 +76,10 @@ export default function PageRenderer() {
                         <Route exact path='/wheels/:wheelId' render={() => user && (
                             <WheelPage userUid={user.uid} />
                         )} />
-                        <Route path='/wheels/:wheelId/settings' render={() => user && (
+                        <Route path='/wheels/:wheelId/settings' render={({ history }) => user && (
                             <ManageWheel
                                 userUid={user.uid}
-                                resetWheelName={() => /* ?? setWheelName(noWheelName) */null}
+                                redirect={history.push}
                             />
                         )} />
                     </main>
