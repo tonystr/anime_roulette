@@ -11,10 +11,8 @@ import WheelSettings from './WheelSettings';
 
 export default function PageRenderer() {
     const [user, userLoading] = useAuthState(auth);
-
     const [wheelTitles, setWheelTitles] = useState({});
     const [wheelIcons, setWheelIcons] = useState({});
-
     const [userData, userDataLoading] = useDocumentData(firestore.collection('users').doc(user?.uid || 'UNDEFINED'));
     const wheels = useMemo(() => userData?.wheels || [], [userData]);
 
@@ -47,6 +45,7 @@ export default function PageRenderer() {
                         wheelIcons={wheelIcons}
                         wheelTitles={wheelTitles}
                         selectedWheelId={selectedWheelId}
+                        userUid={user?.uid}
                     />
                 ))} />
                 <div className='main-content'>
@@ -62,6 +61,7 @@ export default function PageRenderer() {
                         <Route path='/sign_in' render={() => !user || userDataLoading ? <SignIn /> : <Redirect to={`/wheels/${wheels[0]}`} />} />
                         <Route path='/' render={() => user && !userData && !userDataLoading && <Redirect to='/register' />} />
                         <Route path='/register' render={() => <RegisterUser userUid={user?.uid} userIsRegistered={!!userData} />} />
+                        <Redirect from='/' exact to={wheels[0] ? `/wheels/${wheels[0]}` : '/select_wheel'} />
 
                         <Route path='/select_wheel' render={({ history }) => user && userData && (
                             <ManageWheels

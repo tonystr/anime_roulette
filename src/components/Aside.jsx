@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 import { ReactComponent as SettingsIcon } from '../icons/settings.svg';
 import { NavLink, Link } from 'react-router-dom';
+import firestore, { useDocumentData } from '../firestore';
 
-function WheelButton({ wheelId, wheelIcon, wheelTitle, selected }) {
+function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }) {
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
     return (
@@ -11,7 +12,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected }) {
             {wheelIcon && wheelIcon !== 'Loading...' ?
                 <img src={wheelIcon} alt={iconTitle(wheelTitle)} /> :
                 <span className='icon-title'>{iconTitle(wheelTitle)}</span>}
-            {selected && (
+            {selected && isOwner && (
                 <Link to={`/wheels/${wheelId}/settings`}>
                     <span className='settings-button'><SettingsIcon /></span>
                 </Link>
@@ -20,8 +21,9 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected }) {
     );
 }
 
-export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId }) {
+export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid }) {
     const [showAside, setShowAside] = useState(true);
+    const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId}`));
 
     return (
         <aside className={showAside ? '' : 'hidden'}>
@@ -36,6 +38,7 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                         wheelIcon={wheelIcons[wheelId]}
                         wheelTitle={wheelTitles[wheelId]}
                         selected={wheelId === selectedWheelId}
+                        isOwner={userUid && wheel?.owner === userUid}
                     />
                 ) : (
                     <NavLink key={wheelId} to={`/wheels/${wheelId}`}>
