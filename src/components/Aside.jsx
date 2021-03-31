@@ -8,7 +8,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected }) {
 
     return (
         <button className={`wheel-button ${selected ? 'selected' : ''}`}>
-            {wheelIcon ?
+            {wheelIcon && wheelIcon !== 'Loading...' ?
                 <img src={wheelIcon} alt={iconTitle(wheelTitle)} /> :
                 <span className='icon-title'>{iconTitle(wheelTitle)}</span>}
             {selected && (
@@ -22,7 +22,6 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected }) {
 
 export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId }) {
     const [showAside, setShowAside] = useState(true);
-
 
     return (
         <aside className={showAside ? '' : 'hidden'}>

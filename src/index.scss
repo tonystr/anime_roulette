@@ -201,7 +201,9 @@ aside {
     min-height: 100vh;
 
     .main-content {
+        min-width: 10px;
         width: 100%;
+        flex-shrink: 100;
     }
 }
 
@@ -891,6 +893,7 @@ header h1 {
 #home .history {
     text-align: right;
     position: relative;
+    margin-left: 1rem;
 
     > * {
         padding-right: 1rem;
