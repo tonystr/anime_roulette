@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
+import Aside from './Aside';
+import Header from './Header';
+import SignIn from './SignIn';
 import RegisterUser from './RegisterUser';
 import ManageWheels from './ManageWheels';
-import AccessRequests from './AccessRequests';
 import WheelPage from './WheelPage';
-import ManageWheel from './ManageWheel';
-import SignIn from './SignIn';
-import Aside from './Aside';
+import WheelSettings from './WheelSettings';
 
 export default function PageRenderer() {
     const [user, userLoading] = useAuthState(auth);
@@ -77,7 +77,7 @@ export default function PageRenderer() {
                             <WheelPage userUid={user.uid} />
                         )} />
                         <Route path='/wheels/:wheelId/settings' render={({ history }) => user && (
-                            <ManageWheel
+                            <WheelSettings
                                 userUid={user.uid}
                                 redirect={history.push}
                             />
@@ -88,45 +88,3 @@ export default function PageRenderer() {
         </BrowserRouter>
     );
 };
-
-function Header({ user, selectedWheelId, wheelTitle }) {
-    const websiteTitle = true ? 'Anime Roulette' : 'Roulette Wheel';
-
-    return (
-        <header>
-            <div className='wheel-meta'>
-                {/*user && (
-                    <div className='wheel-name'>
-                        <span className='wheel-title'>
-                            {wheelTitle}
-                        </span>
-                        {/*user?.uid && wheel?.owner === user.uid && (
-                            <span className='faded'>
-                                <span className='colorized'>|</span>
-                                <button onClick={null/*() => setManageWheel(prev => !prev)***} className='clickable-faded manage-wheel'>
-                                    manage
-                                </button>
-                            </span>
-                        )***}
-                    </div>
-                )*/}
-                {selectedWheelId && user && <AccessRequests wheelName={selectedWheelId} userUid={user?.uid} />}
-            </div>
-            <h1>{websiteTitle}</h1>
-            <div className="export-import">
-                <SignOut />
-            </div>
-        </header>
-    )
-}
-
-function SignOut({ className='', ...props }) {
-    return auth.currentUser ? (
-        <button {...props}
-            className={'clickable-faded ' + className}
-            onClick={() => auth.signOut()}
-        >
-            Sign out
-        </button>
-    ) : null;
-}

@@ -454,32 +454,6 @@ header {
         width: 33.3334%;
     }
 
-    .wheel-meta {
-        .select {
-            position: relative;
-        }
-
-        .faded {
-            margin-left: 1rem;
-            opacity: 0;
-            transition: .14s opacity;
-
-            .colorized {
-                color: #3a3a36;
-            }
-        }
-
-        .manage-wheel {
-            transition: all .14s;
-            margin-left: 1rem;
-            padding: 0;
-        }
-
-        &:hover .faded {
-            opacity: 1;
-        }
-    }
-
     .wheel-name {
         margin: 1rem 2rem;
         position: relative;
@@ -1185,7 +1159,7 @@ header h1 {
     }
 }
 
-#manage-wheel {
+#wheel-settings {
     display: flex;
     flex-direction: column;
     align-items: center;

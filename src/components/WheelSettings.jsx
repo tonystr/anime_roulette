@@ -5,7 +5,7 @@ import confirmAction from '../scripts/confirmAction';
 
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function ManageWheel({ userUid, redirect }) {
+export default function WheelSettings({ userUid, redirect }) {
     const [users, setUsers] = useState(() => []);
     const [iconUrl, setIconUrl] = useState('');
     const iconUrlLoaded = useRef(false);
@@ -69,7 +69,7 @@ export default function ManageWheel({ userUid, redirect }) {
     }
 
     return (
-        <div id='manage-wheel'>
+        <div id='wheel-settings'>
             <h2>Manage wheel <span className='wheel-title'>{wheel?.title}</span></h2>
             <div className='manage-icon'>
                 <div className='wheel-icon'>
