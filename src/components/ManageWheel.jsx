@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import firestore, { useDocumentData } from '../firestore';
 import confirmAction from '../scripts/confirmAction';
 
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export default function ManageWheel({ userUid, resetWheelName, iconUrl, setIconUrl }) {
+export default function ManageWheel({ userUid, resetWheelName }) {
     const [users, setUsers] = useState(() => []);
+    const [iconUrl, setIconUrl] = useState('');
+    const iconUrlLoaded = useRef(false);
     const { wheelId } = useParams();
     const [wheel] /* , wheelLoading */ = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const iconTitle = (wheel?.title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
+
+    useEffect(() => {
+        if (!iconUrl && wheel?.icon && !iconUrlLoaded.current) {
+            setIconUrl(() => wheel?.icon);
+            iconUrlLoaded.current = true;
+        }
+    }, [wheel?.icon, iconUrl]);
 
     useEffect(() => {
         if (!wheel?.users) return;

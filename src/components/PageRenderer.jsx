@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import firestore, { auth, useDocumentData, useAuthState } from '../firestore';
-import { BrowserRouter, Route, NavLink, Link, Redirect } from 'react-router-dom';
+import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import RegisterUser from './RegisterUser';
 import ManageWheels from './ManageWheels';
 import AccessRequests from './AccessRequests';
 import WheelPage from './WheelPage';
 import ManageWheel from './ManageWheel';
 import SignIn from './SignIn';
-import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
-import { ReactComponent as SettingsIcon } from '../icons/settings.svg';
+import Aside from './Aside';
 
 export default function PageRenderer() {
     const [user, userLoading] = useAuthState(auth);
@@ -89,39 +88,6 @@ export default function PageRenderer() {
         </BrowserRouter>
     );
 };
-
-function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId }) {
-    const [showAside, setShowAside] = useState(true);
-
-    const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
-
-    return (
-        <aside className={showAside ? '' : 'hidden'}>
-            <div className='hamburger'>
-                <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
-            </div>
-            <div className='content'>
-                {wheels.map(wheelId => (
-                    <NavLink key={wheelId} to={`/wheels/${wheelId}`}>
-                        <button className={`wheel-button ${wheelId === selectedWheelId ? 'selected' : ''}`}>
-                            {wheelIcons[wheelId] ?
-                                <img src={wheelIcons[wheelId]} alt={iconTitle(wheelTitles[wheelId])} /> :
-                                <span className='icon-title'>{iconTitle(wheelTitles[wheelId])}</span>}
-                            {wheelId === selectedWheelId && (
-                                <Link to={`/wheels/${wheelId}/settings`}>
-                                    <span className='settings-button'><SettingsIcon /></span>
-                                </Link>
-                            )}
-                        </button>
-                    </NavLink>
-                ))}
-                <NavLink to='/select_wheel'>
-                    <button className='wheel-button add-new'><span className='icon-title'>+</span></button>
-                </NavLink>
-            </div>
-        </aside>
-    );
-}
 
 function Header({ user, selectedWheelId, wheelTitle }) {
     const websiteTitle = true ? 'Anime Roulette' : 'Roulette Wheel';
