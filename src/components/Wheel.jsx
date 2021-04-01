@@ -7,7 +7,7 @@ import firestore from '../firestore';
 const imageCache = {};
 const imageLoading = {};
 
-export default function Wheel({ shows, removeShow, wheelName, users, updateShowProp, colors, addHistory, ...props }) {
+export default function Wheel({ shows, removeShow, wheelId, users, updateShowProp, colors, addHistory, userCanEdit, ...props }) {
     const canvasRef = useRef(null);
     const [size, setSize] = useState(960);
     const [arrowColor, setArrowColor] = useState('#262628');
@@ -17,7 +17,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
     const [rotate, setRotateLocal] = useState(null);
     const [imagesLoaded, setImagesLoaded] = useState(0);
 
-    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const rotateServer = wheel ? wheel.rotate || null : rotate;
 
     useEffect(() => {
@@ -48,12 +48,12 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
 
     const setRotate = useCallback(
         newRotate => {
-            firestore.doc(`wheels/${wheelName}`).update({
+            firestore.doc(`wheels/${wheelId}`).update({
                 rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
             });
             setRotateLocal(newRotate);
         },
-        [rotate, wheelName]
+        [rotate, wheelId]
     );
 
     // Draw wheel
@@ -142,12 +142,12 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
     }
 
     return (
-        <div {...props} id='wheel-width'>
+        <div {...props} id='wheel-width' className={userCanEdit ? 'user-edit' : 'user-no-edit'}>
             <div className='wheel-box'>
                 <div className={'arrow' + (winner ? ' has-winner' : '')}>
                     <div className={'line' + (arrowHover ? ' arrow-hover' : '')} />
                     <ArrowDown
-                        onClick={() => winner && setShowWinner(() => true)}
+                        onClick={() => winner && userCanEdit && setShowWinner(() => true)}
                         onMouseEnter={() => setArrowHover(() => true)}
                         onMouseLeave={() => setArrowHover(() => false)}
                         style={{ fill: arrowColor }}
@@ -156,7 +156,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
                 <canvas
                     id='wheel'
                     className={!shows || shows.length === 0 ? 'empty' : 'populated'}
-                    onClick={() => setRotate(prev => {
+                    onClick={() => userCanEdit && setRotate(prev => {
                         if (prev && rotate.spinning) return prev;
 
                         const date = new Date();
@@ -176,7 +176,7 @@ export default function Wheel({ shows, removeShow, wheelName, users, updateShowP
                 />
             </div>
             <ShowInpsectorModal
-                isOpen={showWinner}
+                isOpen={showWinner && userCanEdit}
                 onRequestClose={() => setShowWinner(() => false)}
                 updateShowProp={updateInspectingShowProp}
                 show={rotate && winner}

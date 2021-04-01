@@ -14,7 +14,7 @@ function SignOut({ className='', ...props }) {
 }
 
 export default function Header({ user, selectedWheelId, wheelTitle }) {
-    const websiteTitle = true ? 'Anime Roulette' : 'Roulette Wheel';
+    const websiteTitle = false ? 'Anime Roulette' : 'Roulette Wheel';
 
     return (
         <header>

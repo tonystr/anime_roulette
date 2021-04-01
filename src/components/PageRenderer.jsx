@@ -36,6 +36,8 @@ export default function PageRenderer() {
 
     const passWheelId = func => (({ location }) => func(location.pathname.match(/[^/]*$/)[0]));
 
+    // <Redirect exact from='/' to={wheels[0] ? `/wheels/${wheels[0]}` : '/select_wheel'} />
+
     return (
         <BrowserRouter>
             <div className='page-wrapper'>
@@ -61,7 +63,6 @@ export default function PageRenderer() {
                         <Route path='/sign_in' render={() => !user || userDataLoading ? <SignIn /> : <Redirect to={`/wheels/${wheels[0]}`} />} />
                         <Route path='/' render={() => user && !userData && !userDataLoading && <Redirect to='/register' />} />
                         <Route path='/register' render={() => <RegisterUser userUid={user?.uid} userIsRegistered={!!userData} />} />
-                        <Redirect from='/' exact to={wheels[0] ? `/wheels/${wheels[0]}` : '/select_wheel'} />
 
                         <Route path='/select_wheel' render={({ history }) => user && userData && (
                             <ManageWheels

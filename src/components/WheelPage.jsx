@@ -8,7 +8,8 @@ import { useParams } from 'react-router-dom';
 export default function WheelPage({ userUid }) {
     const [users, setUsers] = useState(() => []);
     const { wheelId } = useParams();
-    const [wheel] /* , wheelLoading */ = useDocumentData(firestore.doc(`wheels/${wheelId}`));
+    const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
+    const userCanEdit = wheel?.users?.includes(userUid);
 
     useEffect(() => {
         if (!wheel?.users) return;
@@ -73,9 +74,9 @@ export default function WheelPage({ userUid }) {
 
     return (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} />
-            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelId} />
-            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} deleteShow={deleteHistoryShow} />
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} userCanEdit={userCanEdit} />
+            <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelId={wheelId} userCanEdit={userCanEdit} />
+            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} deleteShow={deleteHistoryShow} userCanEdit={userCanEdit} />
         </main>
     );
 };

@@ -3,7 +3,7 @@ import { ReactComponent as UserIcon  } from '../icons/user.svg';
 import ShowInpsectorModal from './ShowInspectorModal';
 import AddNewButton from './AddNewButton';
 
-export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, ...props }) {
+export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, userCanEdit, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
 
@@ -20,40 +20,43 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
                 value={show.name}
                 style={{ borderLeftColor: pickColor(shows.findIndex(s => s === show), colors, shows) }}
                 updateShowProp={updateShowProp}
+                userCanEdit={userCanEdit}
             />
-            <button className='delete' title='Delete Show' onClick={e => removeShow(show.uuid)}>×</button>
-            <button className='clickable-faded edit' title='Edit Show' onClick={() => setInspectingShow(() => show)}>edit</button>
-            <ShowInpsectorModal
-                isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
-                onRequestClose={() => setInspectingShow(null)}
-                show={inspectingShow}
-                updateShowProp={updateInspectingShowProp}
-                users={users}
-                beginWatching={inspectingShow ? () => {
-                    addHistory({ ...inspectingShow, date: new Date() });
-                    removeShow(inspectingShow.uuid);
-                    setInspectingShow(null);
-                } : null}
-            />
+            {userCanEdit && <button className='delete' title='Delete Show' onClick={e => removeShow(show.uuid)}>×</button>}
+            {userCanEdit && <button className='clickable-faded edit' title='Edit Show' onClick={() => setInspectingShow(() => show)}>edit</button>}
+            {userCanEdit && (
+                <ShowInpsectorModal
+                    isOpen={!!inspectingShow && inspectingShow.uuid === show.uuid}
+                    onRequestClose={() => setInspectingShow(null)}
+                    show={inspectingShow}
+                    updateShowProp={updateInspectingShowProp}
+                    users={users}
+                    beginWatching={inspectingShow ? () => {
+                        addHistory({ ...inspectingShow, date: new Date() });
+                        removeShow(inspectingShow.uuid);
+                        setInspectingShow(null);
+                    } : null}
+                />
+            )}
         </div>
     );
 
     return (
         <div {...props}>
-            <div className='shows-list'>
+            <div className={'shows-list' + (userCanEdit ? '' : ' no-edit')}>
                 <div className='top-bar'>
                     <h2>Shows</h2>
                     <button className='show-users-button' title='Toggle Usernames' onClick={() => setShowUsers(prev => !prev)}><UserIcon /></button>
                 </div>
                 {showUsers ?
-                    <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} /> :
-                    [shows && shows.map(renderShows), <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} disabled={testLimit(shows)} />]}
+                    <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} userCanEdit={userCanEdit} /> :
+                    [shows && shows.map(renderShows), userCanEdit && <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} disabled={testLimit(shows)} />]}
             </div>
         </div>
     );
 };
 
-function ShowInput({ value, style, show, updateShowProp, ...props }) {
+function ShowInput({ value, style, show, updateShowProp, userCanEdit, ...props }) {
     const [localValue, setLocalValue] = useState(value);
 
     const parseShowTitle = name => {
@@ -77,6 +80,7 @@ function ShowInput({ value, style, show, updateShowProp, ...props }) {
             style={style}
             onBlur={e => updateValue(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && updateValue(e.target.value)}
+            readOnly={userCanEdit ? null : 'readonly'}
             {...props}
         />
     );
@@ -86,14 +90,14 @@ function testLimit(shows) {
     return shows.length >= 24;
 }
 
-function UserShows({ users, shows, renderShows, addShow }) {
+function UserShows({ users, shows, renderShows, addShow, userCanEdit }) {
     return users.map((user, i) => (
         <div className='user-shows' key={user.name}>
             <h3 key={'h3 ' + user.name} className={i === 0 ? 'first-h3' : ''}>{user.name}</h3>
             {shows && shows
                 .filter(show => show.owner === user.uuid)
                 .map(renderShows)}
-            <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} disabled={testLimit(shows)}  />
+            {userCanEdit && <AddNewButton key={'add new button ' + user.name} user={user} addShow={addShow} disabled={testLimit(shows)}  />}
         </div>
     ));
 }
