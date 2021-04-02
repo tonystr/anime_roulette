@@ -3,32 +3,36 @@ import firestore, { useCollectionData, useDocumentData } from '../firestore';
 import Wheel   from './Wheel';
 import Shows   from './Shows';
 import History from './History';
+import NoWheelAccess from './NoWheelAccess';
 import { useParams } from 'react-router-dom';
+
+window.arrays = [];
 
 export default function WheelPage({ userUid }) {
     const [users, setUsers] = useState(() => []);
     const { wheelId } = useParams();
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const userCanEdit = wheel?.users?.includes(userUid);
+    const userCanView = userCanEdit || !wheel?.private;
 
+    const joinedUsers = wheel?.users?.join(',') || '';
     useEffect(() => {
-        if (!wheel?.users) return;
-        setUsers(() => wheel.users.map(uuid => ({ name: 'User', uuid })));
-        for (const uuid of wheel.users) {
+        if (!joinedUsers) return;
+        const wheelUsers = joinedUsers.split(',');
+        setUsers(prev => wheelUsers.map(uuid => ({ name: 'User', uuid })));
+        for (const uuid of wheelUsers) {
             firestore.collection('users').doc(uuid).get().then(docSnap => {
                 const userDoc = docSnap.data();
                 const name = userDoc.name;
                 setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
             })
         }
-    }, [wheel?.users]);
+    }, [joinedUsers]);
 
     const wheelRef = firestore.doc(`wheels/${wheelId}`);
-    const showsQuery   = wheelRef.collection('shows'  ).orderBy('date');
-    const historyQuery = wheelRef.collection('history').orderBy('date');
 
-    const shows   = translateCDDates(useCollectionData(showsQuery));
-    const history = translateCDDates(useCollectionData(historyQuery));
+    const shows   = translateCDDates(useCollectionData(wheelRef.collection(userCanView ? 'shows'   : 'UNDEFINED').orderBy('date')));
+    const history = translateCDDates(useCollectionData(wheelRef.collection(userCanView ? 'history' : 'UNDEFINED').orderBy('date')));
 
     const colors = [
         '#caa05a',
@@ -72,7 +76,9 @@ export default function WheelPage({ userUid }) {
         .then(() => console.log('Document successfully updated!'))
         .catch(err => console.error('Error updating document: ', err));
 
-    return (
+    return !wheelLoading && (!wheel || (wheel.private && !wheel.users.includes(userUid))) ? (
+        <NoWheelAccess wheel={wheel} userUid={userUid} />
+    ) : (
         <main id='home' role='main'>
             <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} userCanEdit={userCanEdit} />
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelId={wheelId} userCanEdit={userCanEdit} />
