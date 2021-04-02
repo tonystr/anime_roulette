@@ -6,6 +6,7 @@ import confirmAction from '../scripts/confirmAction';
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function WheelSettings({ userUid, redirect }) {
+    const [toggle, setToggle] = useState(true);
     const [users, setUsers] = useState(() => []);
     const [iconUrl, setIconUrl] = useState('');
     const iconUrlLoaded = useRef(false);
@@ -90,6 +91,18 @@ export default function WheelSettings({ userUid, redirect }) {
                         placeholder='Insert Icon Url...'
                     />
                 </div>
+            </div>
+            <div className='wheel-visibility'>
+                <div className='top'>
+                    <h3>Wheel visibility</h3>
+                    <button
+                        className={'toggle' + (wheel?.private ? ' off' : ' on')}
+                        onClick={() => updateShowProp('private', !wheel?.private)} 
+                    />
+                </div>
+                {wheel?.private ?? false ?
+                    <p>This wheel is currently set to <b>private</b>. Users need an account to view this wheel, and they must be given access by you. You can see all users with access in the list below. </p> :
+                    <p>This wheel is currently set to <b>public</b>. Anyone can view (but not interract with) the wheel by visiting this link: <Link to={window.location.href}>{window.location.href}</Link></p>}
             </div>
             <ul className='users'>
                 {users.map(user => (
