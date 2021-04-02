@@ -23,7 +23,7 @@ export default function WheelSettings({ userUid, redirect }) {
 
     useEffect(() => {
         if (!wheel?.users) return;
-        setUsers(() => wheel.users.map(uuid => ({ name: 'User', uuid })));
+        setUsers(prev => wheel.users.map(uuid => ({ name: 'User', uuid })));
         for (const uuid of wheel.users) {
             firestore.collection('users').doc(uuid).get().then(docSnap => {
                 const userDoc = docSnap.data();
@@ -31,7 +31,7 @@ export default function WheelSettings({ userUid, redirect }) {
                 setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
             })
         }
-    }, [wheel?.users]);
+    }, [wheel?.users?.length]);
 
     const updateShowProp = (prop, value) => firestore
         .doc(`wheels/${wheelId}`)
@@ -97,7 +97,7 @@ export default function WheelSettings({ userUid, redirect }) {
                     <h3>Wheel visibility</h3>
                     <button
                         className={'toggle' + (wheel?.private ? ' off' : ' on')}
-                        onClick={() => updateShowProp('private', !wheel?.private)} 
+                        onClick={() => updateShowProp('private', !wheel?.private)}
                     />
                 </div>
                 {wheel?.private ?? false ?
