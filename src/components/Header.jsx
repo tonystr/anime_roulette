@@ -4,7 +4,8 @@ import { auth } from '../firestore';
 
 function SignOut({ className='', ...props }) {
     return auth.currentUser ? (
-        <button {...props}
+        <button
+            {...props}
             className={'clickable-faded ' + className}
             onClick={() => auth.signOut()}
         >

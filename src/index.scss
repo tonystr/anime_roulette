@@ -30,6 +30,11 @@ body {
     color: #eeeff2;
 }
 
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #3a3b3f #262628;
+}
+
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
