@@ -57,8 +57,7 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
         [rotate, wheelId]
     );
 
-    // Draw wheel
-    useEffect(() => {
+    const drawWheel = size => {
         if (!canvasRef || !canvasRef.current || (rotate && rotate.spinning) || !shows) return;
 
         // Draw wheel
@@ -74,6 +73,11 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
             const targetIndex = Math.floor((1 - (off % 1)) * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
+    };
+
+    // Draw wheel
+    useEffect(() => {
+        drawWheel(size);
     }, [canvasRef, size, rotate, rotate?.spinning, shows, colors, imagesLoaded]);
 
     // Resize
@@ -84,6 +88,7 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
             const width = obs[0].contentRect.width;
             if (size !== width) {
                 setSize(() => width);
+                drawWheel(width);
             }
         });
 
