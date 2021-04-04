@@ -9,6 +9,7 @@ const imageLoading = {};
 
 export default function Wheel({ shows, removeShow, wheelId, users, updateShowProp, colors, addHistory, userCanEdit, ...props }) {
     const canvasRef = useRef(null);
+    const widthRef = useRef(null);
     const [size, setSize] = useState(960);
     const [arrowColor, setArrowColor] = useState('#262628');
     const [winner, setWinner] = useState(null);
@@ -73,26 +74,24 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
             const targetIndex = Math.floor((1 - (off % 1)) * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
-
     }, [canvasRef, size, rotate, rotate?.spinning, shows, colors, imagesLoaded]);
 
     // Resize
     useEffect(() => {
-        if (!canvasRef) return;
+        if (!widthRef) return;
 
-        const handleResize = e => {
-            if (!canvasRef || !canvasRef.current) return;
-
-            const parentWidth = document.getElementById('wheel-width').getBoundingClientRect().width;
-            if (size !== parentWidth) {
-                setSize(() => parentWidth);
+        const observer = new ResizeObserver(obs => {
+            const width = obs[0].contentRect.width;
+            if (size !== width) {
+                setSize(() => width);
             }
-        }
+        });
 
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, [canvasRef, size]);
+        const observee = widthRef.current;
+        observer.observe(observee);
+
+        return () => observer.unobserve(observee);
+    }, [widthRef, size]);
 
     // Rotation of doom
     useEffect(() => {
@@ -142,7 +141,7 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
     }
 
     return (
-        <div {...props} id='wheel-width' className={userCanEdit ? 'user-edit' : 'user-no-edit'}>
+        <div {...props} id='wheel-width' ref={widthRef} className={userCanEdit ? 'user-edit' : 'user-no-edit'}>
             <div className='wheel-box'>
                 <div className={'arrow' + (winner ? ' has-winner' : '')}>
                     <div className={'line' + (arrowHover ? ' arrow-hover' : '')} />
