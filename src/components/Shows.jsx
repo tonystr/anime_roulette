@@ -3,7 +3,7 @@ import { ReactComponent as UserIcon  } from '../icons/user.svg';
 import ShowInpsectorModal from './ShowInspectorModal';
 import AddNewButton from './AddNewButton';
 
-export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, userCanEdit, ...props }) {
+export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, userCanEdit, children, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
 
@@ -52,6 +52,7 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
                     <UserShows shows={shows} users={users} renderShows={renderShows} addShow={addShow} userCanEdit={userCanEdit} /> :
                     [shows && shows.map(renderShows), userCanEdit && <AddNewButton key={'global add new button'} user={userUid} addShow={addShow} disabled={testLimit(shows)} />]}
             </div>
+            {children}
         </div>
     );
 };

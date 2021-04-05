@@ -10,6 +10,7 @@ window.arrays = [];
 
 export default function WheelPage({ userUid }) {
     const [users, setUsers] = useState(() => []);
+    const [requested, setRequested] = useState(false);
     const { wheelId } = useParams();
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const userCanEdit = wheel?.users?.includes(userUid);
@@ -76,11 +77,36 @@ export default function WheelPage({ userUid }) {
         .then(() => console.log('Document successfully updated!'))
         .catch(err => console.error('Error updating document: ', err));
 
+    const requestAccess = () => {
+        setRequested(() => true);
+
+        if (!wheel) return;
+        const docRef = firestore.doc(`wheels${window.location.pathname.match(/\/[^/]+$/)}`)
+        docRef.get().then(docSnap => {
+            if (!docSnap.exists) {
+                return;
+            }
+
+            const accessRequests = docSnap.data()?.accessRequests || [];
+
+            if (accessRequests.includes(userUid)) {
+                // setError(() => 'You have already requested access to this wheel. Wait for the owner to accept.');
+                return;
+            }
+
+            docRef.update({ accessRequests: [...accessRequests, userUid] });
+        });
+    };
+
     return !wheelLoading && (!wheel || (wheel.private && !wheel.users.includes(userUid))) ? (
         <NoWheelAccess wheel={wheel} userUid={userUid} />
     ) : (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} userCanEdit={userCanEdit} />
+            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} userCanEdit={userCanEdit}>
+                {!userCanEdit && (requested ?
+                    <p className='requested'>You have requested access. Wait for the owner to approve your request.</p> :
+                    <button className='blop request-access' onClick={requestAccess}>Request access</button>)}
+            </Shows>
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelId={wheelId} userCanEdit={userCanEdit} />
             <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} deleteShow={deleteHistoryShow} userCanEdit={userCanEdit} />
         </main>

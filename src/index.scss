@@ -582,6 +582,19 @@ header h1 {
         width: 30%;
     }
 
+    #wheel-width {
+        width: 40%;
+    }
+
+
+    > .shows {
+        > .requested,
+        > .request-access {
+            margin-top: 1rem;
+            margin-left: 1rem;
+        }
+    }
+
     > .center {
         width: 40%;
         max-width: 700px;
