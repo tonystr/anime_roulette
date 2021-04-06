@@ -8,7 +8,7 @@ export default function Shows({ users, shows, removeShow, addHistory, updateShow
     const [inspectingShow, setInspectingShow] = useState(null);
 
     const updateInspectingShowProp = (show, prop, value) => {
-        if (show[prop] === value) return;
+        if (show[prop] === value || !userCanEdit) return;
         updateShowProp(show.uuid, prop, value);
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
@@ -69,6 +69,7 @@ function ShowInput({ value, style, show, updateShowProp, userCanEdit, ...props }
     }
 
     const updateValue = value => {
+        if (!userCanEdit) return;
         updateShowProp(show.uuid, 'name', value.trim());
         updateShowProp(show.uuid, 'title', parseShowTitle(value));
     }
