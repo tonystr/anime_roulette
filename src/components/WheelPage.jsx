@@ -51,11 +51,6 @@ export default function WheelPage({ userUid }) {
         .then(() => console.log('Document successfully deleted!'))
         .catch(err => console.error('Error removing document: ', err));
 
-    const addShow = show => wheelRef.collection('shows')
-        .doc(show.uuid).set(show)
-        .then(() => console.log('Document successfully added!'))
-        .catch(err => console.error('Error adding document: ', err));
-
     const updateShowProp = (uuid, prop, value) => wheelRef.collection('shows')
         .doc(uuid).update({ [prop]: value })
         .then(() => console.log('Document successfully updated!'))
@@ -66,16 +61,6 @@ export default function WheelPage({ userUid }) {
         .doc(show.uuid).set(show)
         .then(() => console.log('Document successfully added!'))
         .catch(err => console.error('Error adding document: ', err));
-
-    const updateHistoryProp = (uuid, prop, value) => wheelRef.collection('history')
-        .doc(uuid).update({ [prop]: value })
-        .then(() => console.log('Document successfully updated!'))
-        .catch(err => console.error('Error updating document: ', err));
-
-    const deleteHistoryShow = uuid => wheelRef.collection('history')
-        .doc(uuid).delete()
-        .then(() => console.log('Document successfully updated!'))
-        .catch(err => console.error('Error updating document: ', err));
 
     const requestAccess = () => {
         setRequested(() => true);
@@ -102,13 +87,13 @@ export default function WheelPage({ userUid }) {
         <NoWheelAccess wheel={wheel} userUid={userUid} />
     ) : (
         <main id='home' role='main'>
-            <Shows   className='left   shows'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} addShow={addShow} wheelName={wheelId} userUid={userUid} userCanEdit={userCanEdit}>
+            <Shows   className='left   shows'   users={users} shows={shows} wheelId={wheelId} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelName={wheelId} userUid={userUid} userCanEdit={userCanEdit}>
                 {!userCanEdit && (requested ?
                     <p className='requested'>You have requested access. Wait for the owner to approve your request.</p> :
                     <button className='blop request-access' onClick={requestAccess}>Request access</button>)}
             </Shows>
             <Wheel   className='center wheel'   users={users} shows={shows} addHistory={addHistory} colors={colors} removeShow={removeShow} updateShowProp={updateShowProp} wheelId={wheelId} userCanEdit={userCanEdit} />
-            <History className='right  history' users={users} shows={shows} history={history} updateHistoryProp={updateHistoryProp} deleteShow={deleteHistoryShow} userCanEdit={userCanEdit} />
+            <History className='right  history' users={users} shows={shows} history={history} wheelId={wheelId} userCanEdit={userCanEdit} />
         </main>
     );
 };

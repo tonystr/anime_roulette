@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { ReactComponent as UserIcon  } from '../icons/user.svg';
 import ShowInpsectorModal from './ShowInspectorModal';
 import AddNewButton from './AddNewButton';
+import firestore from '../firestore';
 
-export default function Shows({ users, shows, removeShow, addHistory, updateShowProp, addShow, colors, wheelName, userUid, userCanEdit, children, ...props }) {
+export default function Shows({ users, shows, wheelId, removeShow, addHistory, updateShowProp, colors, wheelName, userUid, userCanEdit, children, ...props }) {
     const [showUsers, setShowUsers] = useState(false);
     const [inspectingShow, setInspectingShow] = useState(null);
+
+    const addShow = show => firestore.doc(`wheels/${wheelId}/shows/${show.uuid}`).set(show);
 
     const updateInspectingShowProp = (show, prop, value) => {
         if (show[prop] === value || !userCanEdit) return;

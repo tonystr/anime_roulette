@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import ShowInpsectorModal, { monthNames } from './ShowInspectorModal';
+import firestore from '../firestore';
 
-export default function History({ users, shows, history, updateHistoryProp, deleteShow, userCanEdit, ...props }) {
+export default function History({ users, shows, history, wheelId, userCanEdit, ...props }) {
     const [inspectingShow, setInspectingShow] = useState(null);
+
+    const deleteShow = uuid => firestore.doc(`wheels/${wheelId}/history/${uuid}`).delete();
 
     const updateInspectingShowProp = (show, prop, value) => {
         if (show[prop] === value) return;
-        updateHistoryProp(show.uuid, prop, value);
+
+        firestore.doc(`wheels/${wheelId}/history/${show.uuid}`).update({ [prop]: value })
+
         setInspectingShow(prev => ({ ...prev, [prop]: value }));
     }
 
