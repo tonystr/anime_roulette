@@ -18,21 +18,29 @@ export default function PageRenderer() {
 
     // Load wheel titles and icons
     useEffect(() => {
+        const titlesToUpdate = {};
+        const iconsToUpdate = {};
         for (const wheelId of wheels) {
             if (!wheelTitles[wheelId] || !wheelIcons[wheelId]) {
                 // Prevent duplicate requests by setting the props to a truthy value;
-                if (!wheelTitles[wheelId]) wheelTitles[wheelId] = 'Loading...';
-                if (!wheelIcons[ wheelId]) wheelIcons[ wheelId] = 'Loading...';
+
+                if (!wheelTitles[wheelId]) titlesToUpdate[wheelId] = 'Loading...';
+                if (!wheelIcons[ wheelId]) iconsToUpdate[ wheelId] = 'Loading...';
 
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
-                    if (!snap.exists) return;
+                    if (!snap.exists) {
+                        console.error('Wheel/wheelId not exist when getting wheel titles and icons');
+                        return
+                    }
                     const { title, icon } = snap.data();
                     setWheelTitles(prev => ({ ...prev, [wheelId]: title }));
                     setWheelIcons( prev => ({ ...prev, [wheelId]: icon  }));
                 });
             }
         }
-    }, [wheels.length, wheelIcons, wheelTitles, wheels]);
+        if (Object.keys(titlesToUpdate).length) setWheelTitles(prev => ({ ...prev, ...titlesToUpdate }));
+        if (Object.keys( iconsToUpdate).length)  setWheelIcons(prev => ({ ...prev,  ...iconsToUpdate }));
+    }, [wheels.length, wheels]);
 
     const passWheelId = func => (({ location }) => func(location.pathname.match(/[^/]*$/)[0]));
 

@@ -6,7 +6,6 @@ import confirmAction from '../scripts/confirmAction';
 const weekDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function WheelSettings({ userUid, redirect }) {
-    const [toggle, setToggle] = useState(true);
     const [users, setUsers] = useState(() => []);
     const [iconUrl, setIconUrl] = useState('');
     const iconUrlLoaded = useRef(false);

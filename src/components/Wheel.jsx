@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ReactComponent as ArrowDown } from '../icons/arrow_down.svg';
 import ShowInpsectorModal from './ShowInspectorModal';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
@@ -21,19 +21,21 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
     const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const rotateServer = wheel ? wheel.rotate || null : rotate;
 
+    const showBanners = useMemo(() => shows.map(s => s.banner).join(' |致*,'), [shows]);
     useEffect(() => {
-        for (const show of shows) {
-            if (show.banner && !imageCache[show.banner] && !imageLoading[show.banner]) {
-                imageLoading[show.banner] = true;
-                loadImage({ src: show.banner, maxSeconds : 10 }, status => {
+        const banners = showBanners.split(' |致*,');
+        for (const banner of banners) {
+            if (banner && !imageCache[banner] && !imageLoading[banner]) {
+                imageLoading[banner] = true;
+                loadImage({ src: banner, maxSeconds : 10 }, status => {
                     if (status.err) return console.log(status.err);
-                    imageCache[show.banner] = status.img;
-                    imageLoading[show.banner] = false;
+                    imageCache[banner] = status.img;
+                    imageLoading[banner] = false;
                     setImagesLoaded(prev => prev + 1);
                 });
             }
         }
-    }, [shows]);
+    }, [showBanners]);
 
     useEffect(() => {
         if (compareRotates(rotateServer, rotate) || !rotateServer) return;
@@ -73,16 +75,17 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
             const targetIndex = Math.floor((1 - (off % 1)) * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
-    };
+        // canvasRef, rotate, shows, colors
+    } // useMemo(() => (  ), [rotate?.spinning]);
 
-    // Draw wheel
+    //Draw wheel
     useEffect(() => {
         drawWheel(size);
     }, [canvasRef, size, rotate, rotate?.spinning, shows, colors, imagesLoaded]);
 
     // Resize
     useEffect(() => {
-        if (!widthRef) return;
+        if (!widthRef || !widthRef.current) return;
 
         const observer = new ResizeObserver(obs => {
             const width = obs[0].contentRect.width;
