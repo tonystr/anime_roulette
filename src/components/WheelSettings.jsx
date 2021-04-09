@@ -20,17 +20,20 @@ export default function WheelSettings({ userUid, redirect }) {
         }
     }, [wheel?.icon, iconUrl]);
 
+    const uuidStr = wheel ? wheel.users.join(',') : null;
+
     useEffect(() => {
-        if (!wheel?.users) return;
-        setUsers(prev => wheel.users.map(uuid => ({ name: 'User', uuid })));
-        for (const uuid of wheel.users) {
+        if (!uuidStr) return;
+        const uuids = uuidStr.split(',');
+        setUsers(() => uuids.map(uuid => ({ name: 'User', uuid })));
+        for (const uuid of uuids) {
             firestore.collection('users').doc(uuid).get().then(docSnap => {
                 const userDoc = docSnap.data();
                 const name = userDoc.name;
                 setUsers(prev => prev.map(user => user.uuid === uuid ? ({ ...user, name }) : user));
             })
         }
-    }, [wheel?.users?.length]);
+    }, [uuidStr]);
 
     const updateShowProp = (prop, value) => firestore
         .doc(`wheels/${wheelId}`)

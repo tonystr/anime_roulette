@@ -23,7 +23,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }
 
 export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid }) {
     const [showAside, setShowAside] = useState(true);
-    const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
 
     return (
         <aside className={showAside ? '' : 'hidden'}>

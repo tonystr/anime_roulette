@@ -49,17 +49,14 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
         rotateServer?.offset
     ]);
 
-    const setRotate = useCallback(
-        newRotate => {
-            firestore.doc(`wheels/${wheelId}`).update({
-                rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
-            });
-            setRotateLocal(newRotate);
-        },
-        [rotate, wheelId]
-    );
+    const setRotate = useCallback(newRotate => {
+        firestore.doc(`wheels/${wheelId}`).update({
+            rotate: typeof newRotate === 'function' ? newRotate(rotate) : newRotate
+        });
+        setRotateLocal(newRotate);
+    }, [rotate, wheelId]);
 
-    const drawWheel = size => {
+    const drawWheel = useCallback(size => {
         if (!canvasRef || !canvasRef.current || (rotate && rotate.spinning) || !shows) return;
 
         // Draw wheel
@@ -75,13 +72,12 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
             const targetIndex = Math.floor((1 - (off % 1)) * shows.length);
             setArrowColor(() => pickColor(targetIndex, colors, shows));
         }
-        // canvasRef, rotate, shows, colors
-    } // useMemo(() => (  ), [rotate?.spinning]);
+    }, [canvasRef, rotate, shows, colors]);
 
     //Draw wheel
     useEffect(() => {
         drawWheel(size);
-    }, [canvasRef, size, rotate, rotate?.spinning, shows, colors, imagesLoaded]);
+    }, [drawWheel, canvasRef, size, rotate, rotate?.spinning, shows, colors, imagesLoaded]);
 
     // Resize
     useEffect(() => {
@@ -99,7 +95,7 @@ export default function Wheel({ shows, removeShow, wheelId, users, updateShowPro
         observer.observe(observee);
 
         return () => observer.unobserve(observee);
-    }, [widthRef, size]);
+    }, [drawWheel, widthRef, size]);
 
     // Rotation of doom
     useEffect(() => {
