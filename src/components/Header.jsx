@@ -20,7 +20,7 @@ export default function Header({ user, selectedWheelId, wheelTitle }) {
     return (
         <header>
             <div className='wheel-meta'>
-                {selectedWheelId && user && <AccessRequests wheelName={selectedWheelId} userUid={user?.uid} />}
+                {selectedWheelId && user && <AccessRequests wheelId={selectedWheelId} userUid={user?.uid} />}
             </div>
             <h1>{websiteTitle}</h1>
             <div className="export-import">

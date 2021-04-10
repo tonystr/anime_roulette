@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import firestore, { useDocumentData } from '../firestore';
 
-export default function AccessRequests({ wheelName, userUid }) {
+export default function AccessRequests({ wheelId, userUid }) {
     const [userNames, setUserNames] = useState({});
 
-    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelName}`));
+    const [wheel] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const requests = wheel?.accessRequests;
     const wheelOwner = wheel?.owner;
 
@@ -23,17 +23,15 @@ export default function AccessRequests({ wheelName, userUid }) {
     }, [requests, userNames]);
 
     const accept = uuid => {
-        const newRequests = requests.filter(user => user !== uuid);
-        firestore.doc(`wheels/${wheelName}`).update({
-            accessRequests: newRequests,
+        firestore.doc(`wheels/${wheelId}`).update({
+            accessRequests: requests.filter(user => user !== uuid),
             users: [...wheel.users, uuid]
         });
     };
 
     const reject = uuid => {
-        const newRequests = requests.filter(user => user !== uuid);
-        firestore.doc(`wheels/${wheelName}`).update({
-            accessRequests: newRequests
+        firestore.doc(`wheels/${wheelId}`).update({
+            accessRequests: requests.filter(user => user !== uuid)
         });
     };
 
