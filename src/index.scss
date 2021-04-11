@@ -70,6 +70,10 @@ aside {
         align-items: center;
         position: relative;
 
+        > :first-child {
+            margin-top: .9rem;
+        }
+
         &::before {
             content: '';
             border-top: 2px solid #28282a;
@@ -78,12 +82,40 @@ aside {
         }
     }
 
+
+    .wheel-button-wrapper {
+        height: 50px;
+        margin-bottom: .9rem;
+        position: relative;
+
+        &:hover .title {
+            opacity: 1;
+        }
+
+        .title {
+            opacity: 0;
+            color: #e3e3c3;
+            transition: opacity .14s;
+            position: absolute;
+            left: calc(100% + .6rem);
+            font-size: 1.1rem;
+            pointer-events: none;
+            width: auto;
+            white-space: nowrap;
+            background-color: #111;
+            border-radius: .4rem;
+            padding: .2rem .5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 1px 8px rgba(0,0,0,.3);
+        }
+    }
+
     .wheel-button {
         width:  50px;
         height: 50px;
         overflow: hidden;
         position: relative;
-        margin-top: .9rem;
         background-color: #515262;
         color: #e3e3c3;
         box-shadow: -68px 0 0 2px #8ea091,

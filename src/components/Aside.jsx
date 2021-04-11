@@ -8,16 +8,19 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
     return (
-        <button className={`wheel-button ${selected ? 'selected' : ''}`}>
-            {wheelIcon && wheelIcon !== 'Loading...' ?
-                <img src={wheelIcon} alt={iconTitle(wheelTitle)} /> :
-                <span className='icon-title'>{iconTitle(wheelTitle)}</span>}
-            {selected && isOwner && (
-                <Link to={`/wheels/${wheelId}/settings`}>
-                    <span className='settings-button'><SettingsIcon /></span>
-                </Link>
-            )}
-        </button>
+        <div className='wheel-button-wrapper'>
+            <div className='title'>{wheelTitle}</div>
+            <button className={`wheel-button ${selected ? 'selected' : ''}`}>
+                {wheelIcon && wheelIcon !== 'Loading...' ?
+                    <img src={wheelIcon} alt={iconTitle(wheelTitle)} /> :
+                    <span className='icon-title'>{iconTitle(wheelTitle)}</span>}
+                {selected && isOwner && (
+                    <Link to={`/wheels/${wheelId}/settings`}>
+                        <span className='settings-button'><SettingsIcon /></span>
+                    </Link>
+                )}
+            </button>
+        </div>
     );
 }
 
