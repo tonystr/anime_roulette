@@ -40,7 +40,7 @@ export default function PageRenderer() {
         }
         if (Object.keys(titlesToUpdate).length) setWheelTitles(prev => ({ ...prev, ...titlesToUpdate }));
         if (Object.keys( iconsToUpdate).length)  setWheelIcons(prev => ({ ...prev,  ...iconsToUpdate }));
-    }, [wheels.length, wheels]);
+    }, [wheels.length, wheels]); // eslint-disable-line
 
     const passWheelId = func => (({ location }) => func(location.pathname.match(/[^/]*$/)[0]));
 
