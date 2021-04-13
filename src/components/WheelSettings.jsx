@@ -71,6 +71,8 @@ export default function WheelSettings({ userUid, redirect }) {
         });
     }
 
+    const wheelUrl = window.location.href.slice(0, window.location.href.match(/\/settings\/?$/).index);
+
     return (
         <div id='wheel-settings'>
             <h2>Manage wheel <span className='wheel-title'>{wheel?.title}</span></h2>
@@ -104,8 +106,10 @@ export default function WheelSettings({ userUid, redirect }) {
                 </div>
                 {wheel?.private ?? false ?
                     <p>This wheel is currently set to <b>private</b>. Users need an account to view this wheel, and they must be given access by you. You can see all users with access in the list below. </p> :
-                    <p>This wheel is currently set to <b>public</b>. Anyone can view (but not interract with) the wheel by visiting this link: <Link to={window.location.href}>{window.location.href}</Link></p>}
+                    <p>This wheel is currently set to <b>public</b>. Anyone can view (but not interract with) the wheel by visiting this link: <a href={wheelUrl}>{wheelUrl}</a></p>}
             </div>
+            <h3>Invite link</h3>
+            <a href={wheelUrl}>{wheelUrl}</a>
             <ul className='users'>
                 {users.map(user => (
                     <li key={user.uuid}>
