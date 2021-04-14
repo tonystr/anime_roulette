@@ -48,9 +48,27 @@ aside {
     background-color: #191919;
     width: 70px;
     transition: width .2s;
+    position: relative;
+
+    .bottom {
+        transition: transform .2s;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        $pad: .2rem;
+        padding: .5rem .2rem;
+        width: calc(70px - #{$pad * 2});
+        background-color: #191919;
+        color: #6a6a66;
+        text-align: center;
+    }
 
     &.hidden {
         width: 0;
+
+        .bottom {
+            transform: translateX(-70px);
+        }
 
         .content {
             transform: translateX(-50px);

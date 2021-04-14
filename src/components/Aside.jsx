@@ -57,6 +57,9 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                     <button className='wheel-button add-new'><span className='icon-title'>+</span></button>
                 </NavLink>
             </div>
+            <div className='bottom'>
+                Sign out
+            </div>
         </aside>
     );
 }
