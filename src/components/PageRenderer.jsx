@@ -30,7 +30,7 @@ export default function PageRenderer() {
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) {
                         console.error('Wheel/wheelId not exist when getting wheel titles and icons');
-                        return
+                        return;
                     }
                     const { title, icon } = snap.data();
                     setWheelTitles(prev => ({ ...prev, [wheelId]: title }));

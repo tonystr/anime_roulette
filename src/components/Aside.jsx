@@ -2,7 +2,19 @@ import React, { useState } from 'react';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 import { ReactComponent as SettingsIcon } from '../icons/settings.svg';
 import { NavLink, Link } from 'react-router-dom';
-import firestore, { useDocumentData } from '../firestore';
+import firestore, { useDocumentData, auth } from '../firestore';
+
+function SignOut({ className='', ...props }) {
+    return auth.currentUser ? (
+        <button
+            {...props}
+            className={'clickable-faded ' + className}
+            onClick={() => auth.signOut()}
+        >
+            Sign out
+        </button>
+    ) : null;
+}
 
 function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }) {
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
@@ -58,7 +70,7 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                 </NavLink>
             </div>
             <div className='bottom'>
-                Sign out
+                <SignOut />
             </div>
         </aside>
     );

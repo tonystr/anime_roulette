@@ -61,6 +61,10 @@ aside {
         background-color: #191919;
         color: #6a6a66;
         text-align: center;
+
+        > button {
+            padding: 0;
+        }
     }
 
     &.hidden {
