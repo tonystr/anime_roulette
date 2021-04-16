@@ -63,7 +63,6 @@ export default function PageRenderer() {
                         <Header
                             user={user}
                             selectedWheelId={selectedWheelId}
-                            wheelTitle={wheelTitles[selectedWheelId] || selectedWheelId}
                         />
                     ))} />
                     <main>
