@@ -1,7 +1,7 @@
 import React from 'react';
 import AccessRequests from './AccessRequests';
 
-export default function Header({ user, selectedWheelId }) {
+export default function Header({ user, selectedWheelId, wheelTitle }) {
     const websiteTitle = false ? 'Anime Roulette' : 'Roulette Wheel';
 
     return (
@@ -9,7 +9,7 @@ export default function Header({ user, selectedWheelId }) {
             <div className='wheel-meta'>
                 {selectedWheelId && user && <AccessRequests wheelId={selectedWheelId} userUid={user?.uid} />}
             </div>
-            <h1>{websiteTitle}</h1>
+            <h1>{wheelTitle ?? websiteTitle}</h1>
         </header>
     )
 }
