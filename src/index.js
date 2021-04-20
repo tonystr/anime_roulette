@@ -11,5 +11,7 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
+// Emergency comment!
+
 // reportWebVitals(console.log) || https://bit.ly/CRA-vitals
 reportWebVitals();
