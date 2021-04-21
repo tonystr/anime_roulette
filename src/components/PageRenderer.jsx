@@ -72,7 +72,7 @@ export default function PageRenderer() {
                         <Route path='/' render={() => user && !userData && !userDataLoading && <Redirect to='/register' />} />
                         <Route path='/register' render={() => <RegisterUser userUid={user?.uid} userIsRegistered={!!userData} />} />
 
-                        <Route path='/select_wheel' render={({ history }) => user && userData && (
+                        <Route exact path={['/select_wheel', '/']} render={({ history }) => user && userData && (
                             <ManageWheels
                                 uid={user.uid}
                                 userWheels={wheels}
