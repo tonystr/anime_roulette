@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 import { ReactComponent as SettingsIcon } from '../icons/settings.svg';
+import { ReactComponent as LeaveIcon } from '../icons/logout.svg';
 import { NavLink, Link } from 'react-router-dom';
 import firestore, { useDocumentData, auth } from '../firestore';
 
@@ -16,7 +17,7 @@ function SignOut({ className='', ...props }) {
     ) : null;
 }
 
-function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }) {
+function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false, ownerLoading=false }) {
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
     return (
@@ -26,10 +27,14 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }
                 {wheelIcon && wheelIcon !== 'Loading...' ?
                     <img src={wheelIcon} alt={iconTitle(wheelTitle)} /> :
                     <span className='icon-title'>{iconTitle(wheelTitle)}</span>}
-                {selected && isOwner && (
-                    <Link to={`/wheels/${wheelId}/settings`}>
-                        <span className='settings-button'><SettingsIcon /></span>
-                    </Link>
+                {selected && !ownerLoading && (
+                    isOwner ? (
+                        <Link to={`/wheels/${wheelId}/settings`}>
+                            <span className='sub-button settings'><SettingsIcon /></span>
+                        </Link>
+                    ) : (
+                        <span className='sub-button leave'><LeaveIcon /></span>
+                    )
                 )}
             </button>
         </div>
@@ -38,7 +43,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false }
 
 export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid }) {
     const [showAside, setShowAside] = useState(true);
-    const [wheel] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
+    const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
 
     return (
         <aside className={showAside ? '' : 'hidden'}>
@@ -54,6 +59,7 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                         wheelTitle={wheelTitles[wheelId]}
                         selected={wheelId === selectedWheelId}
                         isOwner={userUid && wheel?.owner === userUid}
+                        ownerLoading={wheelLoading}
                     />
                 ) : (
                     <NavLink key={wheelId} to={`/wheels/${wheelId}`}>
