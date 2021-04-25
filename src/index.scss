@@ -165,13 +165,18 @@ aside {
             right: 0;
             margin: 0;
             padding: 3px;
-            background-color: #515262;
             opacity: 0;
-            fill: #e3e3c3;
 
             &.settings {
                 top: 0;
                 border-bottom-left-radius: 8px;
+                background-color: #515262;
+                fill: #e3e3c3;
+
+                &:hover {
+                    background-color: #8ea091;
+                    fill: #fff;
+                }
             }
 
             &.leave {
@@ -180,19 +185,14 @@ aside {
                 background-color: #333333;
                 fill: #af4040;
 
-                svg {
-                    transform: translate(2px, 1px);
-                }
-
                 &:hover {
                     background-color: #543344;
                     fill: #ff3030;
                 }
-            }
 
-            &:hover {
-                background-color: #8ea091;
-                fill: #fff;
+                svg {
+                    transform: translate(2px, 1px);
+                }
             }
 
             svg {
