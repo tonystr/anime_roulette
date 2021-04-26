@@ -17,7 +17,7 @@ function SignOut({ className='', ...props }) {
     ) : null;
 }
 
-function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false, ownerLoading=false }) {
+function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, leaveWheel, isOwner=false, ownerLoading=false }) {
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
 
     return (
@@ -33,7 +33,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false, 
                             <span className='sub-button settings'><SettingsIcon /></span>
                         </Link>
                     ) : (
-                        <span className='sub-button leave'><LeaveIcon /></span>
+                        <span className='sub-button leave' onClick={() => leaveWheel(wheelId)}><LeaveIcon /></span>
                     )
                 )}
             </button>
@@ -41,7 +41,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, isOwner=false, 
     );
 }
 
-export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid }) {
+export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid, leaveWheel }) {
     const [showAside, setShowAside] = useState(true);
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
 
@@ -60,6 +60,7 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                         selected={wheelId === selectedWheelId}
                         isOwner={userUid && wheel?.owner === userUid}
                         ownerLoading={wheelLoading}
+                        leaveWheel={leaveWheel}
                     />
                 ) : (
                     <NavLink key={wheelId} to={`/wheels/${wheelId}`}>
@@ -68,6 +69,7 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                             wheelIcon={wheelIcons[wheelId]}
                             wheelTitle={wheelTitles[wheelId]}
                             selected={wheelId === selectedWheelId}
+                            leaveWheel={leaveWheel}
                         />
                     </NavLink>
                 ))}

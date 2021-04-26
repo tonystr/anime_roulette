@@ -43,8 +43,11 @@ export default function PageRenderer() {
     }, [wheels.length, wheels]); // eslint-disable-line
 
     const passWheelId = func => (({ location }) => func(location.pathname.match(/[^/]*$/)[0]));
-
-    // <Redirect exact from='/' to={wheels[0] ? `/wheels/${wheels[0]}` : '/select_wheel'} />
+    
+    const leaveWheel = wheelId => {
+        if (!user.uid || !wheels || !wheels.length) return;
+        firestore.doc(`users/${user.uid}`).update({ wheels: wheels.filter(w => w !== wheelId) })
+    };
 
     return (
         <BrowserRouter>
@@ -56,6 +59,7 @@ export default function PageRenderer() {
                         wheelTitles={wheelTitles}
                         selectedWheelId={selectedWheelId}
                         userUid={user?.uid}
+                        leaveWheel={leaveWheel}
                     />
                 ))} />
                 <div className='main-content'>
