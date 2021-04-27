@@ -8,10 +8,11 @@ import { useParams } from 'react-router-dom';
 
 window.arrays = [];
 
-export default function WheelPage({ userUid }) {
+export default function WheelPage({ userUid, wheels }) {
     const [users, setUsers] = useState(() => []);
     const [requested, setRequested] = useState(false);
     const { wheelId } = useParams();
+    const [hasUpdatedWheels, setHasUpdatedWheels] = useState(false);
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const userCanEdit = wheel?.users?.includes(userUid);
     const userCanView = userCanEdit || !wheel?.private;
@@ -29,6 +30,13 @@ export default function WheelPage({ userUid }) {
             })
         }
     }, [joinedUsers]);
+
+    // Assert wheel's prescence in wheels array
+    useEffect(() => {
+        if (wheels && wheels.length && !wheels.includes(wheelId)) {
+            firestore.doc(`users/${userUid}`).update({ wheels: [...wheels, wheelId] });
+        }
+    }, [wheels]);
 
     const wheelRef = firestore.doc(`wheels/${wheelId}`);
 
