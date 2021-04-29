@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 import { ReactComponent as SettingsIcon } from '../icons/settings.svg';
 import { ReactComponent as LeaveIcon } from '../icons/logout.svg';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, Redirect } from 'react-router-dom';
 import firestore, { useDocumentData, auth } from '../firestore';
 
 function SignOut({ className='', ...props }) {
@@ -43,10 +43,17 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, leaveWheel, isO
 
 export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid, leaveWheel }) {
     const [showAside, setShowAside] = useState(true);
+    const [redirect, setRedirect] = useState(null);
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
+
+    const leaveWheelRedirect = wheelId => {
+        leaveWheel(wheelId);
+        setRedirect(() => '/');
+    }
 
     return (
         <aside className={showAside ? '' : 'hidden'}>
+            {redirect && <Redirect to={redirect} />}
             <div className='hamburger'>
                 <HamburgerMenuIcon width='24' height='24' onClick={() => setShowAside(prev => !prev)} />
             </div>
@@ -60,7 +67,7 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
                         selected={wheelId === selectedWheelId}
                         isOwner={userUid && wheel?.owner === userUid}
                         ownerLoading={wheelLoading}
-                        leaveWheel={leaveWheel}
+                        leaveWheel={leaveWheelRedirect}
                     />
                 ) : (
                     <NavLink key={wheelId} to={`/wheels/${wheelId}`}>

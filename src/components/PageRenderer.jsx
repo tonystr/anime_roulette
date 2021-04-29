@@ -46,7 +46,7 @@ export default function PageRenderer() {
 
     const leaveWheel = wheelId => {
         if (!user.uid || !wheels || !wheels.length) return;
-        firestore.doc(`users/${user.uid}`).update({ wheels: wheels.filter(w => w !== wheelId) })
+        firestore.doc(`users/${user.uid}`).update({ wheels: wheels.filter(w => w !== wheelId) });
     };
 
     return (
