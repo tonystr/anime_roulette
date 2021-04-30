@@ -28,7 +28,7 @@ export default function NoWheelAccess({ wheel, userUid }) {
     return (
         <div id='no-wheel-access'>
             <p>
-                There is either no wheel here, or the wheel's visibility is set to private.
+                There either is no wheel here, or the wheel's visibility is set to private.
             </p>
             {requested ?
                 <p>You have requested access. Wait for the owner to accept.</p> :

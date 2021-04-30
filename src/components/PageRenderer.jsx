@@ -29,6 +29,8 @@ export default function PageRenderer() {
 
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) {
+                        setWheelTitles(prev => ({ ...prev, [wheelId]: null }));
+                        setWheelIcons( prev => ({ ...prev, [wheelId]: null }));
                         console.error('Wheel/wheelId not exist when getting wheel titles and icons');
                         return;
                     }
@@ -42,7 +44,7 @@ export default function PageRenderer() {
         if (Object.keys( iconsToUpdate).length)  setWheelIcons(prev => ({ ...prev,  ...iconsToUpdate }));
     }, [wheels.length, wheels]); // eslint-disable-line
 
-    const passWheelId = func => (({ location }) => func(location.pathname.match(/[^/]*$/)[0]));
+    const passWheelId = func => ({ location }) => func(location.pathname.match(/[^/]*$/)[0]);
 
     const leaveWheel = wheelId => {
         if (!user.uid || !wheels || !wheels.length) return;
@@ -67,7 +69,7 @@ export default function PageRenderer() {
                         <Header
                             user={user}
                             selectedWheelId={selectedWheelId}
-                            wheelTitle={wheelTitles[selectedWheelId]}
+                            wheelTitle={wheels.includes(selectedWheelId) ? wheelTitles[selectedWheelId] : 'Anime Roulette'}
                         />
                     ))} />
                     <main>
