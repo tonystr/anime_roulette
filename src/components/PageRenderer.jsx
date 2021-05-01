@@ -29,7 +29,7 @@ export default function PageRenderer() {
 
                 firestore.collection('wheels').doc(wheelId).get().then(snap => {
                     if (!snap.exists) {
-                        setWheelTitles(prev => ({ ...prev, [wheelId]: null }));
+                        setWheelTitles(prev => ({ ...prev, [wheelId]: 'Unknown Wheel' }));
                         setWheelIcons( prev => ({ ...prev, [wheelId]: null }));
                         console.error('Wheel/wheelId not exist when getting wheel titles and icons');
                         return;

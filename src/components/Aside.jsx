@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReactComponent as HamburgerMenuIcon } from '../icons/hamenu.svg';
 import { ReactComponent as SettingsIcon } from '../icons/settings.svg';
 import { ReactComponent as LeaveIcon } from '../icons/logout.svg';
-import { NavLink, Link, Redirect } from 'react-router-dom';
+import { NavLink, Link, Redirect, useHistory } from 'react-router-dom';
 import firestore, { useDocumentData, auth } from '../firestore';
 
 function SignOut({ className='', ...props }) {
@@ -45,11 +45,16 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
     const [showAside, setShowAside] = useState(true);
     const [redirect, setRedirect] = useState(null);
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
+    const history = useHistory();
 
     const leaveWheelRedirect = wheelId => {
-        leaveWheel(wheelId);
         setRedirect(() => '/');
+        leaveWheel(wheelId);
     }
+
+    useEffect(() => {
+        history.listen(() => setRedirect(() => null));
+    }, []);
 
     return (
         <aside className={showAside ? '' : 'hidden'}>
