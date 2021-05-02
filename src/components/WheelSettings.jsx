@@ -73,6 +73,22 @@ export default function WheelSettings({ userUid, redirect }) {
 
     const wheelUrl = window.location.href.slice(0, window.location.href.match(/\/settings\/?$/).index);
 
+    const copyWheelUrl = () => {
+        const input = document.getElementById('wheel-url-input');
+
+        input.style = `
+            display: block;
+            position: absolute;
+            top: -10000px;
+            left: -100000px;
+        `;
+        input.select();
+        input.setSelectionRange(0, 99999); /* For mobile devices */
+
+        document.execCommand('copy');
+        input.style = 'display: none;';
+    };
+
     return (
         <div id='wheel-settings'>
             <h2>Manage wheel <span className='wheel-title'>{wheel?.title}</span></h2>
@@ -109,7 +125,11 @@ export default function WheelSettings({ userUid, redirect }) {
                     <p>This wheel is currently set to <b>public</b>. Anyone can view (but not interract with) the wheel by visiting this link: <a href={wheelUrl}>{wheelUrl}</a></p>}
             </div>
             <h3>Invite link</h3>
-            <a href={wheelUrl}>{wheelUrl}</a>
+            <div>
+                <a href={wheelUrl}>{wheelUrl}</a>
+                <input id='wheel-url-input' value={wheelUrl} style={{ display: 'none' }} />
+                <button onClick={copyWheelUrl}>copy</button>
+            </div>
             <ul className='users'>
                 {users.map(user => (
                     <li key={user.uuid}>
