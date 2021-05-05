@@ -242,7 +242,8 @@ aside {
             position: absolute;
             text-align: center;
             font-size: 1.2rem;
-            top: 12px;
+            font-family: Verdana;
+            top: 13px;
             left: 0;
             right: 0;
             color: #e3e3c3;
@@ -257,6 +258,10 @@ aside {
             width: 100%;
             height: 100%;
             color: #ff3030;
+            -webkit-backface-visibility: hidden;
+            -ms-transform: translateZ(0); /* IE 9 */
+            -webkit-transform: translateZ(0); /* Chrome, Safari, Opera */
+            transform: translateZ(0);
         }
     }
 
