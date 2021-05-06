@@ -42,7 +42,7 @@ function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, leaveWheel, isO
 }
 
 export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId, userUid, leaveWheel }) {
-    const [showAside, setShowAside] = useState(true);
+    const [showAside, setShowAside] = useState(localStorage.getItem('show-aside') === 'false' ? false : true);
     const [redirect, setRedirect] = useState(null);
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${selectedWheelId || 'UNDEFINED'}`));
     const history = useHistory();
@@ -52,9 +52,10 @@ export default function Aside({ wheels, wheelIcons, wheelTitles, selectedWheelId
         leaveWheel(wheelId);
     }
 
-    useEffect(() => {
-        history.listen(() => setRedirect(() => null));
-    }, []);
+    useEffect(() => history.listen(() => setRedirect(() => null)), []);
+    useEffect(() => localStorage.setItem('show-aside', showAside), [showAside]);
+
+    console.log('showAside is:', showAside ? 'true' : 'false');
 
     return (
         <aside className={showAside ? '' : 'hidden'}>
