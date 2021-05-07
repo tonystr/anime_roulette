@@ -1,0 +1,29 @@
+{
+    "event-roles": [
+        {
+            "title": "VN challenge",
+            "role-id": 635657222067847198,
+            "emoji": "🖋️"
+        },
+        {
+            "title": "book club",
+            "role-id": 744315065179701399,
+            "emoji": "📖"
+        },
+        {
+            "title": "reading stream",
+            "role-id": 747137103569092729,
+            "emoji": "📹"
+        },
+        {
+            "title": "conversation club",
+            "role-id": 832980546152824853,
+            "emoji": "💬"
+        },
+        {
+            "title": "movie club",
+            "role-id": 838402651943075910,
+            "emoji": "🎥"
+        }
+    ]
+}
