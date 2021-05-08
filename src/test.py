@@ -23,7 +23,7 @@ class Reactions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         #  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: IMPLEMENT DOWNLOADING FOR REAL  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        self.event_roles = DOWNLOAD DATA FROM TEST.JSON."event-roles"
+        self.event_roles = DOWNLOAD DATA FROM TEST.JSON."event-roles" (load string and use json.loads() maybe idk)
 
     @commands.Cog.listener()
     async def on_ready(self):
