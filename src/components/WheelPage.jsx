@@ -76,9 +76,7 @@ export default function WheelPage({ userUid, wheels }) {
         if (!wheel) return;
         const docRef = firestore.doc(`wheels${window.location.pathname.match(/\/[^/]+$/)}`)
         docRef.get().then(docSnap => {
-            if (!docSnap.exists) {
-                return;
-            }
+            if (!docSnap.exists) return;
 
             const accessRequests = docSnap.data()?.accessRequests || [];
 
