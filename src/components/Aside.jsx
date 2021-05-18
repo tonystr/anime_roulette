@@ -19,7 +19,7 @@ function SignOut({ className='', ...props }) {
 
 function WheelButton({ wheelId, wheelIcon, wheelTitle, selected, leaveWheel, isOwner=false, ownerLoading=false }) {
     const iconTitle = title => (title || '???').replace(/\W*(\w)\w+\W*/g, '$1').toUpperCase();
-
+//as
     return (
         <div className='wheel-button-wrapper'>
             <div className='title'>{wheelTitle}</div>
