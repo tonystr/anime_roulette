@@ -12,7 +12,6 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[] }) {
     const [success, setSuccess] = useState('');
     const [requestDisabled, setRequestDisabled] = useState(true);
     const [ownDisabled, setOwnDisabled] = useState(true);
-    const noWheels = userWheels.length < 1
 
     const requestAccess = () => {
         if (requestDisabled) return;
@@ -89,7 +88,7 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[] }) {
 
     return (
         <div className='no-wheels page-form'>
-            <h2>{noWheels ? 'You don\'t have access to any wheels' : 'Select a wheel from the side-menu, or'}</h2>
+            <h2>{userWheels.length < 1 ? 'You don\'t have access to any wheels' : 'Select a wheel from the side-menu, or'}</h2>
             <div>
                 <label htmlFor='request-access'>Request access:</label>
                 <input
