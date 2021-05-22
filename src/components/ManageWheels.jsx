@@ -79,11 +79,10 @@ export default function ManageWheels({ uid, selectWheelName, userWheels=[] }) {
             return;
         }
 
-        firestore.collection('wheels').doc(ownName).get().then(docSnap => {
+        firestore.doc(`wheels/${ownName}`).get().then(docSnap => {
             setError(() => docSnap.exists ? 'Error: Wheel name taken' : '');
             setOwnDisabled(() => docSnap.exists);
         });
-
     }, [ownName]);
 
     return (
