@@ -133,6 +133,20 @@ aside {
         }
     }
 
+    .kofi-link {
+        img {
+            transition: .14s all;
+            border-radius: 50%;
+
+            &:hover {
+                border-radius: 9px;
+                box-shadow: 0 0 18px rgba(#fff,.4);
+            }
+        }
+
+        margin-bottom: .7rem;
+    }
+
     .wheel-button {
         width:  50px;
         height: 50px;
@@ -259,6 +273,7 @@ aside {
             height: 100%;
             color: #ff3030;
             -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
             -ms-transform: translateZ(0); /* IE 9 */
             -webkit-transform: translateZ(0); /* Chrome, Safari, Opera */
             transform: translateZ(0);
@@ -1413,9 +1428,6 @@ header h1 {
             font-size: 1.3rem;
             margin: .5rem; // calc(.85rem - .15rem)
             margin-right: .8rem;
-        }
-
-        .kick-button {
         }
 
         .owner-tag {

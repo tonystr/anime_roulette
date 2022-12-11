@@ -6,13 +6,10 @@ import History from './History';
 import NoWheelAccess from './NoWheelAccess';
 import { useParams } from 'react-router-dom';
 
-window.arrays = [];
-
 export default function WheelPage({ userUid, wheels }) {
     const [users, setUsers] = useState(() => []);
     const [requested, setRequested] = useState(false);
     const { wheelId } = useParams();
-    const [hasUpdatedWheels, setHasUpdatedWheels] = useState(false);
     const [wheel, wheelLoading] = useDocumentData(firestore.doc(`wheels/${wheelId}`));
     const userCanEdit = wheel?.users?.includes(userUid);
     const userCanView = userCanEdit || !wheel?.private;
@@ -21,7 +18,7 @@ export default function WheelPage({ userUid, wheels }) {
     useEffect(() => {
         if (!joinedUsers) return;
         const wheelUsers = joinedUsers.split(',');
-        setUsers(prev => wheelUsers.map(uuid => ({ name: 'User', uuid })));
+        setUsers(() => wheelUsers.map(uuid => ({ name: 'User', uuid })));
         for (const uuid of wheelUsers) {
             firestore.collection('users').doc(uuid).get().then(docSnap => {
                 const userDoc = docSnap.data();

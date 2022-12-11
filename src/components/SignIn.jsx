@@ -8,7 +8,6 @@ export default function SignIn() {
     return (
         <div className='sign-in-page'>
             <div className='background'>
-                <img src='./nadeko.png' alt='' />
             </div>
             <div className='middle-center'>
                 <div className='info'>
